@@ -34,11 +34,11 @@ class SpaceApp(tk.Frame):
 		self._Entry_folder.grid(row = 1, column = 0, padx = (5,0), sticky = tk.W)
 		self._Button_browse.grid(row = 1, column = 1, padx = 5)
 		self._Frame_input.grid(row = 0, sticky = tk.W)
-		# -- normalize is by itself, no sub-frame
+		# -- normalize is by itself, no sub-frame --
 		self._Var_normalize = tk.IntVar()
 		self._Checkbutton_normalize = tk.Checkbutton(self._LabelFrame_data, text = "Normalize data during import", variable = self._Var_normalize)
 		self._Checkbutton_normalize.grid(row = 1, sticky = tk.W)
-		# -- pca sub-frame
+		# -- pca sub-frame --
 		self._Frame_pca = tk.Frame(self._LabelFrame_data)
 		self._Var_pca = tk.IntVar()
 		self._Checkbutton_pca = tk.Checkbutton(self._Frame_pca, text = "Perform PCA", variable = self._Var_pca)
@@ -47,9 +47,20 @@ class SpaceApp(tk.Frame):
 		self._Checkbutton_pca.grid(row = 0, sticky = tk.W)
 		self._Label_pca_text.grid(row = 1, column = 0, sticky = tk.W)
 		self._Entry_pca.grid(row = 1, column = 1)
-		self._Frame_pca.grid(row = 2, sticky = tk.W)
+		self._Frame_pca.grid(row = 2, pady = (0,5), sticky = tk.W)
 		# data widgets grid
 		self._LabelFrame_data.grid(padx = (10,0), pady = (5,0))
+
+		# kmeans widgets
+		self._LabelFrame_kmeans = tk.LabelFrame(self, text = "K-means algorithm")
+		self._Var_kmeans = tk.IntVar()
+		self._Checkbutton_kmeans = tk.Checkbutton(self._LabelFrame_kmeans, text = "Perform K-means", variable = self._Var_kmeans)
+		self._Checkbutton_kmeans.grid(row = 0, sticky = tk.W)
+		self._Label_k = tk.Label(self._LabelFrame_kmeans, text = "Number of clusters (k):")
+		self._Entry_k = tk.Entry(self._LabelFrame_kmeans, width = 5)
+		self._Label_k.grid(row = 1, column = 0, sticky = tk.W)
+		self._Entry_k.grid(row = 1, column = 1, pady = (0,5))
+		self._LabelFrame_kmeans.grid(padx = (10,0), pady = (30,0), sticky = tk.EW)
 
 	def _quick_message_box(self, text):
 		"""A quick and dirty messagebox for showing simple output for debugging."""
