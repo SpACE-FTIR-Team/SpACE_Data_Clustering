@@ -49,7 +49,7 @@ class SpaceApp(tk.Frame):
 		self._Entry_pca.grid(row = 1, column = 1)
 		self._Frame_pca.grid(row = 2, pady = (0,5), sticky = tk.W)
 		# data widgets grid
-		self._LabelFrame_data.grid(padx = (10,0), pady = (5,0))
+		self._LabelFrame_data.grid(row = 0, column = 0, padx = (10,0), pady = (5,0))
 
 		# kmeans widgets
 		self._LabelFrame_kmeans = tk.LabelFrame(self, text = "K-means algorithm")
@@ -60,7 +60,8 @@ class SpaceApp(tk.Frame):
 		self._Entry_k = tk.Entry(self._LabelFrame_kmeans, width = 5)
 		self._Label_k.grid(row = 1, column = 0, pady = (0,5), sticky = tk.W)
 		self._Entry_k.grid(row = 1, column = 1, pady = (0,5))
-		self._LabelFrame_kmeans.grid(padx = (10,0), pady = (30,0), sticky = tk.EW)
+		# kmeans grid
+		self._LabelFrame_kmeans.grid(row = 1, column = 0, padx = (10,0), pady = (30,0), sticky = tk.EW)
 
 		# dbscan widgets
 		self._LabelFrame_dbscan = tk.LabelFrame(self, text = "DBSCAN algorithm")
@@ -78,7 +79,16 @@ class SpaceApp(tk.Frame):
 		self._Label_minpts.grid(row = 1, column = 0, sticky = tk.E)
 		self._Entry_minpts.grid(row = 1, column = 1, sticky = tk.W)
 		self._Frame_dbscan_parameters.grid(row = 1, pady = (0, 5), sticky = tk.W)
-		self._LabelFrame_dbscan.grid(padx = (10,0), pady = (5,0), sticky = tk.EW)
+		# dbscan grid
+		self._LabelFrame_dbscan.grid(row = 2, column = 0, padx = (10,0), pady = (5,0), sticky = tk.EW)
+
+		# action buttons
+		self._Frame_action_buttons = tk.Frame(self)
+		self._Button_go = tk.Button(self._Frame_action_buttons, text = "Go", width = 15, command = self._on_go)
+		self._Button_save = tk.Button(self._Frame_action_buttons, text = "Save", width = 15, command = self._on_save, state = "disabled")
+		self._Button_go.grid(pady = 10)
+		self._Button_save.grid(pady = 10)
+		self._Frame_action_buttons.grid(row = 3, column = 0, pady = 30)
 
 	def _quick_message_box(self, text):
 		"""A quick and dirty messagebox for showing simple output for debugging."""
@@ -86,6 +96,12 @@ class SpaceApp(tk.Frame):
 
 	def _on_browse(self):
 		self._quick_message_box("Congrats, you clicked the Browse button.")
+
+	def _on_go(self):
+		self._quick_message_box("Congrats, you clicked the Go button.")
+	
+	def _on_save(self):
+		self._quick_message_box("Congrats, you clicked the Save button.")
 
 	def _on_close(self):
 		self.master.destroy()
