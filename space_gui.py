@@ -23,14 +23,32 @@ class SpaceApp(tk.Frame):
 
 	def _create_widgets(self):
 		"""Create and configure all the widgets in the main frame."""
-		# data
+		# data widgets
 		self._LabelFrame_data = tk.LabelFrame(self, text = "Data")
-		self._Label_data_text = tk.Label(self._LabelFrame_data, text = "Input folder:")
-		self._Entry_folder = tk.Entry(self._LabelFrame_data, width = 30)
-		self._Button_browse = tk.Button(self._LabelFrame_data, text = "Browse...", command = self._on_browse)
-		self._Label_data_text.grid(row = 0, column = 0, padx = (5,0), sticky = tk.W)
+		# -- input sub-frame --
+		self._Frame_input = tk.Frame(self._LabelFrame_data)
+		self._Label_data_text = tk.Label(self._Frame_input, text = "Input folder:")
+		self._Entry_folder = tk.Entry(self._Frame_input, width = 30)
+		self._Button_browse = tk.Button(self._Frame_input, text = "Browse...", command = self._on_browse)
+		self._Label_data_text.grid(row = 0, column = 0, padx = (0,0), sticky = tk.W)
 		self._Entry_folder.grid(row = 1, column = 0, padx = (5,0), sticky = tk.W)
-		self._Button_browse.grid(row  = 1, column = 1, padx = 5)
+		self._Button_browse.grid(row = 1, column = 1, padx = 5)
+		self._Frame_input.grid(row = 0, sticky = tk.W)
+		# -- normalize is by itself, no sub-frame
+		self._Var_normalize = tk.IntVar()
+		self._Checkbutton_normalize = tk.Checkbutton(self._LabelFrame_data, text = "Normalize data during import", variable = self._Var_normalize)
+		self._Checkbutton_normalize.grid(row = 1, sticky = tk.W)
+		# -- pca sub-frame
+		self._Frame_pca = tk.Frame(self._LabelFrame_data)
+		self._Var_pca = tk.IntVar()
+		self._Checkbutton_pca = tk.Checkbutton(self._Frame_pca, text = "Perform PCA", variable = self._Var_pca)
+		self._Label_pca_text = tk.Label(self._Frame_pca, text = "Number of dimensions:")
+		self._Entry_pca = tk.Entry(self._Frame_pca, width = 5)
+		self._Checkbutton_pca.grid(row = 0, sticky = tk.W)
+		self._Label_pca_text.grid(row = 1, column = 0, sticky = tk.W)
+		self._Entry_pca.grid(row = 1, column = 1)
+		self._Frame_pca.grid(row = 2, sticky = tk.W)
+		# data widgets grid
 		self._LabelFrame_data.grid(padx = (10,0), pady = (5,0))
 
 	def _quick_message_box(self, text):
