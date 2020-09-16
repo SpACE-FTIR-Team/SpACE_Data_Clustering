@@ -58,9 +58,27 @@ class SpaceApp(tk.Frame):
 		self._Checkbutton_kmeans.grid(row = 0, sticky = tk.W)
 		self._Label_k = tk.Label(self._LabelFrame_kmeans, text = "Number of clusters (k):")
 		self._Entry_k = tk.Entry(self._LabelFrame_kmeans, width = 5)
-		self._Label_k.grid(row = 1, column = 0, sticky = tk.W)
+		self._Label_k.grid(row = 1, column = 0, pady = (0,5), sticky = tk.W)
 		self._Entry_k.grid(row = 1, column = 1, pady = (0,5))
 		self._LabelFrame_kmeans.grid(padx = (10,0), pady = (30,0), sticky = tk.EW)
+
+		# dbscan widgets
+		self._LabelFrame_dbscan = tk.LabelFrame(self, text = "DBSCAN algorithm")
+		self._Var_dbscan = tk.IntVar()
+		self._Checkbutton_dbscan = tk.Checkbutton(self._LabelFrame_dbscan, text = "Perform DBSCAN", variable = self._Var_dbscan)
+		self._Checkbutton_dbscan.grid(row = 0, sticky = tk.W)
+		# -- dbscan parameters sub-frame --
+		self._Frame_dbscan_parameters = tk.Frame(self._LabelFrame_dbscan)
+		self._Label_eps = tk.Label(self._Frame_dbscan_parameters, text = "epsilon:")
+		self._Entry_eps = tk.Entry(self._Frame_dbscan_parameters, width = 5)
+		self._Label_eps.grid(row = 0, column = 0, sticky = tk.E)
+		self._Entry_eps.grid(row = 0, column = 1, sticky = tk.W)
+		self._Label_minpts = tk.Label(self._Frame_dbscan_parameters, text = "MinPts:")
+		self._Entry_minpts = tk.Entry(self._Frame_dbscan_parameters, width = 5)
+		self._Label_minpts.grid(row = 1, column = 0, sticky = tk.E)
+		self._Entry_minpts.grid(row = 1, column = 1, sticky = tk.W)
+		self._Frame_dbscan_parameters.grid(row = 1, pady = (0, 5), sticky = tk.W)
+		self._LabelFrame_dbscan.grid(padx = (10,0), pady = (5,0), sticky = tk.EW)
 
 	def _quick_message_box(self, text):
 		"""A quick and dirty messagebox for showing simple output for debugging."""
