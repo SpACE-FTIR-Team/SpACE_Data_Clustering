@@ -23,8 +23,9 @@ class SpaceApp(tk.Frame):
 
 	def _create_widgets(self):
 		"""Create and configure all the widgets in the main frame."""
+		self._Frame_options = tk.Frame(self)
 		# data widgets
-		self._LabelFrame_data = tk.LabelFrame(self, text = "Data")
+		self._LabelFrame_data = tk.LabelFrame(self._Frame_options, text = "Data")
 		# -- input sub-frame --
 		self._Frame_input = tk.Frame(self._LabelFrame_data)
 		self._Label_data_text = tk.Label(self._Frame_input, text = "Input folder:")
@@ -52,7 +53,7 @@ class SpaceApp(tk.Frame):
 		self._LabelFrame_data.grid(row = 0, column = 0, padx = (10,0), pady = (5,0))
 
 		# kmeans widgets
-		self._LabelFrame_kmeans = tk.LabelFrame(self, text = "K-means algorithm")
+		self._LabelFrame_kmeans = tk.LabelFrame(self._Frame_options, text = "K-means algorithm")
 		self._Var_kmeans = tk.IntVar()
 		self._Checkbutton_kmeans = tk.Checkbutton(self._LabelFrame_kmeans, text = "Perform K-means", variable = self._Var_kmeans)
 		self._Checkbutton_kmeans.grid(row = 0, sticky = tk.W)
@@ -64,7 +65,7 @@ class SpaceApp(tk.Frame):
 		self._LabelFrame_kmeans.grid(row = 1, column = 0, padx = (10,0), pady = (30,0), sticky = tk.EW)
 
 		# dbscan widgets
-		self._LabelFrame_dbscan = tk.LabelFrame(self, text = "DBSCAN algorithm")
+		self._LabelFrame_dbscan = tk.LabelFrame(self._Frame_options, text = "DBSCAN algorithm")
 		self._Var_dbscan = tk.IntVar()
 		self._Checkbutton_dbscan = tk.Checkbutton(self._LabelFrame_dbscan, text = "Perform DBSCAN", variable = self._Var_dbscan)
 		self._Checkbutton_dbscan.grid(row = 0, sticky = tk.W)
@@ -83,12 +84,20 @@ class SpaceApp(tk.Frame):
 		self._LabelFrame_dbscan.grid(row = 2, column = 0, padx = (10,0), pady = (5,0), sticky = tk.EW)
 
 		# action buttons
-		self._Frame_action_buttons = tk.Frame(self)
+		self._Frame_action_buttons = tk.Frame(self._Frame_options)
 		self._Button_go = tk.Button(self._Frame_action_buttons, text = "Go", width = 15, command = self._on_go)
 		self._Button_save = tk.Button(self._Frame_action_buttons, text = "Save", width = 15, command = self._on_save, state = "disabled")
 		self._Button_go.grid(pady = 10)
 		self._Button_save.grid(pady = 10)
 		self._Frame_action_buttons.grid(row = 3, column = 0, pady = 30)
+
+		self._Frame_options.grid(row = 0, column = 0, sticky = tk.N)
+
+		# canvas is a placeholder for visualization
+		self._Frame_canvas = tk.Frame(self)
+		self._Canvas_visualization = tk.Canvas(self._Frame_canvas, width = 600, height = 600, bg = "blue")
+		self._Canvas_visualization.grid()
+		self._Frame_canvas.grid(row = 0, column = 1, padx = 10, pady = 10)
 
 	def _quick_message_box(self, text):
 		"""A quick and dirty messagebox for showing simple output for debugging."""
