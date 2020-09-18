@@ -111,8 +111,8 @@ class SpaceApp(tk.Frame):
 
 	def _on_go(self):
 		self._quick_message_box("Congrats, you clicked the Go button.")
-		if self._Var_kmeans:
-			space_kmeans.do_Kmeans(self._Var_kmeans_clusters, space_random_data.generateRandomData(1000))
+		if self._Var_kmeans.get():
+			space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), space_random_data.generateRandomData(1000))
 	
 	def _on_save(self):
 		self._quick_message_box("Congrats, you clicked the Save button.")
