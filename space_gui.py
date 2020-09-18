@@ -1,5 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox as tkmb
+import space_kmeans
+import space_random_data
 
 def launch_gui():
 	root = tk.Tk()
@@ -54,11 +56,12 @@ class SpaceApp(tk.Frame):
 
 		# kmeans widgets
 		self._LabelFrame_kmeans = tk.LabelFrame(self._Frame_options, text = "K-means algorithm")
-		self._Var_kmeans = tk.IntVar()
+		self._Var_kmeans = tk.BooleanVar()
+		self._Var_kmeans_clusters = tk.IntVar()
 		self._Checkbutton_kmeans = tk.Checkbutton(self._LabelFrame_kmeans, text = "Perform K-means", variable = self._Var_kmeans)
 		self._Checkbutton_kmeans.grid(row = 0, sticky = tk.W)
 		self._Label_k = tk.Label(self._LabelFrame_kmeans, text = "Number of clusters (k):")
-		self._Entry_k = tk.Entry(self._LabelFrame_kmeans, width = 5)
+		self._Entry_k = tk.Entry(self._LabelFrame_kmeans, width = 5, textvariable = self._Var_kmeans_clusters)
 		self._Label_k.grid(row = 1, column = 0, pady = (0,5), sticky = tk.W)
 		self._Entry_k.grid(row = 1, column = 1, pady = (0,5))
 		# kmeans grid
@@ -108,6 +111,8 @@ class SpaceApp(tk.Frame):
 
 	def _on_go(self):
 		self._quick_message_box("Congrats, you clicked the Go button.")
+		if self._Var_kmeans:
+			space_kmeans.do_Kmeans(self._Var_kmeans_clusters, space_random_data.generateRandomData(1000))
 	
 	def _on_save(self):
 		self._quick_message_box("Congrats, you clicked the Save button.")
