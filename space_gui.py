@@ -5,6 +5,7 @@
 import tkinter as tk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
 import space_random_data
 import space_plot_kmeans
