@@ -34,17 +34,20 @@ def file_to_data_object(file_list):
     for item in processed_data:
         data = pd.read_csv(item, sep=":", header=None, engine="python", names=columns, quotechar='"')
 
-        # find the index where xy_pairs begin
-        pairs, pair_index = [], 0
+        pairs, pair_index, desc_index = [], 0, 0
         # the first column contains both the pairs and the labels for descriptive data
         first_col = data['descriptor']
         # search every row in the first column for \t
         for value in first_col:
+            # find the index where xy_pairs begin
             # I noticed that all the pairs contain tabs, so search each file for the first occurrence of \t
             if "\t" in value:
                 pairs.append(value.split("\t"))
                 if pair_index == 0:
                     pair_index = first_col[first_col == value].index[0]
+            # find the index for the description field for description processing below
+            elif "Description" in value:
+                desc_index = first_col[first_col == "Description"].index[0]
 
         # convert pairs to DataFrame, with column labels for given X Units and Y Units
         if pair_index != 0:
@@ -64,34 +67,36 @@ def file_to_data_object(file_list):
         # Make a copy, this is recommended by pandas documentation for modifying individual cells
         descriptive_copy = descriptive_data.copy()
         # if overflow is nan, drop overflow columns
-        if pd.isna(descriptive_data.loc[10, 'overflow']):
+        if pd.isna(descriptive_data.loc[desc_index, 'overflow']):
             descriptive_data = descriptive_data.dropna(axis=1)
 
         # if overflow2 is nan, combine value and overflow for description, and drop overflow columns
-        elif pd.isna(descriptive_data.loc[10, 'overflow2']):
-            combine_string = ': ' + descriptive_data.loc[10, 'overflow']
-            descriptive_copy.loc[10, 'value'] = descriptive_data.loc[10, 'value'] + combine_string
+        elif pd.isna(descriptive_data.loc[desc_index, 'overflow2']):
+            combine_string = ': ' + descriptive_data.loc[desc_index, 'overflow']
+            descriptive_copy.loc[desc_index, 'value'] = descriptive_data.loc[desc_index, 'value'] + combine_string
             descriptive_data = descriptive_copy.drop(['overflow', 'overflow2', 'overflow3'], axis=1)
 
         # if overflow3 is nan, combine value and overflow1 and 2 for description, and drop overflow columns
-        elif pd.isna(descriptive_data.loc[10, 'overflow3']):
-            combine_string = ': ' + descriptive_data.loc[10, 'overflow'] + ': ' + \
-                             descriptive_data.loc[10, 'overflow2']
-            descriptive_copy.loc[10, 'value'] = descriptive_data.loc[10, 'value'] + combine_string
+        elif pd.isna(descriptive_data.loc[desc_index, 'overflow3']):
+            combine_string = ': ' + descriptive_data.loc[desc_index, 'overflow'] + ': ' + \
+                             descriptive_data.loc[desc_index, 'overflow2']
+            descriptive_copy.loc[desc_index, 'value'] = descriptive_data.loc[desc_index, 'value'] + combine_string
             descriptive_data = descriptive_copy.drop(['overflow', 'overflow2', 'overflow3'], axis=1)
 
         # else combine all overflow columns with value, and drop overflow columns
         else:
-            combine_string = ': ' + descriptive_data.loc[10, 'overflow'] + ': ' + \
-                             descriptive_data.loc[10, 'overflow2'] + ': ' + \
-                             descriptive_data.loc[10, 'overflow3']
-            descriptive_copy.loc[10, 'value'] = descriptive_data.loc[10, 'value'] + combine_string
+            combine_string = ': ' + descriptive_data.loc[desc_index, 'overflow'] + ': ' + \
+                             descriptive_data.loc[desc_index, 'overflow2'] + ': ' + \
+                             descriptive_data.loc[desc_index, 'overflow3']
+            descriptive_copy.loc[desc_index, 'value'] = descriptive_data.loc[desc_index, 'value'] + combine_string
             descriptive_data = descriptive_copy.drop(['overflow', 'overflow2', 'overflow3'], axis=1)
 
         # construct DataObject with DataFrames and filepath (may want more parameters later)
         processed_item = DataObject(descriptive_data, xy_pairs, item)
         DataObjects.append(processed_item)
         print(f"{processed_item} converted to two DataFrames successfully.")
+
+    return DataObjects
 
 
 if __name__ == '__main__':
