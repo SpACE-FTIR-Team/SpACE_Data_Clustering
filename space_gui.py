@@ -1,27 +1,37 @@
+#
+# Graphical user interface for SpACE
+#
+
 import tkinter as tk
 import tkinter.messagebox as tkmb
 import space_kmeans
 import space_random_data
 
-def launch_gui():
+def launch_gui(cnf):
 	root = tk.Tk()
-	app = SpaceApp(master = root)
+	app = SpaceApp(master = root, config = cnf)
 	app.mainloop()
 
 class SpaceApp(tk.Frame):
 	"""A tkinter GUI-based app for SpACE."""
 
-	def __init__(self, master):
+	def __init__(self, master, config = {}):
 		"""Set up the root window and instantiate the main frame."""
 		super().__init__(master)
 		self.master = master
-		self.master.title("SpACE v.0.0.1")
+		self.config = config
+		if config != {}:
+			self.master.title("%s v. %s" %
+				(self.config.get("APP_NAME", 'Application'),
+				self.config.get("APP_VERSION", 'Unknown')))
 		self.grid()
 
 		# attach handler for exiting the program
 		self.master.protocol("WM_DELETE_WINDOW", self._on_close)
 
 		self._create_widgets()
+		if config != {}:
+			self._set_defaults()
 
 	def _create_widgets(self):
 		"""Create and configure all the widgets in the main frame."""
@@ -105,6 +115,13 @@ class SpaceApp(tk.Frame):
 		self._Canvas_visualization = tk.Canvas(self._Frame_canvas, width = 600, height = 600, bg = "blue")
 		self._Canvas_visualization.grid()
 		self._Frame_canvas.grid(row = 0, column = 1, padx = 10, pady = 10)
+
+	def _set_defaults(self):
+		self._Var_folder.set(self.config["DEFAULT_INPUT_PATH"])
+		self._Var_pca_dimensions.set(self.config["DEFAULT_PCA_DIMENSIONS"])
+		self._Var_kmeans_clusters.set(self.config["DEFAULT_KMEANS_K"])
+		self._Var_eps.set(self.config["DEFAULT_DBSCAN_EPS"])
+		self._Var_minpts.set(self.config["DEFAULT_DBSCAN_MINPTS"])
 
 	def _quick_message_box(self, text):
 		"""A quick and dirty messagebox for showing simple output for debugging."""
