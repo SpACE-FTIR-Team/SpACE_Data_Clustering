@@ -7,6 +7,7 @@ import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 import space_kmeans
 import space_random_data
+import space_plot_kmeans
 
 
 def launch_gui(cnf):
@@ -146,7 +147,9 @@ class SpaceApp(tk.Frame):
     def _on_go(self):
         self._quick_message_box("Congrats, you clicked the Go button.")
         if self._Var_kmeans.get():
-            space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), space_random_data.generateRandomData(1000))
+            dataset = space_random_data.generateRandomData(1000)
+            k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
+            space_plot_kmeans.plot(dataset, k_clusters)
 
     def _on_save(self):
         self._quick_message_box("Congrats, you clicked the Save button.")
