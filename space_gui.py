@@ -4,6 +4,7 @@
 
 import tkinter as tk
 import tkinter.messagebox as tkmb
+import tkinter.filedialog as tkfd
 import space_kmeans
 import space_random_data
 
@@ -40,7 +41,7 @@ class SpaceApp(tk.Frame):
 		self._LabelFrame_data = tk.LabelFrame(self._Frame_options, text = "Data")
 		# -- input sub-frame --
 		self._Frame_input = tk.Frame(self._LabelFrame_data)
-		self._Label_data_text = tk.Label(self._Frame_input, text = "Input folder:")
+		self._Label_data_text = tk.Label(self._Frame_input, text = "Input from folder:")
 		self._Var_folder = tk.StringVar()
 		self._Entry_folder = tk.Entry(self._Frame_input, width = 30, textvariable = self._Var_folder)
 		self._Button_browse = tk.Button(self._Frame_input, text = "Browse...", command = self._on_browse)
@@ -128,7 +129,11 @@ class SpaceApp(tk.Frame):
 		tkmb.showinfo("Message", text)
 
 	def _on_browse(self):
-		self._quick_message_box("Congrats, you clicked the Browse button.")
+		dir = tkfd.askdirectory(initialdir = self._Var_folder.get())
+		# askdirectory returns '' if the user clicked cancel
+		# so only update the folder path if the user actually selected something
+		if dir != '':
+			self._Var_folder.set(dir)
 
 	def _on_go(self):
 		self._quick_message_box("Congrats, you clicked the Go button.")
