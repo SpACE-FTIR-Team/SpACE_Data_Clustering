@@ -37,3 +37,8 @@ These were the latest versions at the time the project was started.
 * (if you are installing by itself, instead of as part of Anaconda3)
 * 3.3.2
 * https://matplotlib.org/users/installing.html
+
+## pandas
+* (if you are installing by itself, instead of as part of Anaconda3)
+* 1.1.2
+* https://pandas.pydata.org/docs/getting_started/install.html
