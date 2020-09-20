@@ -25,10 +25,15 @@ These were the latest versions at the time the project was started.
 
 ## scikit-learn
 * (if you are installing by itself, instead of as part of Anaconda3)
-* scikit-learn-0.23.2
+* 0.23.2
 * https://scikit-learn.org/stable/install.html
    * (On my system, the following additional dependencies were installed --Brad)
    * joblib-0.16.0
    * numpy-1.19.2
    * scipy-1.5.2
    * threadpoolctl-2.1.0
+
+## matplotlib
+* (if you are installing by itself, instead of as part of Anaconda3)
+* 3.3.2
+* https://matplotlib.org/users/installing.html
