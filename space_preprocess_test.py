@@ -2,6 +2,7 @@
 # A test file for an attempt at processing the data.
 # I only tested this on the 1340 files after the initial preprocess. Didn't get any errors.
 #
+#
 
 import pandas as pd
 import glob
@@ -16,12 +17,17 @@ columns = ['descriptor', 'value', 'overflow', 'overflow2', 'overflow3']
 DataObjects = []
 
 
+# Function: File to DataObject
+# Description: This function takes a list of files (files variable above) and converts them to two pandas
+# DataFrames, one of descriptive data, and one of float values for the xy_pairs. The DataFrames are used as
+# parameters to construct a DataObject. The function then returns an array of each file as a DataObject.
+#
+# Returns: DataObjects
+#
 def file_to_data_object(file_list):
     # print(len(file_list))
 
     processed_data = []
-    xy_pairs = pd.DataFrame()
-
     # first preprocess - this should be a one time operation per Dr. Yoshimatsu
     for file in file_list:
         if "tir" in file and "nicolet" in file and "spectrum" in file:
@@ -91,6 +97,12 @@ def file_to_data_object(file_list):
             descriptive_copy.loc[desc_index, 'value'] = descriptive_data.loc[desc_index, 'value'] + combine_string
             descriptive_data = descriptive_copy.drop(['overflow', 'overflow2', 'overflow3'], axis=1)
 
+        # DataFrame values are initially typed as objects, code below is conversion to workable data types
+        # convert descriptive data to strings
+        descriptive_data = descriptive_data.convert_dtypes(convert_string=True)
+        # convert xy_pairs to floats
+        xy_pairs[xy_pairs.columns[0]] = xy_pairs[xy_pairs.columns[0]].astype(float)
+        xy_pairs[xy_pairs.columns[1]] = xy_pairs[xy_pairs.columns[1]].astype(float)
         # construct DataObject with DataFrames and filepath (may want more parameters later)
         processed_item = DataObject(descriptive_data, xy_pairs, item)
         DataObjects.append(processed_item)
