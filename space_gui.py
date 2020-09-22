@@ -35,6 +35,7 @@ class SpaceApp(tk.Frame):
         self._create_widgets()
         if config != {}:
             self._set_defaults()
+        self.log("SpACE graphical user interface startup")
 
     def _create_widgets(self):
         """Create and configure all the widgets in the main frame."""
@@ -132,6 +133,17 @@ class SpaceApp(tk.Frame):
         self._Var_eps.set(self.config["DEFAULT_DBSCAN_EPS"])
         self._Var_minpts.set(self.config["DEFAULT_DBSCAN_MINPTS"])
 
+    def log(self, text):
+        """A simple logging facility for status messages
+        during program execution."""
+        # Right now this just logs to the console.
+        # Future expansion options:
+        # a) simply turn this off prior to project submission
+        # b) or perhaps save to a file
+        # c) or perhaps output to a logging window that the user can
+        #    see/hide as desired so they know what's going on
+        print("%s" % text)
+
     def _quick_message_box(self, text):
         """A quick and dirty messagebox for showing simple output for debugging."""
         tkmb.showinfo("Message", text)
@@ -141,10 +153,11 @@ class SpaceApp(tk.Frame):
         # askdirectory returns '' if the user clicked cancel
         # so only update the folder path if the user actually selected something
         if dir != '':
+            self.log("user: changed input folder to %s" % dir)
             self._Var_folder.set(dir)
 
     def _on_go(self):
-        self._quick_message_box("Congrats, you clicked the Go button.")
+        self.log("user: pressed Go button")
         if self._Var_kmeans.get():
             space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), space_random_data.generateRandomData(1000))
 
