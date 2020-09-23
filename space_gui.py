@@ -5,6 +5,7 @@
 import tkinter as tk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
+import space_file_ops as fileops
 import space_kmeans
 import space_random_data
 
@@ -156,8 +157,17 @@ class SpaceApp(tk.Frame):
             self.log("user: changed input folder to %s" % dir)
             self._Var_folder.set(dir)
 
+    def _do_import_data(self):
+        # verify we have a good path in the input folder widget
+        if not fileops.path_exists(self._Var_folder.get()):
+            # this is a fatal error - log to console and pop up a messagebox
+            self.log("Invalid path: %s" % self._Var_folder.get())
+            self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
+            return
+
     def _on_go(self):
         self.log("user: pressed Go button")
+        self._do_import_data()
         if self._Var_kmeans.get():
             space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), space_random_data.generateRandomData(1000))
 
