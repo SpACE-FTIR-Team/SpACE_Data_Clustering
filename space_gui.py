@@ -166,6 +166,8 @@ class SpaceApp(tk.Frame):
             return
         file_list = fileops.collect_all_filenames(self._Var_folder.get())
         self.log("Found %s files and folders in %s" % (len(file_list), self._Var_folder.get()))
+        filtered_file_list = fileops.filter_filenames(file_list)
+        self.log("Found %s files matching the filename filter criteria" % len(filtered_file_list))
 
     def _on_go(self):
         self.log("user: pressed Go button")
