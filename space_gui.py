@@ -164,6 +164,8 @@ class SpaceApp(tk.Frame):
             self.log("Invalid path: %s" % self._Var_folder.get())
             self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
             return
+        file_list = fileops.collect_all_filenames(self._Var_folder.get())
+        self.log("Found %s files and folders in %s" % (len(file_list), self._Var_folder.get()))
 
     def _on_go(self):
         self.log("user: pressed Go button")
