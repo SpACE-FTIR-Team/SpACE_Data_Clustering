@@ -23,9 +23,9 @@ def filter_filenames(file_list):
 	"""Iterates through a list of files and retains only
 	those that have 'tir' 'nicolet' 'spectrum' and '.txt'
 	in the filename. Returns a Python list."""
-	return list(filter(lambda filename: 'tir' in filename \
-								and 'nicolet' in filename \
-								and 'spectrum' in filename \
+	return list(filter(lambda filename: 'tir' in filename
+								and 'nicolet' in filename
+								and 'spectrum' in filename
 								and '.txt' in filename,
 								file_list))
 
