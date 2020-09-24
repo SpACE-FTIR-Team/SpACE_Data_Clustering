@@ -6,7 +6,7 @@ import tkinter as tk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 import space_file_ops as fileops
-import space_parse as parse
+import space_data_ops as dataops
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
 import space_random_data
@@ -178,16 +178,22 @@ class SpaceApp(tk.Frame):
         filtered_file_list = fileops.filter_filenames(file_list)
         self.log("Found %s files matching the filename filter criteria" % len(filtered_file_list))
         # parse
-        self._pandas_dataframes = parse.file_to_data_object(filtered_file_list)
+        self._pandas_dataframes = dataops.file_to_data_object(filtered_file_list)
         self.log("Parsed into %s pandas dataframes" % len(self._pandas_dataframes))
+        # range check
+        # alignment
 
     def _on_go(self):
         self.log("user: pressed Go button")
         self._do_import_data()
+        # normalization
+        # pca
+        # kmeans
         if self._Var_kmeans.get():
             dataset = space_random_data.generateRandomData(1000)
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
             space_plot_kmeans.plot(dataset, k_clusters)
+        # dbscan
 
     def _on_save(self):
         self._quick_message_box("Congrats, you clicked the Save button.")
