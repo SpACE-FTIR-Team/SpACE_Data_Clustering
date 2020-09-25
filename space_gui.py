@@ -5,6 +5,8 @@
 import tkinter as tk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
+import space_file_ops as fileops
+import space_data_ops as dataops
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
 import space_random_data
@@ -38,6 +40,8 @@ class SpaceApp(tk.Frame):
         if config != {}:
             self._set_defaults()
         self.log("SpACE graphical user interface startup")
+
+        self._pandas_dataframes = []
 
     def _create_widgets(self):
         """Create and configure all the widgets in the main frame."""
@@ -158,12 +162,38 @@ class SpaceApp(tk.Frame):
             self.log("user: changed input folder to %s" % dir)
             self._Var_folder.set(dir)
 
+    def _do_import_data(self):
+        # reset everything, in case we are running multiple times
+        self._pandas_dataframes = []
+        # verify we have a good path in the input folder widget
+        if not fileops.path_exists(self._Var_folder.get()):
+            # this is a fatal error - log to console and pop up a messagebox
+            self.log("Invalid path: %s" % self._Var_folder.get())
+            self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
+            return
+        # search for all files in input folder and subfolder
+        file_list = fileops.collect_all_filenames(self._Var_folder.get())
+        self.log("Found %s files and folders in %s" % (len(file_list), self._Var_folder.get()))
+        # filter by filename
+        filtered_file_list = fileops.filter_filenames(file_list)
+        self.log("Found %s files matching the filename filter criteria" % len(filtered_file_list))
+        # parse
+        self._pandas_dataframes = dataops.file_to_data_object(filtered_file_list)
+        self.log("Parsed into %s pandas dataframes" % len(self._pandas_dataframes))
+        # range check
+        # alignment
+
     def _on_go(self):
         self.log("user: pressed Go button")
+        self._do_import_data()
+        # normalization
+        # pca
+        # kmeans
         if self._Var_kmeans.get():
             dataset = space_random_data.generateRandomData(1000)
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
             space_plot_kmeans.plot(dataset, k_clusters)
+        # dbscan
 
     def _on_save(self):
         self._quick_message_box("Congrats, you clicked the Save button.")
