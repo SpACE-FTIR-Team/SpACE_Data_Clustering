@@ -45,3 +45,9 @@ def get_file_list(folder):
     filtered_file_list = fileops.filter_filenames(file_list)
     print("Found %s files matching the filename filter criteria" % len(filtered_file_list))
     return filtered_file_list
+
+def simulate_go(folder):
+    """Run the same basic steps that the GUI go button would do."""
+    data_objects = all_dobj(folder)
+    dataops.reindex(data_objects)
+    return data_objects

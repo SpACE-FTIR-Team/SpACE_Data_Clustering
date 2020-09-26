@@ -93,3 +93,19 @@ def file_to_data_object(file_list):
         DataObjects.append(processed_item)
 
     return DataObjects
+
+def reindex(data_objects):
+    """This function takes a list of data objects, iterates over them,
+    and changes the index in the 'pairs' dataframe of each data object.
+    The integer index [0, 1, 2, ..., n] is dropped.
+    The ' Wavelength (micrometers)' [note the leading space] column becomes
+    the new index. [note also some columns have (micrometer) without
+    the plural s]
+    The ' Wavelength (micrometers)' column is renamed 'wavelength'.
+    Dataframes are modified in-place, so nothing is returned."""
+    for dobj in data_objects:
+        dataframe = dobj.pairs
+        wavelength_col_name = dataframe.columns[0]
+        dataframe.rename(columns={wavelength_col_name: 'wavelength'}, inplace=True)
+        dataframe.set_index('wavelength', inplace=True)
+    return None

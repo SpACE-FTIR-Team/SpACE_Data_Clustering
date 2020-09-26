@@ -183,6 +183,9 @@ class SpaceApp(tk.Frame):
         self.log("Loading into data objects...")
         self._data_objs = dataops.file_to_data_object(filtered_file_list)
         self.log("Loaded %s data objects" % len(self._data_objs))
+        # re-index the pairs dataframes
+        self.log("Re-indexing pairs dataframes...")
+        dataops.reindex(self._data_objs)
         # range check
         # alignment
 
