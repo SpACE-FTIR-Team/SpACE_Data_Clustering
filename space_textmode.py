@@ -50,4 +50,10 @@ def simulate_go(folder):
     """Run the same basic steps that the GUI go button would do."""
     data_objects = all_dobj(folder)
     dataops.reindex(data_objects)
+    print("Calculating common range...")
+    min, max = dataops.find_common_range(data_objects)
+    if (min, max) == (None, None):
+        print("No range in common!")
+    else:
+        print("Common wavelength range is %s to %s" % (min, max))
     return data_objects

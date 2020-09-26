@@ -187,6 +187,16 @@ class SpaceApp(tk.Frame):
         self.log("Re-indexing pairs dataframes...")
         dataops.reindex(self._data_objs)
         # range check
+        self.log("Calculating common range...")
+        min, max = dataops.find_common_range(self._data_objs)
+        if (min, max) == (None, None):
+            # lack of a common range across files is a fatal error
+            # log to console and pop up a messagebox
+            self.log("No range in common!")
+            self._quick_message_box("No range in common!")
+            return
+        else:
+            self.log("All files have this wavelength range in common: %s to %s" % (min, max))
         # alignment
 
     def _on_go(self):

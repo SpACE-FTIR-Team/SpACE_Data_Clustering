@@ -109,3 +109,23 @@ def reindex(data_objects):
         dataframe.rename(columns={wavelength_col_name: 'wavelength'}, inplace=True)
         dataframe.set_index('wavelength', inplace=True)
     return None
+
+def find_common_range(data_objects):
+    """This function takes a list of data objects, iterates over them,
+    and checks the minimum and maximum wavelength in every pairs dataframe,
+    keeping track of the highest minimum and lowest maximum seen.
+    When done, if min < max, then the common range of all data objects is
+    min to max. Return (min, max)
+    If min > max, the data objects have no range in common. Return (None, None)"""
+    highest_minimum = data_objects[0].pairs.index.min()
+    lowest_maximum = data_objects[0].pairs.index.max()
+    for dobj in data_objects[1:]:
+        dataframe = dobj.pairs
+        if dataframe.index.min() > highest_minimum:
+            highest_minimum = dataframe.index.min()
+        if dataframe.index.max() < lowest_maximum:
+            lowest_maximum = dataframe.index.max()
+    if highest_minimum < lowest_maximum:
+        return highest_minimum, lowest_maximum
+    else:
+        return None, None
