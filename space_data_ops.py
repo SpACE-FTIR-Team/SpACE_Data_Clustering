@@ -2,7 +2,7 @@
 # Data functions for SpACE
 # 
 # Currently includes: import NASA ECOstress Spectral Library files
-# into pandas dataframes
+# into DataObjects (see DataObject.py)
 #
 # TODO: range checking, data alignment, normalization, PCA?
 
