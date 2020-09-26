@@ -6,21 +6,21 @@ import space_file_ops as fileops
 import space_data_ops as dataops
 
 def one_dobj(folder):
-    """Get one pandas dataframe.
+    """Get one data object.
     Accepts a path to the data files. Parses the first file found in that path
     that matches the filespec (tir, nicolet, specturm, .txt).
-    Returns one pandas dataframe."""
+    Returns one data object."""
     filtered_file_list = get_file_list(folder)
     if filtered_file_list == None:
         return None
     print("Using first file found: %s" % filtered_file_list[0])
     # parse
     df = dataops.file_to_data_object(filtered_file_list[0:1])
-    print("Parsed into %s pandas dataframes" % len(df))
+    print("Parsed into %s data objects" % len(df))
     return df[0]
 
 def all_dobj(folder):
-    """Get all pandas dataframes.
+    """Get all data objects.
     Accepts a path to the data files. Parses all the files found in that path
     that match the filespec (tir, nicolet, specturm, .txt).
     Returns a list of pandas dataframes."""
@@ -29,7 +29,7 @@ def all_dobj(folder):
         return None
     # parse
     df = dataops.file_to_data_object(filtered_file_list)
-    print("Parsed into %s pandas dataframes" % len(df))
+    print("Parsed into %s data objects" % len(df))
     return df
 
 def get_file_list(folder):
