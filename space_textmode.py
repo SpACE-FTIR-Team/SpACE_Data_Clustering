@@ -28,6 +28,7 @@ def all_dobj(folder):
     if filtered_file_list == None:
         return None
     # parse
+    print("Parsing...")
     df = dataops.file_to_data_object(filtered_file_list)
     print("Parsed into %s data objects" % len(df))
     return df
@@ -49,11 +50,15 @@ def get_file_list(folder):
 def simulate_go(folder):
     """Run the same basic steps that the GUI go button would do."""
     data_objects = all_dobj(folder)
+    print("Re-indexing...")
     dataops.reindex(data_objects)
     print("Calculating common range...")
     min, max = dataops.find_common_range(data_objects)
     if (min, max) == (None, None):
         print("No range in common!")
+        return None
     else:
         print("Common wavelength range is %s to %s" % (min, max))
+    print("Truncating data to range %s to %s..." % (min, max))
+    dataops.truncate(data_objects, min, max)
     return data_objects

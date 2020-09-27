@@ -197,6 +197,9 @@ class SpaceApp(tk.Frame):
             return
         else:
             self.log("All files have this wavelength range in common: %s to %s" % (min, max))
+        # truncate to common range
+        print("Truncating data to range %s to %s..." % (min, max))
+        dataops.truncate(self._data_objs, min, max)
         # alignment
 
     def _on_go(self):
