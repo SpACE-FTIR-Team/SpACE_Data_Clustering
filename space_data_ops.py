@@ -3,9 +3,11 @@
 # 
 # Currently includes: import NASA ECOstress Spectral Library files
 # into DataObjects (see DataObject.py), re-index dataframes,
-# find common range, truncate dataframes to common range.
+# find common range, truncate dataframes to common range,
+# align data to be in the same step, and add in missing values 
+# with interpolation
 #
-# TODO: data alignment, normalization, PCA?
+# TODO: normalization, PCA?
 
 import pandas as pd
 from DataObject import DataObject
