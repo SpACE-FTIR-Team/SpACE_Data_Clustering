@@ -41,7 +41,8 @@ class SpaceApp(tk.Frame):
             self._set_defaults()
         self.log("SpACE graphical user interface startup")
 
-        self._pandas_dataframes = []
+        # data objects holding pandas dataframes
+        self._data_objs = []
 
     def _create_widgets(self):
         """Create and configure all the widgets in the main frame."""
@@ -164,10 +165,11 @@ class SpaceApp(tk.Frame):
 
     def _do_import_data(self):
         # reset everything, in case we are running multiple times
-        self._pandas_dataframes = []
+        self._data_objs = []
         # verify we have a good path in the input folder widget
         if not fileops.path_exists(self._Var_folder.get()):
-            # this is a fatal error - log to console and pop up a messagebox
+            # a nonexistent path is a fatal error
+            # log to console and pop up a messagebox
             self.log("Invalid path: %s" % self._Var_folder.get())
             self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
             return
@@ -178,22 +180,40 @@ class SpaceApp(tk.Frame):
         filtered_file_list = fileops.filter_filenames(file_list)
         self.log("Found %s files matching the filename filter criteria" % len(filtered_file_list))
         # parse
-        self._pandas_dataframes = dataops.file_to_data_object(filtered_file_list)
-        self.log("Parsed into %s pandas dataframes" % len(self._pandas_dataframes))
+        self.log("Loading into data objects...")
+        self._data_objs = dataops.file_to_data_object(filtered_file_list)
+        self.log("Loaded %s data objects" % len(self._data_objs))
+        # re-index the pairs dataframes
+        self.log("Re-indexing pairs dataframes...")
+        dataops.reindex(self._data_objs)
         # range check
+        self.log("Calculating common range...")
+        min, max = dataops.find_common_range(self._data_objs)
+        if (min, max) == (None, None):
+            # lack of a common range across files is a fatal error
+            # log to console and pop up a messagebox
+            self.log("No range in common!")
+            self._quick_message_box("No range in common!")
+            return
+        else:
+            self.log("All files have this wavelength range in common: %s to %s" % (min, max))
+        # truncate to common range
+        print("Truncating data to range %s to %s..." % (min, max))
+        dataops.truncate(self._data_objs, min, max)
         # alignment
 
     def _on_go(self):
+        # TODO: busy cursor and disable Go button
         self.log("user: pressed Go button")
         self._do_import_data()
-        # normalization
-        # pca
+        # TODO: normalization
+        # TODO: pca
         # kmeans
         if self._Var_kmeans.get():
             dataset = space_random_data.generateRandomData(1000)
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
             space_plot_kmeans.plot(dataset, k_clusters)
-        # dbscan
+        # TODO: dbscan
 
     def _on_save(self):
         self._quick_message_box("Congrats, you clicked the Save button.")

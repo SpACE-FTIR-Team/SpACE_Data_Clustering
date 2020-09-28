@@ -2,9 +2,10 @@
 # Data functions for SpACE
 # 
 # Currently includes: import NASA ECOstress Spectral Library files
-# into pandas dataframes
+# into DataObjects (see DataObject.py), re-index dataframes,
+# find common range, truncate dataframes to common range.
 #
-# TODO: range checking, data alignment, normalization, PCA?
+# TODO: data alignment, normalization, PCA?
 
 import pandas as pd
 from DataObject import DataObject
@@ -93,3 +94,54 @@ def file_to_data_object(file_list):
         DataObjects.append(processed_item)
 
     return DataObjects
+
+def reindex(data_objects):
+    """This function takes a list of data objects, iterates over them,
+    and changes the index in the 'pairs' dataframe of each data object.
+    The integer index [0, 1, 2, ..., n] is dropped.
+    The ' Wavelength (micrometers)' [note the leading space] column becomes
+    the new index. [note also some columns have (micrometer) without
+    the plural s]
+    The ' Wavelength (micrometers)' column is renamed 'wavelength'.
+    Dataframes are modified in-place, so None is returned."""
+    for dobj in data_objects:
+        dataframe = dobj.pairs
+        wavelength_col_name = dataframe.columns[0]
+        dataframe.rename(columns={wavelength_col_name: 'wavelength'}, inplace=True)
+        dataframe.set_index('wavelength', inplace=True)
+    return None
+
+def find_common_range(data_objects):
+    """This function takes a list of data objects, iterates over them,
+    and checks the minimum and maximum wavelength in every 'pairs' dataframe,
+    keeping track of the highest minimum and lowest maximum seen.
+    When done, if min < max, then the common range of all data objects is
+    min to max. Return (min, max).
+    If min > max, the data objects have no range in common. Return (None, None)."""
+    highest_minimum = data_objects[0].pairs.index.min()
+    lowest_maximum = data_objects[0].pairs.index.max()
+    for dobj in data_objects[1:]:
+        dataframe = dobj.pairs
+        if dataframe.index.min() > highest_minimum:
+            highest_minimum = dataframe.index.min()
+        if dataframe.index.max() < lowest_maximum:
+            lowest_maximum = dataframe.index.max()
+    if highest_minimum < lowest_maximum:
+        return highest_minimum, lowest_maximum
+    else:
+        return None, None
+
+def truncate(data_objects, min, max):
+    """This function takes a list of data objects, iterates over them,
+    and truncates every 'pairs' dataframe to remove any rows (wavelengths)
+    below 'min' and above 'max'. The result is that all 'pairs' dataframes
+    will have the same range of wavelengths. (Note that wavelengths are
+    not aligned here; that comes later.)
+    Pandas can't truncate in place, so a new truncated dataframe is
+    constructed and then the DataObject 'pairs' dataframe is replaced
+    with the new dataframe. Returns None."""
+    for dobj in data_objects:
+        original_dataframe = dobj.pairs
+        truncated_dataframe = original_dataframe.truncate(before=min, after=max, axis='index')
+        dobj.pairs = truncated_dataframe
+    return None
