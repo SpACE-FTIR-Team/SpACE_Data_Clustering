@@ -5,6 +5,7 @@
 import tkinter as tk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
+from time import sleep
 import space_file_ops as fileops
 import space_data_ops as dataops
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -15,29 +16,29 @@ import space_plot_kmeans
 
 def launch_gui(cnf):
     root = tk.Tk()
-    app = SpaceApp(master=root, config=cnf)
+    app = SpaceApp(master=root, app_config=cnf)
     app.mainloop()
 
 
 class SpaceApp(tk.Frame):
     """A tkinter GUI-based app for SpACE."""
 
-    def __init__(self, master, config={}):
+    def __init__(self, master, app_config={}):
         """Set up the root window and instantiate the main frame."""
         super().__init__(master)
         self.master = master
-        self.config = config
-        if config != {}:
+        self.app_config = app_config
+        if app_config != {}:
             self.master.title("%s v. %s" %
-                              (self.config.get("APP_NAME", 'Application'),
-                               self.config.get("APP_VERSION", 'Unknown')))
+                              (self.app_config.get("APP_NAME", 'Application'),
+                               self.app_config.get("APP_VERSION", 'Unknown')))
         self.grid()
 
         # attach handler for exiting the program
         self.master.protocol("WM_DELETE_WINDOW", self._on_close)
 
         self._create_widgets()
-        if config != {}:
+        if app_config != {}:
             self._set_defaults()
         self.log("SpACE graphical user interface startup")
 
@@ -134,11 +135,11 @@ class SpaceApp(tk.Frame):
         self._Frame_canvas.grid(row=0, column=1, padx=10, pady=10)
 
     def _set_defaults(self):
-        self._Var_folder.set(self.config["DEFAULT_INPUT_PATH"])
-        self._Var_pca_dimensions.set(self.config["DEFAULT_PCA_DIMENSIONS"])
-        self._Var_kmeans_clusters.set(self.config["DEFAULT_KMEANS_K"])
-        self._Var_eps.set(self.config["DEFAULT_DBSCAN_EPS"])
-        self._Var_minpts.set(self.config["DEFAULT_DBSCAN_MINPTS"])
+        self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
+        self._Var_pca_dimensions.set(self.app_config["DEFAULT_PCA_DIMENSIONS"])
+        self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
+        self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
+        self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
 
     def log(self, text):
         """A simple logging facility for status messages
@@ -203,7 +204,13 @@ class SpaceApp(tk.Frame):
         # alignment
 
     def _on_go(self):
-        # TODO: busy cursor and disable Go button
+        # this might take a while, so disable the Go button and busy the cursor
+        # while we do work
+        self._Button_go.config(state="disabled")
+        self.update()
+        self.master.config(cursor="watch")
+        sleep(.5)   # cursor is sometimes not updating without this delay
+        self.master.update()
         self.log("user: pressed Go button")
         self._do_import_data()
         # TODO: normalization
@@ -214,6 +221,10 @@ class SpaceApp(tk.Frame):
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
             space_plot_kmeans.plot(dataset, k_clusters)
         # TODO: dbscan
+        # re-enable Go button and un-busy the cursor now that we're done
+        self.master.config(cursor="")
+        self._Button_go.config(state="normal")
+        self.master.update()
 
     def _on_save(self):
         self._quick_message_box("Congrats, you clicked the Save button.")
