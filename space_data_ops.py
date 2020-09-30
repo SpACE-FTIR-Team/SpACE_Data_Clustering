@@ -3,9 +3,11 @@
 # 
 # Currently includes: import NASA ECOstress Spectral Library files
 # into DataObjects (see DataObject.py), re-index dataframes,
-# find common range, truncate dataframes to common range.
+# find common range, truncate dataframes to common range,
+# align data to be in the same step, and add in missing values 
+# with interpolation
 #
-# TODO: data alignment, normalization, PCA?
+# TODO: normalization, PCA?
 
 import pandas as pd
 from DataObject import DataObject
@@ -144,4 +146,20 @@ def truncate(data_objects, min, max):
         original_dataframe = dobj.pairs
         truncated_dataframe = original_dataframe.truncate(before=min, after=max, axis='index')
         dobj.pairs = truncated_dataframe
+    return None
+
+def align(data_objects, align_to):
+    """This function takes a list of data objects, iterates over them, and makes every 'pairs' dataframe use the same
+    x axis.  The result is that all 'pairs' dataframes will use the same x axis and thus be aligned.  align_to should also be a dataframe
+    and contains the x axis that all dataobjs should be aligned to."""
+    alignment_pairs = align_to.pairs
+    for dobj in data_objects:
+        dobj.pairs.align(alignment_pairs, join="right")
+    return None
+
+def interp(data_objects):
+    """This function takes a list of data objects, iterates over them, and fills in any missing values caused by an alignment
+    the result is that all 'pairs' dataframes will have all of the values filled in with a value estimated through interpolation"""
+    for dobj in data_objects:
+        dobj.pairs.interpolate(method = "spline", order = 2)
     return None
