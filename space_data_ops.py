@@ -148,18 +148,27 @@ def truncate(data_objects, min, max):
         dobj.pairs = truncated_dataframe
     return None
 
+def find_max_res(data_objects, data_range):
+    """This function takes a list of data objects and the range common to them, iterates over them, and finds the
+    object with the highest resolution.  It will return the index of this object"""
+    max_res = 0
+    max_res_index = 0
+    for i in range(len(data_objects)):
+        cur_res = data_range / data_objects[i].pairs.size
+        if cur_res > max_res:
+            max_res = cur_res
+            max_res_index = i
+    return max_res_index
+
+
 def align(data_objects, align_to):
     """This function takes a list of data objects, iterates over them, and makes every 'pairs' dataframe use the same
-    x axis.  The result is that all 'pairs' dataframes will use the same x axis and thus be aligned.  align_to should also be a dataframe
+    x axis.  The result is that all 'pairs' dataframes will use the same x axis and thus be aligned.  This will then fill in 
+    any missing values caused by the alignment using.  align_to should also be the index of the data object to align to
     and contains the x axis that all dataobjs should be aligned to."""
-    alignment_pairs = align_to.pairs
+    alignment_pairs = data_objects[align_to].pairs
     for dobj in data_objects:
-        dobj.pairs.align(alignment_pairs, join="right")
-    return None
-
-def interp(data_objects):
-    """This function takes a list of data objects, iterates over them, and fills in any missing values caused by an alignment
-    the result is that all 'pairs' dataframes will have all of the values filled in with a value estimated through interpolation"""
-    for dobj in data_objects:
-        dobj.pairs.interpolate(method = "spline", order = 2)
+        dobj.pairs.align(alignment_pairs, join="outer")
+        dobj.pairs.interpolate()
+        dobj.pairs.align(alignment_pairs, join ="left")
     return None
