@@ -208,6 +208,8 @@ class SpaceApp(tk.Frame):
         self.log("Aligning the pairs dataframes")
         dataops.align(self._data_objs, max_res_index)
 
+        self._dataset = dataops.combine(self._data_objs)
+
         
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
@@ -223,9 +225,9 @@ class SpaceApp(tk.Frame):
         # TODO: pca
         # kmeans
         if self._Var_kmeans.get():
-            dataset = space_random_data.generateRandomData(1000)
-            k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
-            space_plot_kmeans.plot(dataset, k_clusters)
+            #self._dataset = space_random_data.generateRandomData(1000)
+            k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+            space_plot_kmeans.plot(self._dataset, k_clusters)
         # TODO: dbscan
         # re-enable Go button and un-busy the cursor now that we're done
         self.master.config(cursor="")
