@@ -129,11 +129,35 @@ class SpaceApp(tk.Frame):
 
         self._Frame_options.grid(row=0, column=0, sticky=tk.N)
 
+        # notebook (tabs)
+        self._Notebook_controller = ttk.Notebook(self)
+
+        self._Tab_log = ttk.Frame(self._Notebook_controller)
+        self._Tab_kmeans = ttk.Frame(self._Notebook_controller)
+        self._Tab_dbscan = ttk.Frame(self._Notebook_controller)
+        self._Notebook_controller.add(self._Tab_log, text="Log")
+        self._Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
+        self._Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
         # canvas is a placeholder for visualization
-        self._Frame_canvas = ttk.Frame(self)
-        self._Canvas_visualization = tk.Canvas(self._Frame_canvas, width=600, height=600, bg="blue")
-        self._Canvas_visualization.grid()
-        self._Frame_canvas.grid(row=0, column=1, padx=10, pady=10)
+        self._Canvas_kmeans = tk.Canvas(self._Tab_kmeans, width=600, height=600, bg="blue")
+        self._Canvas_kmeans.grid()
+        self._Canvas_dbscan = tk.Canvas(self._Tab_dbscan, width=600, height=600, bg="green")
+        self._Canvas_dbscan.grid()
+        # scrollbar and text widgets for log
+        self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient = tk.HORIZONTAL)
+        self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient = tk.VERTICAL)
+        self._Text_log = tk.Text(self._Tab_log, wrap = tk.NONE, width=72, height=36,
+                                xscrollcommand = self._Scroll_H.set,
+                                yscrollcommand = self._Scroll_V.set,
+                                bg="black", fg="gray")
+        self._Scroll_H["command"] = self._Text_log.xview
+        self._Scroll_V["command"] = self._Text_log.yview
+        self._Text_log.grid(row=0, column=0)
+        self._Scroll_H.grid(row=1, column=0, sticky=tk.E+tk.W)
+        self._Scroll_V.grid(row=0, column=1, sticky=tk.N+tk.S)
+
+        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10)
+
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
@@ -151,7 +175,8 @@ class SpaceApp(tk.Frame):
         # b) or perhaps save to a file
         # c) or perhaps output to a logging window that the user can
         #    see/hide as desired so they know what's going on
-        print("%s" % text)
+        self._Text_log.insert(tk.END, "%s\n" % text)
+        self.master.update()
 
     def _quick_message_box(self, text):
         """A quick and dirty messagebox for showing simple output for debugging."""
@@ -200,7 +225,7 @@ class SpaceApp(tk.Frame):
         else:
             self.log("All files have this wavelength range in common: %s to %s" % (min, max))
         # truncate to common range
-        print("Truncating data to range %s to %s..." % (min, max))
+        self.log("Truncating data to range %s to %s..." % (min, max))
         dataops.truncate(self._data_objs, min, max)
         # align the pairs dataframes.  Currently just uses the first dataframe to align to, will need to research if this is the best one to align to
         self.log("Aligning the pairs dataframes")
