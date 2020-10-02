@@ -171,7 +171,8 @@ def align(data_objects, align_to):
     alignment_pairs = data_objects[align_to].pairs
     for dobj in data_objects:
         ( _ ,dobj.pairs) = alignment_pairs.align(dobj.pairs, join="outer", axis = 0)
-        dobj.pairs = dobj.pairs.interpolate()
+        dobj.pairs = dobj.pairs.interpolate(limit_direction='both')
+        # dobj.pairs = dobj.pairs.interpolate()
         ( _ , dobj.pairs) = alignment_pairs.align(dobj.pairs, join ="left", axis = 0)
     return None
 
