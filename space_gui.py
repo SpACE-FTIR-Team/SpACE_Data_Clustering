@@ -206,6 +206,12 @@ class SpaceApp(tk.Frame):
         # filter by filename
         filtered_file_list = fileops.filter_filenames(file_list)
         self.log("Found %s files matching the filename filter criteria" % len(filtered_file_list))
+        if len(filtered_file_list) == 0:
+            # a empty path is a fatal error
+            # log to console and pop up a messagebox
+            self.log("No files found path: %s" % self._Var_folder.get())
+            self._quick_message_box("No files found:\n%s" % self._Var_folder.get())
+            return
         # parse
         self.log("Loading into data objects...")
         self._data_objs = dataops.file_to_data_object(filtered_file_list)
