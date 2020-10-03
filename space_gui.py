@@ -164,11 +164,14 @@ class SpaceApp(tk.Frame):
         self._Text_log.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E+tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N+tk.S)
-        # canvas is a placeholder for visualization
-        self._Canvas_kmeans = tk.Canvas(self._Tab_kmeans, width=600, height=600, bg="blue")
-        self._Canvas_kmeans.grid(sticky=tk.N+tk.E+tk.W+tk.S)
-        self._Canvas_dbscan = tk.Canvas(self._Tab_dbscan, width=600, height=600, bg="green")
-        self._Canvas_dbscan.grid(sticky=tk.N+tk.S+tk.E+tk.W)
+        # kmeans panel
+        self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self)
+        self._kmeans_viz_panel.get_frame_handle().grid()
+        self._kmeans_viz_panel.disable_widgets()
+        # dbscan panel
+        self._dbscan_viz_panel = VisualizationPanel(self._Tab_dbscan, self)
+        self._dbscan_viz_panel.get_frame_handle().grid()
+        self._dbscan_viz_panel.disable_widgets()
 
         # end setup of NOTEBOOK (tabs), right column
         self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N+tk.S+tk.E+tk.W)
@@ -250,7 +253,7 @@ class SpaceApp(tk.Frame):
         dataops.truncate(self._data_objs, min, max)
         # finds the index of the file with the highest resolution
         self.log("Finding highest resolution file...")
-        max_res_index = dataops.find_max_res(self._data_objs, max - min)
+        max_res_index = dataops.find_max_res(self._data_objs)
         # align the pairs dataframes to dataframe with highest resolution
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
@@ -288,3 +291,23 @@ class SpaceApp(tk.Frame):
 
     def _on_close(self):
         self.master.destroy()
+
+class VisualizationPanel(object):
+    """A panel with tkinter widgets for the K-means and DBSCAN
+    visualization plots."""
+
+    def __init__(self, parent, controller):
+        self._Frame = ttk.Frame(parent)
+        self._Frame.grid()
+
+        self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot")
+        self._Button.grid()
+
+    def get_frame_handle(self):
+        return self._Frame
+
+    def disable_widgets(self):
+        self._Button.config(state="disabled")
+
+    def enable_widgets(self):
+        self._Button.config(state="normal")
