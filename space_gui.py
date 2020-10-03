@@ -278,6 +278,8 @@ class SpaceApp(tk.Frame):
             self.log("Performing K-means...")
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
             self.log("...done.")
+            # TODO: check the kmeans clustering succeeded before enabling plot widgets
+            self._kmeans_viz_panel.enable_widgets()
             # plotting broke, disable for now
             #space_plot_kmeans.plot(self._dataset, k_clusters)
         # TODO: dbscan
@@ -297,9 +299,15 @@ class VisualizationPanel(object):
     visualization plots."""
 
     def __init__(self, parent, controller):
+        """Set up frame and widgets."""
         self._Frame = ttk.Frame(parent)
         self._Frame.grid()
-
+        self._Var_dimensions = tk.StringVar()
+        self._Combobox = ttk.Combobox(self._Frame, width=5, justify="center",
+                                        state="readonly", textvariable=self._Var_dimensions,
+                                        values=['2D', '3D'])
+        self._Combobox.current(0)
+        self._Combobox.grid(pady=10)
         self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot")
         self._Button.grid()
 
@@ -307,7 +315,9 @@ class VisualizationPanel(object):
         return self._Frame
 
     def disable_widgets(self):
+        self._Combobox.config(state="disabled")
         self._Button.config(state="disabled")
 
     def enable_widgets(self):
+        self._Combobox.config(state="readonly")
         self._Button.config(state="normal")
