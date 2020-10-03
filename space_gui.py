@@ -3,6 +3,7 @@
 #
 
 import tkinter as tk
+import tkinter.ttk as ttk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 from time import sleep
@@ -47,31 +48,31 @@ class SpaceApp(tk.Frame):
 
     def _create_widgets(self):
         """Create and configure all the widgets in the main frame."""
-        self._Frame_options = tk.Frame(self)
+        self._Frame_options = ttk.Frame(self)
         # data widgets
-        self._LabelFrame_data = tk.LabelFrame(self._Frame_options, text="Data")
+        self._LabelFrame_data = ttk.LabelFrame(self._Frame_options, text="Data")
         # -- input sub-frame --
-        self._Frame_input = tk.Frame(self._LabelFrame_data)
-        self._Label_data_text = tk.Label(self._Frame_input, text="Input from folder:")
+        self._Frame_input = ttk.Frame(self._LabelFrame_data)
+        self._Label_data_text = ttk.Label(self._Frame_input, text="Input from folder:")
         self._Var_folder = tk.StringVar()
-        self._Entry_folder = tk.Entry(self._Frame_input, width=30, textvariable=self._Var_folder)
-        self._Button_browse = tk.Button(self._Frame_input, text="Browse...", command=self._on_browse)
+        self._Entry_folder = ttk.Entry(self._Frame_input, width=30, textvariable=self._Var_folder)
+        self._Button_browse = ttk.Button(self._Frame_input, text="Browse...", command=self._on_browse)
         self._Label_data_text.grid(row=0, column=0, padx=(0, 0), sticky=tk.W)
         self._Entry_folder.grid(row=1, column=0, padx=(5, 0), sticky=tk.W)
         self._Button_browse.grid(row=1, column=1, padx=5)
         self._Frame_input.grid(row=0, sticky=tk.W)
         # -- normalize is by itself, no sub-frame --
         self._Var_normalize = tk.BooleanVar()
-        self._Checkbutton_normalize = tk.Checkbutton(self._LabelFrame_data, text="Normalize data during import",
+        self._Checkbutton_normalize = ttk.Checkbutton(self._LabelFrame_data, text="Normalize data during import",
                                                      variable=self._Var_normalize)
         self._Checkbutton_normalize.grid(row=1, sticky=tk.W)
         # -- pca sub-frame --
-        self._Frame_pca = tk.Frame(self._LabelFrame_data)
+        self._Frame_pca = ttk.Frame(self._LabelFrame_data)
         self._Var_pca = tk.BooleanVar()
         self._Var_pca_dimensions = tk.IntVar()
-        self._Checkbutton_pca = tk.Checkbutton(self._Frame_pca, text="Perform PCA", variable=self._Var_pca)
-        self._Label_pca_text = tk.Label(self._Frame_pca, text="Number of dimensions:")
-        self._Entry_pca = tk.Entry(self._Frame_pca, width=5, justify="center", textvariable=self._Var_pca_dimensions)
+        self._Checkbutton_pca = ttk.Checkbutton(self._Frame_pca, text="Perform PCA", variable=self._Var_pca)
+        self._Label_pca_text = ttk.Label(self._Frame_pca, text="Number of dimensions:")
+        self._Entry_pca = ttk.Entry(self._Frame_pca, width=5, justify="center", textvariable=self._Var_pca_dimensions)
         self._Checkbutton_pca.grid(row=0, sticky=tk.W)
         self._Label_pca_text.grid(row=1, column=0, sticky=tk.W)
         self._Entry_pca.grid(row=1, column=1)
@@ -80,14 +81,14 @@ class SpaceApp(tk.Frame):
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
 
         # kmeans widgets
-        self._LabelFrame_kmeans = tk.LabelFrame(self._Frame_options, text="K-means algorithm")
+        self._LabelFrame_kmeans = ttk.LabelFrame(self._Frame_options, text="K-means algorithm")
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans_clusters = tk.IntVar()
-        self._Checkbutton_kmeans = tk.Checkbutton(self._LabelFrame_kmeans, text="Perform K-means",
+        self._Checkbutton_kmeans = ttk.Checkbutton(self._LabelFrame_kmeans, text="Perform K-means",
                                                   variable=self._Var_kmeans)
         self._Checkbutton_kmeans.grid(row=0, sticky=tk.W)
-        self._Label_k = tk.Label(self._LabelFrame_kmeans, text="Number of clusters (k):")
-        self._Entry_k = tk.Entry(self._LabelFrame_kmeans, width=5, justify="center",
+        self._Label_k = ttk.Label(self._LabelFrame_kmeans, text="Number of clusters (k):")
+        self._Entry_k = ttk.Entry(self._LabelFrame_kmeans, width=5, justify="center",
                                  textvariable=self._Var_kmeans_clusters)
         self._Label_k.grid(row=1, column=0, pady=(0, 5), sticky=tk.W)
         self._Entry_k.grid(row=1, column=1, pady=(0, 5))
@@ -95,21 +96,21 @@ class SpaceApp(tk.Frame):
         self._LabelFrame_kmeans.grid(row=1, column=0, padx=(10, 0), pady=(30, 0), sticky=tk.EW)
 
         # dbscan widgets
-        self._LabelFrame_dbscan = tk.LabelFrame(self._Frame_options, text="DBSCAN algorithm")
+        self._LabelFrame_dbscan = ttk.LabelFrame(self._Frame_options, text="DBSCAN algorithm")
         self._Var_dbscan = tk.BooleanVar()
-        self._Checkbutton_dbscan = tk.Checkbutton(self._LabelFrame_dbscan, text="Perform DBSCAN",
+        self._Checkbutton_dbscan = ttk.Checkbutton(self._LabelFrame_dbscan, text="Perform DBSCAN",
                                                   variable=self._Var_dbscan)
         self._Checkbutton_dbscan.grid(row=0, sticky=tk.W)
         # -- dbscan parameters sub-frame --
-        self._Frame_dbscan_parameters = tk.Frame(self._LabelFrame_dbscan)
+        self._Frame_dbscan_parameters = ttk.Frame(self._LabelFrame_dbscan)
         self._Var_eps = tk.DoubleVar()
         self._Var_minpts = tk.IntVar()
-        self._Label_eps = tk.Label(self._Frame_dbscan_parameters, text="epsilon:")
-        self._Entry_eps = tk.Entry(self._Frame_dbscan_parameters, width=5, justify="center", textvariable=self._Var_eps)
+        self._Label_eps = ttk.Label(self._Frame_dbscan_parameters, text="epsilon:")
+        self._Entry_eps = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center", textvariable=self._Var_eps)
         self._Label_eps.grid(row=0, column=0, sticky=tk.E)
         self._Entry_eps.grid(row=0, column=1, sticky=tk.W)
-        self._Label_minpts = tk.Label(self._Frame_dbscan_parameters, text="MinPts:")
-        self._Entry_minpts = tk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
+        self._Label_minpts = ttk.Label(self._Frame_dbscan_parameters, text="MinPts:")
+        self._Entry_minpts = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
                                       textvariable=self._Var_minpts)
         self._Label_minpts.grid(row=1, column=0, sticky=tk.E)
         self._Entry_minpts.grid(row=1, column=1, sticky=tk.W)
@@ -118,9 +119,9 @@ class SpaceApp(tk.Frame):
         self._LabelFrame_dbscan.grid(row=2, column=0, padx=(10, 0), pady=(5, 0), sticky=tk.EW)
 
         # action buttons
-        self._Frame_action_buttons = tk.Frame(self._Frame_options)
-        self._Button_go = tk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
-        self._Button_save = tk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
+        self._Frame_action_buttons = ttk.Frame(self._Frame_options)
+        self._Button_go = ttk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
+        self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
                                       state="disabled")
         self._Button_go.grid(pady=10)
         self._Button_save.grid(pady=10)
@@ -128,11 +129,35 @@ class SpaceApp(tk.Frame):
 
         self._Frame_options.grid(row=0, column=0, sticky=tk.N)
 
+        # notebook (tabs)
+        self._Notebook_controller = ttk.Notebook(self)
+
+        self._Tab_log = ttk.Frame(self._Notebook_controller)
+        self._Tab_kmeans = ttk.Frame(self._Notebook_controller)
+        self._Tab_dbscan = ttk.Frame(self._Notebook_controller)
+        self._Notebook_controller.add(self._Tab_log, text="Log")
+        self._Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
+        self._Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
         # canvas is a placeholder for visualization
-        self._Frame_canvas = tk.Frame(self)
-        self._Canvas_visualization = tk.Canvas(self._Frame_canvas, width=600, height=600, bg="blue")
-        self._Canvas_visualization.grid()
-        self._Frame_canvas.grid(row=0, column=1, padx=10, pady=10)
+        self._Canvas_kmeans = tk.Canvas(self._Tab_kmeans, width=600, height=600, bg="blue")
+        self._Canvas_kmeans.grid()
+        self._Canvas_dbscan = tk.Canvas(self._Tab_dbscan, width=600, height=600, bg="green")
+        self._Canvas_dbscan.grid()
+        # scrollbar and text widgets for log
+        self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient = tk.HORIZONTAL)
+        self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient = tk.VERTICAL)
+        self._Text_log = tk.Text(self._Tab_log, wrap = tk.NONE, width=72, height=36,
+                                xscrollcommand = self._Scroll_H.set,
+                                yscrollcommand = self._Scroll_V.set,
+                                bg="black", fg="gray")
+        self._Scroll_H["command"] = self._Text_log.xview
+        self._Scroll_V["command"] = self._Text_log.yview
+        self._Text_log.grid(row=0, column=0)
+        self._Scroll_H.grid(row=1, column=0, sticky=tk.E+tk.W)
+        self._Scroll_V.grid(row=0, column=1, sticky=tk.N+tk.S)
+
+        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10)
+
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
@@ -150,7 +175,8 @@ class SpaceApp(tk.Frame):
         # b) or perhaps save to a file
         # c) or perhaps output to a logging window that the user can
         #    see/hide as desired so they know what's going on
-        print("%s" % text)
+        self._Text_log.insert(tk.END, "%s\n" % text)
+        self.master.update()
 
     def _quick_message_box(self, text):
         """A quick and dirty messagebox for showing simple output for debugging."""
@@ -199,7 +225,7 @@ class SpaceApp(tk.Frame):
         else:
             self.log("All files have this wavelength range in common: %s to %s" % (min, max))
         # truncate to common range
-        print("Truncating data to range %s to %s..." % (min, max))
+        self.log("Truncating data to range %s to %s..." % (min, max))
         dataops.truncate(self._data_objs, min, max)
         # finds the index of the file with the highest resolution
         self.log("Finding highest resolution file")
