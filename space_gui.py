@@ -28,14 +28,12 @@ class SpaceApp(tk.Frame):
         """Set up the root window and instantiate the main frame."""
         super().__init__(master)
         self.master = master
-        self.master.grid_columnconfigure(0, weight=1)
-        self.master.grid_rowconfigure(0, weight=1)
         self.app_config = app_config
         if app_config != {}:
             self.master.title("%s v. %s" %
                               (self.app_config.get("APP_NAME", 'Application'),
                                self.app_config.get("APP_VERSION", 'Unknown')))
-        self.grid(sticky=tk.N+tk.S+tk.E+tk.W)
+        self.grid()
 
         # attach handler for exiting the program
         self.master.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -50,10 +48,6 @@ class SpaceApp(tk.Frame):
 
     def _create_widgets(self):
         """Create and configure all the widgets in the main frame."""
-        self.grid_columnconfigure(index=0, weight=0)
-        self.grid_columnconfigure(index=1, weight=1)
-        self.grid_rowconfigure(index=0, weight=1)
-        
         self._Frame_options = ttk.Frame(self)
         # data widgets
         self._LabelFrame_data = ttk.LabelFrame(self._Frame_options, text="Data")
@@ -141,20 +135,14 @@ class SpaceApp(tk.Frame):
         self._Tab_log = ttk.Frame(self._Notebook_controller)
         self._Tab_kmeans = ttk.Frame(self._Notebook_controller)
         self._Tab_dbscan = ttk.Frame(self._Notebook_controller)
-        self._Tab_log.grid_columnconfigure(index=0, weight=1)
-        self._Tab_log.grid_rowconfigure(index=0, weight=1)
-        self._Tab_kmeans.grid_columnconfigure(index=0, weight=1)
-        self._Tab_kmeans.grid_rowconfigure(index=0, weight=1)
-        self._Tab_dbscan.grid_columnconfigure(index=0, weight=1)
-        self._Tab_dbscan.grid_rowconfigure(index=0, weight=1)
         self._Notebook_controller.add(self._Tab_log, text="Log")
         self._Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
         self._Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
         # canvas is a placeholder for visualization
         self._Canvas_kmeans = tk.Canvas(self._Tab_kmeans, width=600, height=600, bg="blue")
-        self._Canvas_kmeans.grid(sticky=tk.N+tk.E+tk.W+tk.S)
+        self._Canvas_kmeans.grid()
         self._Canvas_dbscan = tk.Canvas(self._Tab_dbscan, width=600, height=600, bg="green")
-        self._Canvas_dbscan.grid(sticky=tk.N+tk.S+tk.E+tk.W)
+        self._Canvas_dbscan.grid()
         # scrollbar and text widgets for log
         self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient = tk.HORIZONTAL)
         self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient = tk.VERTICAL)
@@ -164,11 +152,11 @@ class SpaceApp(tk.Frame):
                                 bg="black", fg="gray")
         self._Scroll_H["command"] = self._Text_log.xview
         self._Scroll_V["command"] = self._Text_log.yview
-        self._Text_log.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+        self._Text_log.grid(row=0, column=0)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E+tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N+tk.S)
 
-        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N+tk.S+tk.E+tk.W)
+        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10)
 
 
     def _set_defaults(self):
