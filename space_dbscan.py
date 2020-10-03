@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 # Generate sample data
-#centers = [[1, 1], [-1, -1], [1, -1]]
+centers = [[1, 1], [-1, -1], [1, -1]]
 dataset, labels_true = make_blobs(n_samples=750, centers=centers, cluster_std=0.4,
                             random_state=0)
 

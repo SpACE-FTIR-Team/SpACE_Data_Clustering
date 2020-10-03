@@ -201,13 +201,16 @@ class SpaceApp(tk.Frame):
         # truncate to common range
         print("Truncating data to range %s to %s..." % (min, max))
         dataops.truncate(self._data_objs, min, max)
+        # finds the index of the file with the highest resolution
+        self.log("Finding highest resolution file")
+        max_res_index = dataops.find_max_res(self._data_objs, max - min)
         # align the pairs dataframes.  Currently just uses the first dataframe to align to, will need to research if this is the best one to align to
         self.log("Aligning the pairs dataframes")
-        dataops.align(self._data_objs, self._data_objs[0])
-        # interpolate the pairs dataframes to fill in any missing values after the alignment
-        self.log("Interpolating the pairs dataframes")
-        dataops.interp(self._data_objs)
+        dataops.align(self._data_objs, max_res_index)
 
+        self._dataset = dataops.combine(self._data_objs)
+
+        
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
         # while we do work
@@ -222,9 +225,9 @@ class SpaceApp(tk.Frame):
         # TODO: pca
         # kmeans
         if self._Var_kmeans.get():
-            dataset = space_random_data.generateRandomData(1000)
-            k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
-            space_plot_kmeans.plot(dataset, k_clusters)
+            #self._dataset = space_random_data.generateRandomData(1000)
+            k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+            space_plot_kmeans.plot(self._dataset, k_clusters)
         # TODO: dbscan
         # re-enable Go button and un-busy the cursor now that we're done
         self.master.config(cursor="")

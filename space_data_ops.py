@@ -111,6 +111,7 @@ def reindex(data_objects):
         wavelength_col_name = dataframe.columns[0]
         dataframe.rename(columns={wavelength_col_name: 'wavelength'}, inplace=True)
         dataframe.set_index('wavelength', inplace=True)
+        dataframe.sort_index(inplace = True)
     return None
 
 def find_common_range(data_objects):
@@ -144,22 +145,40 @@ def truncate(data_objects, min, max):
     with the new dataframe. Returns None."""
     for dobj in data_objects:
         original_dataframe = dobj.pairs
-        truncated_dataframe = original_dataframe.truncate(before=min, after=max, axis='index')
+        truncated_dataframe = original_dataframe.truncate(before=min, after=max, axis='index', copy = True)
         dobj.pairs = truncated_dataframe
     return None
 
+def find_max_res(data_objects, data_range):
+    """This function takes a list of data objects and the range common to them, iterates over them, and finds the
+    object with the most points.  It will return the index of this object"""
+    max_pts = 0
+    max_pts_index = 0
+    for i in range(len(data_objects)):
+        cur_pts = data_objects[i].pairs.size
+        if cur_pts > max_pts:
+            max_pts = cur_pts
+            max_pts_index = i
+    return max_pts_index
+
+
 def align(data_objects, align_to):
     """This function takes a list of data objects, iterates over them, and makes every 'pairs' dataframe use the same
-    x axis.  The result is that all 'pairs' dataframes will use the same x axis and thus be aligned.  align_to should also be a dataframe
+    x axis.  The result is that all 'pairs' dataframes will use the same x axis and thus be aligned.  This will then fill in 
+    any missing values caused by the alignment using.  align_to should also be the index of the data object to align to
     and contains the x axis that all dataobjs should be aligned to."""
-    alignment_pairs = align_to.pairs
+
+    alignment_pairs = data_objects[align_to].pairs
     for dobj in data_objects:
-        dobj.pairs.align(alignment_pairs, join="right")
+        ( _ ,dobj.pairs) = alignment_pairs.align(dobj.pairs, join="outer", axis = 0)
+        dobj.pairs = dobj.pairs.interpolate(limit_direction='both')
+        # dobj.pairs = dobj.pairs.interpolate()
+        ( _ , dobj.pairs) = alignment_pairs.align(dobj.pairs, join ="left", axis = 0)
     return None
 
-def interp(data_objects):
-    """This function takes a list of data objects, iterates over them, and fills in any missing values caused by an alignment
-    the result is that all 'pairs' dataframes will have all of the values filled in with a value estimated through interpolation"""
-    for dobj in data_objects:
-        dobj.pairs.interpolate(method = "spline", order = 2)
-    return None
+def combine(data_objects):
+    """This function takes a list of data objects all sharing a common x coordinate and outputs them all as one block
+    This block will have each data_object taking up one row where each column is a different y coordinate.
+    Returns a block of data"""
+    data_block = pd.concat([dobj.pairs.transpose() for dobj in data_objects], ignore_index = True)
+    return data_block
