@@ -6,7 +6,7 @@ import space_gui as gui
 
 CONFIG = {
 	"APP_NAME": "SpACE",
-	"APP_VERSION": "0.0.4",
+	"APP_VERSION": "0.0.5",
 	"DEFAULT_PCA_DIMENSIONS": 2,
 	"DEFAULT_KMEANS_K": 8,
 	"DEFAULT_DBSCAN_EPS": 1.0,
