@@ -149,7 +149,7 @@ def truncate(data_objects, min, max):
         dobj.pairs = truncated_dataframe
     return None
 
-def find_max_res(data_objects, data_range):
+def find_max_res(data_objects):
     """This function takes a list of data objects and the range common to them, iterates over them, and finds the
     object with the most points.  It will return the index of this object"""
     max_pts = 0
