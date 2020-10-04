@@ -191,9 +191,10 @@ class SpaceApp(tk.Frame):
         # normalization
 
         # pca
-        if(self._Var_eps.get() == True):
-            normalization.PCAnormalize(self._pandas_dataframes, int(self._Entry_pca.get()))
-            print('PCA applied')
+        if self._Var_pca.get():
+            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
+            normalization.PCAnormalize(self._pandas_dataframes, self._Var_pca_dimensions.get())
+            self.log('PCA applied')
         # kmeans
         if self._Var_kmeans.get():
             dataset = space_random_data.generateRandomData(1000)
