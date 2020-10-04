@@ -235,7 +235,7 @@ class SpaceApp(tk.Frame):
         dataops.truncate(self._data_objs, min, max)
         # finds the index of the file with the highest resolution
         self.log("Finding highest resolution file...")
-        max_res_index = dataops.find_max_res(self._data_objs, max - min)
+        max_res_index = dataops.find_max_res(self._data_objs)
         # align the pairs dataframes to dataframe with highest resolution
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
