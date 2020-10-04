@@ -11,6 +11,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
 import space_random_data
 import space_plot_kmeans
+import normalization
 
 
 def launch_gui(cnf):
@@ -183,11 +184,16 @@ class SpaceApp(tk.Frame):
         # range check
         # alignment
 
+
     def _on_go(self):
         self.log("user: pressed Go button")
         self._do_import_data()
         # normalization
+
         # pca
+        if(self._Var_eps.get() == True):
+            normalization.PCAnormalize(self._pandas_dataframes, int(self._Entry_pca.get()))
+            print('PCA applied')
         # kmeans
         if self._Var_kmeans.get():
             dataset = space_random_data.generateRandomData(1000)
