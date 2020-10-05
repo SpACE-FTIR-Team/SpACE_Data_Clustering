@@ -14,4 +14,4 @@ def PCAnormalize(dataObjectArray, dimensions):
     for i in dataOb:
         pca = PCA(n_components=dims, copy=False, svd_solver='full')
         pca.fit(i.pairs)
-    print("PCA done")
+    #print("PCA done")

@@ -240,12 +240,20 @@ class SpaceApp(tk.Frame):
         # align the pairs dataframes to dataframe with highest resolution
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
+        
+        #PCA
+        if self._Var_pca.get():
+            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
+            normalization.PCAnormalize(self._data_objs, self._Var_pca_dimensions.get())
+            #normalization.PCAnormalize(self._data_objs, 1)
+            self.log('PCA applied')
+
         # final, pre-processed dataset
         self.log("Done importing and pre-processing data files")
         self._dataset = dataops.combine(self._data_objs)
         
         # alignment
-
+   
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
@@ -258,14 +266,8 @@ class SpaceApp(tk.Frame):
         self.log("user: pressed Go button")
         self._do_import_data()
         # TODO: normalization
-        # TODO: pca
-        # normalization
 
-        # pca
-        if self._Var_pca.get():
-            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
-            normalization.PCAnormalize(self._pandas_dataframes, self._Var_pca_dimensions.get())
-            self.log('PCA applied')
+        
         # kmeans
         if self._Var_kmeans.get() and self._data_objs != []:
             self.log("Performing K-means...")
