@@ -49,8 +49,14 @@ class SpaceApp(tk.Frame):
 
     def _create_widgets(self):
         """Create and configure all the widgets in the main frame."""
+        self.grid_columnconfigure(index=0, weight=0)
+        self.grid_columnconfigure(index=1, weight=1)
+        self.grid_rowconfigure(index=0, weight=1)
+        
+        # OPTIONS FRAME, left column
         self._Frame_options = ttk.Frame(self)
-        # data widgets
+
+        # - DATA widgets -
         self._LabelFrame_data = ttk.LabelFrame(self._Frame_options, text="Data")
         # -- input sub-frame --
         self._Frame_input = ttk.Frame(self._LabelFrame_data)
@@ -78,10 +84,10 @@ class SpaceApp(tk.Frame):
         self._Label_pca_text.grid(row=1, column=0, sticky=tk.W)
         self._Entry_pca.grid(row=1, column=1)
         self._Frame_pca.grid(row=2, pady=(0, 5), sticky=tk.W)
-        # data widgets grid
+        # - DATA widgets grid -
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
 
-        # kmeans widgets
+        # - KMEANS widgets -
         self._LabelFrame_kmeans = ttk.LabelFrame(self._Frame_options, text="K-means algorithm")
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans_clusters = tk.IntVar()
@@ -93,10 +99,10 @@ class SpaceApp(tk.Frame):
                                  textvariable=self._Var_kmeans_clusters)
         self._Label_k.grid(row=1, column=0, pady=(0, 5), sticky=tk.W)
         self._Entry_k.grid(row=1, column=1, pady=(0, 5))
-        # kmeans grid
+        # - KMEANS widgets grid -
         self._LabelFrame_kmeans.grid(row=1, column=0, padx=(10, 0), pady=(30, 0), sticky=tk.EW)
 
-        # dbscan widgets
+        # - DBSCAN widgets -
         self._LabelFrame_dbscan = ttk.LabelFrame(self._Frame_options, text="DBSCAN algorithm")
         self._Var_dbscan = tk.BooleanVar()
         self._Checkbutton_dbscan = ttk.Checkbutton(self._LabelFrame_dbscan, text="Perform DBSCAN",
@@ -116,35 +122,36 @@ class SpaceApp(tk.Frame):
         self._Label_minpts.grid(row=1, column=0, sticky=tk.E)
         self._Entry_minpts.grid(row=1, column=1, sticky=tk.W)
         self._Frame_dbscan_parameters.grid(row=1, pady=(0, 5), sticky=tk.W)
-        # dbscan grid
+        # - DBSCAN grid -
         self._LabelFrame_dbscan.grid(row=2, column=0, padx=(10, 0), pady=(5, 0), sticky=tk.EW)
 
-        # action buttons
+        # - BUTTONS for actions -
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
         self._Button_go = ttk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
         self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
                                       state="disabled")
         self._Button_go.grid(pady=10)
         self._Button_save.grid(pady=10)
+        # - BUTTONS for actions grid -
         self._Frame_action_buttons.grid(row=3, column=0, pady=30)
 
+        # end setup of OPTIONS FRAME, left column
         self._Frame_options.grid(row=0, column=0, sticky=tk.N)
 
-        # notebook (tabs)
+        # NOTEBOOK (tabs), right column
         self._Notebook_controller = ttk.Notebook(self)
-
+        # the tabs
         self._Tab_log = ttk.Frame(self._Notebook_controller)
         self._Tab_kmeans = ttk.Frame(self._Notebook_controller)
         self._Tab_dbscan = ttk.Frame(self._Notebook_controller)
+        # rezise setup
+        for tab in (self._Tab_log, self._Tab_kmeans, self._Tab_dbscan):
+            tab.grid_columnconfigure(index=0, weight=1)
+            tab.grid_rowconfigure(index=0, weight=1)
         self._Notebook_controller.add(self._Tab_log, text="Log")
         self._Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
         self._Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
-        # canvas is a placeholder for visualization
-        self._Canvas_kmeans = tk.Canvas(self._Tab_kmeans, width=600, height=600, bg="blue")
-        self._Canvas_kmeans.grid()
-        self._Canvas_dbscan = tk.Canvas(self._Tab_dbscan, width=600, height=600, bg="green")
-        self._Canvas_dbscan.grid()
-        # scrollbar and text widgets for log
+        # log text box and scrollbars
         self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient = tk.HORIZONTAL)
         self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient = tk.VERTICAL)
         self._Text_log = tk.Text(self._Tab_log, wrap = tk.NONE, width=72, height=36,
@@ -156,8 +163,17 @@ class SpaceApp(tk.Frame):
         self._Text_log.grid(row=0, column=0)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E+tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N+tk.S)
+        # kmeans panel
+        self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self)
+        self._kmeans_viz_panel.get_frame_handle().grid()
+        self._kmeans_viz_panel.disable_widgets()
+        # dbscan panel
+        self._dbscan_viz_panel = VisualizationPanel(self._Tab_dbscan, self)
+        self._dbscan_viz_panel.get_frame_handle().grid()
+        self._dbscan_viz_panel.disable_widgets()
 
-        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10)
+        # end setup of NOTEBOOK (tabs), right column
+        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N+tk.S+tk.E+tk.W)
 
 
     def _set_defaults(self):
@@ -273,6 +289,8 @@ class SpaceApp(tk.Frame):
             self.log("Performing K-means...")
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
             self.log("...done.")
+            # TODO: check the kmeans clustering succeeded before enabling plot widgets
+            self._kmeans_viz_panel.enable_widgets()
             # plotting broke, disable for now
             #space_plot_kmeans.plot(self._dataset, k_clusters)
         # TODO: dbscan
@@ -286,3 +304,31 @@ class SpaceApp(tk.Frame):
 
     def _on_close(self):
         self.master.destroy()
+
+class VisualizationPanel(object):
+    """A panel with tkinter widgets for the K-means and DBSCAN
+    visualization plots."""
+
+    def __init__(self, parent, controller):
+        """Set up frame and widgets."""
+        self._Frame = ttk.Frame(parent)
+        self._Frame.grid()
+        self._Var_dimensions = tk.StringVar()
+        self._Combobox = ttk.Combobox(self._Frame, width=5, justify="center",
+                                        state="readonly", textvariable=self._Var_dimensions,
+                                        values=['2D', '3D'])
+        self._Combobox.current(0)
+        self._Combobox.grid(pady=10)
+        self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot")
+        self._Button.grid()
+
+    def get_frame_handle(self):
+        return self._Frame
+
+    def disable_widgets(self):
+        self._Combobox.config(state="disabled")
+        self._Button.config(state="disabled")
+
+    def enable_widgets(self):
+        self._Combobox.config(state="readonly")
+        self._Button.config(state="normal")
