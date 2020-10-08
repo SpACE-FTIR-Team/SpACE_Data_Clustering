@@ -13,6 +13,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
 import space_random_data
 import space_plot_kmeans
+import normalization
 
 
 def launch_gui(cnf):
@@ -28,14 +29,12 @@ class SpaceApp(tk.Frame):
         """Set up the root window and instantiate the main frame."""
         super().__init__(master)
         self.master = master
-        self.master.grid_columnconfigure(0, weight=1)
-        self.master.grid_rowconfigure(0, weight=1)
         self.app_config = app_config
         if app_config != {}:
             self.master.title("%s v. %s" %
                               (self.app_config.get("APP_NAME", 'Application'),
                                self.app_config.get("APP_VERSION", 'Unknown')))
-        self.grid(sticky=tk.N+tk.S+tk.E+tk.W)
+        self.grid()
 
         # attach handler for exiting the program
         self.master.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -161,7 +160,7 @@ class SpaceApp(tk.Frame):
                                 bg="black", fg="gray")
         self._Scroll_H["command"] = self._Text_log.xview
         self._Scroll_V["command"] = self._Text_log.yview
-        self._Text_log.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+        self._Text_log.grid(row=0, column=0)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E+tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N+tk.S)
         # kmeans panel
@@ -257,10 +256,21 @@ class SpaceApp(tk.Frame):
         # align the pairs dataframes to dataframe with highest resolution
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
+        
+        #PCA
+        if self._Var_pca.get():
+            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
+            normalization.PCAnormalize(self._data_objs, self._Var_pca_dimensions.get())
+            #normalization.PCAnormalize(self._data_objs, 1)
+            self.log('PCA applied')
+
         # final, pre-processed dataset
         self.log("Done importing and pre-processing data files")
         self._dataset = dataops.combine(self._data_objs)
         
+        # alignment
+   
+
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
         # while we do work
@@ -272,7 +282,8 @@ class SpaceApp(tk.Frame):
         self.log("user: pressed Go button")
         self._do_import_data()
         # TODO: normalization
-        # TODO: pca
+
+        
         # kmeans
         if self._Var_kmeans.get() and self._data_objs != []:
             self.log("Performing K-means...")
