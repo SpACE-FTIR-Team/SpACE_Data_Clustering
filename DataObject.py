@@ -9,7 +9,7 @@ class DataObject:
         self.descriptive = descriptive_data
         self.pairs = xy_pairs
         self.path = filepath
-        # self.filename = self.path.split("\\")[1]
+        self.filename = self.path.split("\\")[1]
 
     def __str__(self):
         return self.path

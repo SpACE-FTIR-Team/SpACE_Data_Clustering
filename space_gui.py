@@ -256,12 +256,13 @@ class SpaceApp(tk.Frame):
         # align the pairs dataframes to dataframe with highest resolution
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
+
+        fileops.save_files(self._Var_folder.get(), "align/", self._data_objs)
         
         #PCA
         if self._Var_pca.get():
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
             normalization.PCAnormalize(self._data_objs, self._Var_pca_dimensions.get())
-            #normalization.PCAnormalize(self._data_objs, 1)
             self.log('PCA applied')
 
         # final, pre-processed dataset
@@ -281,6 +282,9 @@ class SpaceApp(tk.Frame):
         self.master.update()
         self.log("user: pressed Go button")
         self._do_import_data()
+
+        #This re-enables the save button
+        self._Button_save["state"] = "normal"
         # TODO: normalization
 
         
@@ -300,7 +304,7 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
-        self._quick_message_box("Congrats, you clicked the Save button.")
+        self._quick_message_box("Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
 
     def _on_close(self):
         self.master.destroy()
