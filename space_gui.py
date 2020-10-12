@@ -210,10 +210,17 @@ class SpaceApp(tk.Frame):
         # verify we have a good path in the input folder widget
         if not fileops.path_exists(self._Var_folder.get()):
             # a nonexistent path is a fatal error
-            # log to console and pop up a messagebox
+            
             self.log("Invalid path: %s" % self._Var_folder.get())
             self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
             return False
+        # verify kmeans number of clusters
+        if self._Var_kmeans.get():
+            if self._Var_kmeans_clusters.get() < 2:
+                # bad number of clusters is a fatal error
+                self.log("Number of clusters for K-means must be at least 2.")
+                self._quick_message_box("Number of clusters for K-means must be at least 2.")
+                return False
         self.log("All user input OK.")
         self.log("-- End input validation --")
         return True
