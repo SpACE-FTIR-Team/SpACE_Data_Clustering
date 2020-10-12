@@ -32,9 +32,9 @@ def filter_filenames(file_list):
 def save_files(folder, suffix, data_objects):
 	"""Accepts a specified filepath, a suffix to add to it, and a list of data_objects.  Iterates
 	through them all and saves them to the filepath with the suffix added on. Saves as .csv"""
-	dir_name = folder + suffix
-	if not os.path.isdir(dir_name):
-		os.mkdir(dir_name)
+	save_folder_name = os.path.join(folder, suffix)
+	if not path_exists(save_folder_name):
+		os.mkdir(save_folder_name)
 	for dobj in data_objects:
-		save_string = (dir_name + dobj.filename).rstrip("txt") + "csv"
+		save_string = (save_folder_name + dobj.filename).rstrip("txt") + "csv"
 		dobj.pairs.to_csv(save_string)  # other arguments can be supplied, check pandas docs
