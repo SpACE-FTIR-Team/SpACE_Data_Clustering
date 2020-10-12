@@ -312,6 +312,15 @@ class SpaceApp(tk.Frame):
         # plotting broke, disable for now
         #space_plot_kmeans.plot(self._dataset, k_clusters)
 
+    def _do_dbscan_clustering(self):
+        # epsilon: self._Var_eps.get()
+        # minpts: self._Var_minpts.get()
+        self.log("-- Begin DBSCAN clustering --")
+        k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        self.log("-- End DBSCAN clustering --")
+        # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
+        self._dbscan_viz_panel.enable_widgets()
+
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
         # while we do work
@@ -326,11 +335,10 @@ class SpaceApp(tk.Frame):
             self._do_import_data()
             if self._Var_kmeans.get() and self._data_objs != []:
                 self._do_kmeans_clustering()
-
-            # This re-enables the save button
+            if self._Var_dbscan.get() and self._data_objs != []:
+                self._do_dbscan_clustering()
+            # re-enable the save button
             self._Button_save["state"] = "normal"
-            
-            # TODO: dbscan
         else:
             # at least one input check failed
             pass # this is here for possible future expansion
