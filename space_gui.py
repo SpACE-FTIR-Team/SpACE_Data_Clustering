@@ -221,6 +221,18 @@ class SpaceApp(tk.Frame):
                 self.log("Number of clusters for K-means must be at least 2.")
                 self._quick_message_box("Number of clusters for K-means must be at least 2.")
                 return False
+        # verify dbscan epsilon and minpts
+        if self._Var_dbscan.get():
+            if self._Var_eps.get() < 0:
+                # bad epsilon is a fatal error
+                self.log("DBSCAN epsilon must be greater than zero.")
+                self._quick_message_box("DBSCAN epsilon must be greater than zero.")
+                return False
+            if self._Var_minpts.get() < 3:
+                # bad minpts is a fatal error
+                self.log("DBSCAN MinPts must be at least 3.")
+                self._quick_message_box("DBSCAN MinPts must be at least 3.")
+                return False
         self.log("All user input OK.")
         self.log("-- End input validation --")
         return True
