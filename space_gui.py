@@ -11,7 +11,6 @@ import space_file_ops as fileops
 import space_data_ops as dataops
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
-import space_random_data
 import space_plot_kmeans
 import normalization
 
