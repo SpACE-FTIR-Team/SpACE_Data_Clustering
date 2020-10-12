@@ -257,7 +257,7 @@ class SpaceApp(tk.Frame):
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
 
-        fileops.save_files(self._Var_folder.get(), "align/", self._data_objs)
+        fileops.save_files(self._Var_folder.get(), "/align/", self._data_objs)
         
         #PCA
         if self._Var_pca.get():
@@ -293,6 +293,7 @@ class SpaceApp(tk.Frame):
             self.log("Performing K-means...")
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
             self.log("...done.")
+            composition = space_kmeans.calculate_composition(k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
             # TODO: check the kmeans clustering succeeded before enabling plot widgets
             self._kmeans_viz_panel.enable_widgets()
             # plotting broke, disable for now
