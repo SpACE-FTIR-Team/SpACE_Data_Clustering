@@ -316,7 +316,7 @@ class SpaceApp(tk.Frame):
         # epsilon: self._Var_eps.get()
         # minpts: self._Var_minpts.get()
         self.log("-- Begin DBSCAN clustering --")
-        k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        # call dbscan here
         self.log("-- End DBSCAN clustering --")
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
