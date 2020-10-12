@@ -330,6 +330,9 @@ class SpaceApp(tk.Frame):
         sleep(.5)   # cursor is sometimes not updating without this delay
         self.master.update()
         self.log("user: pressed Go button")
+        # disable visualization until we have new data
+        self._kmeans_viz_panel.disable_widgets()
+        self._dbscan_viz_panel.disable_widgets()
         if self._validate_user_input():
             # all input checks passed
             self._do_import_data()
