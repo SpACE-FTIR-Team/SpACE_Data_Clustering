@@ -16,4 +16,5 @@ def plot(dataset, clusters):
         cy.append(i[1])
     plt.scatter(x= x, y= y, c=clusters.labels_, cmap = "tab20")
     plt.scatter(x = cx, y = cy, marker = "x", color = "black", s = 50)
+    plt.title("Kmeans")
     plt.show()
