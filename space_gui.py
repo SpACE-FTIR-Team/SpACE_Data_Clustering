@@ -198,6 +198,26 @@ class SpaceApp(tk.Frame):
         """A quick and dirty messagebox for showing simple output for debugging."""
         tkmb.showinfo("Message", text)
 
+    def _validate_user_input(self):
+        """Check for valid input from user in the following controls:
+        - input folder entry
+        - kmeans number of clusters k
+        - dbscan epsilon
+        - dbscan minpts
+        Gives error message to user if anything is wrong.
+        Returns True if no errors, false if any error."""
+        self.log("-- Begin input validation --")
+        # verify we have a good path in the input folder widget
+        if not fileops.path_exists(self._Var_folder.get()):
+            # a nonexistent path is a fatal error
+            # log to console and pop up a messagebox
+            self.log("Invalid path: %s" % self._Var_folder.get())
+            self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
+            return False
+        self.log("All user input OK.")
+        self.log("-- End input validation --")
+        return True
+
     def _on_browse(self):
         dir = tkfd.askdirectory(initialdir=self._Var_folder.get())
         # askdirectory returns '' if the user clicked cancel
@@ -209,13 +229,7 @@ class SpaceApp(tk.Frame):
     def _do_import_data(self):
         # reset everything, in case we are running multiple times
         self._data_objs = []
-        # verify we have a good path in the input folder widget
-        if not fileops.path_exists(self._Var_folder.get()):
-            # a nonexistent path is a fatal error
-            # log to console and pop up a messagebox
-            self.log("Invalid path: %s" % self._Var_folder.get())
-            self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
-            return
+        self.log("-- Begin data import and pre-processing --")
         # search for all files in input folder and subfolder
         file_list = fileops.collect_all_filenames(self._Var_folder.get())
         self.log("Found %s files and folders in %s" % (len(file_list), self._Var_folder.get()))
@@ -265,8 +279,8 @@ class SpaceApp(tk.Frame):
             self.log('PCA applied')
 
         # final, pre-processed dataset
-        self.log("Done importing and pre-processing data files")
         self._dataset = dataops.combine(self._data_objs)
+        self.log("-- End data import and pre-processing --")
         
         # alignment
    
@@ -280,23 +294,28 @@ class SpaceApp(tk.Frame):
         sleep(.5)   # cursor is sometimes not updating without this delay
         self.master.update()
         self.log("user: pressed Go button")
-        self._do_import_data()
+        if self._validate_user_input():
+            # all input checks passed
+            self._do_import_data()
 
-        #This re-enables the save button
-        self._Button_save["state"] = "normal"
-        # TODO: normalization
-
+            #This re-enables the save button
+            self._Button_save["state"] = "normal"
+            # TODO: normalization
+            
+            # kmeans
+            if self._Var_kmeans.get() and self._data_objs != []:
+                self.log("Performing K-means...")
+                k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+                self.log("...done.")
+                # TODO: check the kmeans clustering succeeded before enabling plot widgets
+                self._kmeans_viz_panel.enable_widgets()
+                # plotting broke, disable for now
+                #space_plot_kmeans.plot(self._dataset, k_clusters)
+            # TODO: dbscan
+        else:
+            # at least one input check failed
+            pass # this is here for possible future expansion
         
-        # kmeans
-        if self._Var_kmeans.get() and self._data_objs != []:
-            self.log("Performing K-means...")
-            k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
-            self.log("...done.")
-            # TODO: check the kmeans clustering succeeded before enabling plot widgets
-            self._kmeans_viz_panel.enable_widgets()
-            # plotting broke, disable for now
-            #space_plot_kmeans.plot(self._dataset, k_clusters)
-        # TODO: dbscan
         # re-enable Go button and un-busy the cursor now that we're done
         self.master.config(cursor="")
         self._Button_go.config(state="normal")
