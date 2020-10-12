@@ -302,7 +302,15 @@ class SpaceApp(tk.Frame):
         self.log("-- End data import and pre-processing --")
         
         # alignment
-   
+
+    def _do_kmeans_clustering(self):
+        self.log("-- Begin K-means clustering --")
+        k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        self.log("-- End K-means clustering --")
+        # TODO: check the kmeans clustering succeeded before enabling plot widgets
+        self._kmeans_viz_panel.enable_widgets()
+        # plotting broke, disable for now
+        #space_plot_kmeans.plot(self._dataset, k_clusters)
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
@@ -316,20 +324,12 @@ class SpaceApp(tk.Frame):
         if self._validate_user_input():
             # all input checks passed
             self._do_import_data()
-
-            #This re-enables the save button
-            self._Button_save["state"] = "normal"
-            # TODO: normalization
-            
-            # kmeans
             if self._Var_kmeans.get() and self._data_objs != []:
-                self.log("Performing K-means...")
-                k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
-                self.log("...done.")
-                # TODO: check the kmeans clustering succeeded before enabling plot widgets
-                self._kmeans_viz_panel.enable_widgets()
-                # plotting broke, disable for now
-                #space_plot_kmeans.plot(self._dataset, k_clusters)
+                self._do_kmeans_clustering()
+
+            # This re-enables the save button
+            self._Button_save["state"] = "normal"
+            
             # TODO: dbscan
         else:
             # at least one input check failed
