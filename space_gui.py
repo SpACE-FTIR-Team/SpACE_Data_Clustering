@@ -11,8 +11,6 @@ import space_file_ops as fileops
 import space_data_ops as dataops
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
-import space_random_data
-import space_plot_kmeans
 import normalization
 
 
@@ -297,7 +295,7 @@ class SpaceApp(tk.Frame):
             # TODO: check the kmeans clustering succeeded before enabling plot widgets
             self._kmeans_viz_panel.enable_widgets()
             # plotting broke, disable for now
-            #space_plot_kmeans.plot(self._dataset, k_clusters)
+            #space_kmeans.plot2D(self._dataset, k_clusters)
         # TODO: dbscan
         # re-enable Go button and un-busy the cursor now that we're done
         self.master.config(cursor="")
