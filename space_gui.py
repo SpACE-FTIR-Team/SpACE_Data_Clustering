@@ -9,9 +9,7 @@ import tkinter.filedialog as tkfd
 from time import sleep
 import space_file_ops as fileops
 import space_data_ops as dataops
-import space_kmeans
-import space_plot_kmeans
-
+import space_kmeans as km
 
 def launch_gui(cnf):
     root = tk.Tk()
@@ -219,6 +217,10 @@ class SpaceApp(tk.Frame):
                 self.log("Number of clusters for K-means must be at least 2.")
                 self._quick_message_box("Number of clusters for K-means must be at least 2.")
                 return False
+            if self._Var_kmeans_clusters.get() > len(self._data_objs):
+                self.log("Number of clusters for K-means must be at less than the number of datafiles.")
+                self._quick_message_box("Number of clusters for K-means must be less than the number of datafiles.")
+                return False
         # verify dbscan epsilon and minpts
         if self._Var_dbscan.get():
             if self._Var_eps.get() < 0:
@@ -293,7 +295,7 @@ class SpaceApp(tk.Frame):
             self._data_objs = dataops.linear_normalize(self._data_objs)
             self.log('Data normalized from range 0 to 1')
 
-        fileops.save_files(self._Var_folder.get(), "align/", self._data_objs)
+        fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
 
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
@@ -308,12 +310,12 @@ class SpaceApp(tk.Frame):
 
     def _do_kmeans_clustering(self):
         self.log("-- Begin K-means clustering --")
-        k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        composition = km.calculate_composition(k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
+        fileops.save_kmeans_cluster_files(self._Var_folder, "/kmeans_clustering/", k_clusters, composition)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
-        # plotting broke, disable for now
-        space_plot_kmeans.plot(self._dataset, k_clusters)
 
     def _do_dbscan_clustering(self):
         # epsilon: self._Var_eps.get()
