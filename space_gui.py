@@ -288,10 +288,10 @@ class SpaceApp(tk.Frame):
         dataops.align(self._data_objs, max_res_index)
 
         # Normalization
-        if self._Var_normalize.get():
-            self.log('Normalizing data...')
-            self._data_objs = dataops.linear_normalize(self._data_objs)
-            self.log('Data normalized from range 0 to 1')
+        #   if self._Var_normalize.get():
+        #    self.log('Normalizing data...')
+        #    self._data_objs = dataops.linear_normalize(self._data_objs)
+        #    self.log('Data normalized from range 0 to 1')
 
         fileops.save_files(self._Var_folder.get(), "align/", self._data_objs)
 
@@ -303,6 +303,12 @@ class SpaceApp(tk.Frame):
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
             self._dataset = dataops.pca(self._dataset, self._Var_pca_dimensions.get())
             self.log('PCA applied')
+
+        # Normalization
+        if self._Var_normalize.get():
+            self.log('Normalizing data...')
+            self._dataset = dataops.normalize_combined(self._dataset)
+            self.log('Data normalized from 0 to 1')
 
         self.log("-- End data import and pre-processing --")
 

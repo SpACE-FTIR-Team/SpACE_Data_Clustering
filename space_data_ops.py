@@ -202,9 +202,16 @@ def linear_normalize(dataObjectArray):
     return dataObjectArray
 
 
+def normalize_combined(combined):
+    """Normalizes the last combined DataFrame to range 0 to 1. Returns a new DataFrame"""
+    scaler = preprocessing.MinMaxScaler()
+    normalized_frame = scaler.fit_transform(combined)
+    return pd.DataFrame(normalized_frame, index=combined.index, columns=combined.columns)
+
+
 def pca(dataObjectArray, dimensions):
-    """Performs PCA and returns the dataset transformed to n-dimensions"""
+    """Performs PCA and returns the dataset transformed to n-dimensions as a DataFrame"""
     pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
     pca.fit(dataObjectArray)
     transformed = pca.transform(dataObjectArray)
-    return transformed
+    return pd.DataFrame(transformed, index=dataObjectArray.index)
