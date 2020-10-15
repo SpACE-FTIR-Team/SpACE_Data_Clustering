@@ -307,12 +307,10 @@ class SpaceApp(tk.Frame):
 
     def _do_kmeans_clustering(self):
         self.log("-- Begin K-means clustering --")
-        k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        self._k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
-        # plotting broke, disable for now
-        space_plot_kmeans.plot(self._dataset, k_clusters)
 
     def _do_dbscan_clustering(self):
         # epsilon: self._Var_eps.get()
@@ -364,6 +362,7 @@ class SpaceApp(tk.Frame):
     def _on_generate_plot_kmeans(self):
         self.log("user: pressed Generate Plot button (kmeans)")
         self.log("Plotting in %s dimensions" % self._kmeans_viz_panel.get_dimensions())
+        space_plot_kmeans.plot(self._dataset, self._k_clusters)
 
     def _on_generate_plot_dbscan(self):
         self.log("user: pressed Generate Plot button (dbscan)")
