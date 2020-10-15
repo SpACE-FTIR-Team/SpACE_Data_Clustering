@@ -45,5 +45,5 @@ def save_kmeans_cluster_files(folder, suffix, km, c):
 	dir_name = folder + suffix
 	if not os.path.isdir(dir_name):
 		os.mkdir(dir_name)
-	save_string = (dir_name + "cluster_composition")
+	save_string = (dir_name + "cluster_composition.csv")
 	c.to_csv(save_string)  # other arguments can be supplied, check pandas docs

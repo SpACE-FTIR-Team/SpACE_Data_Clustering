@@ -217,10 +217,6 @@ class SpaceApp(tk.Frame):
                 self.log("Number of clusters for K-means must be at least 2.")
                 self._quick_message_box("Number of clusters for K-means must be at least 2.")
                 return False
-            if self._Var_kmeans_clusters.get() > len(self._data_objs):
-                self.log("Number of clusters for K-means must be at less than the number of datafiles.")
-                self._quick_message_box("Number of clusters for K-means must be less than the number of datafiles.")
-                return False
         # verify dbscan epsilon and minpts
         if self._Var_dbscan.get():
             if self._Var_eps.get() < 0:
@@ -289,13 +285,15 @@ class SpaceApp(tk.Frame):
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
 
+        fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
+
         # Normalization
         if self._Var_normalize.get():
             self.log('Normalizing data...')
             self._data_objs = dataops.linear_normalize(self._data_objs)
             self.log('Data normalized from range 0 to 1')
 
-        fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
+        fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
 
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
@@ -312,10 +310,11 @@ class SpaceApp(tk.Frame):
         self.log("-- Begin K-means clustering --")
         k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
         composition = km.calculate_composition(k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
-        fileops.save_kmeans_cluster_files(self._Var_folder, "/kmeans_clustering/", k_clusters, composition)
+        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", k_clusters, composition)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
+        km.plot2D(self._dataset, k_clusters)
 
     def _do_dbscan_clustering(self):
         # epsilon: self._Var_eps.get()

@@ -22,7 +22,7 @@ def calculate_composition(km, num_clusters, data_objects):
     Each row is a cluster, and each column is a category"""
     comp = pd.DataFrame(index = range(num_clusters))
     for i in range(len(data_objects)):
-        category = data_objects[i].descriptive.loc[data_objects[i].descriptive['descriptor'] == 'Type', 'value'][1]
+        category = data_objects[i].descriptive.loc[data_objects[i].descriptive['descriptor'] == 'Type', 'value'][1].upper()
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[km.labels_[i],category] = 1
@@ -32,36 +32,24 @@ def calculate_composition(km, num_clusters, data_objects):
     return comp
 
 def plot2D(dataset, clusters):
-    x = []
-    y = []
     cx = []
     cy = []
-    for i in dataset:
-        x.append(i[0])
-        y.append(i[1])
     for i in clusters.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
-    plt.scatter(x= x, y= y, c=clusters.labels_, cmap = ["tab20", "tab20b", "tab20c"])
+    plt.scatter(x= dataset[0], y= dataset[1], c=clusters.labels_, cmap = "tab20")
     plt.scatter(x = cx, y = cy, marker = "x", color = "black", s = 50)
     plt.show()
 
 def plot3D(dataset, clusters):
-    x = []
-    y = []
-    z = []
     cx = []
     cy = []
     cz = []
-    for i in dataset:
-        x.append(i[0])
-        y.append(i[1])
-        z.append(i[2])
     for i in clusters.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
         cz.append(i[2])
     ax = plt.axes(projection = "3d")
-    ax.scatter3D(x= x, y= y, c=clusters.labels_, cmap = ["tab20", "tab20b", "tab20c"])
-    ax.scatter3D(x= cx, y= cy, marker = "x", color = "blue", s = 50)
+    ax.scatter3D(xs = dataset[0], ys = dataset[1], zs = dataset[2], c=clusters.labels_, cmap = "tab20")
+    ax.scatter3D(xs = cx, ys = cy, zs = cz, marker = "x", color = "blue", s = 50)
     plt.show()
