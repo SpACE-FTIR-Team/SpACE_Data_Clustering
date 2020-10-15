@@ -203,8 +203,8 @@ def linear_normalize(dataObjectArray):
 
 
 def pca(dataObjectArray, dimensions):
-    """Performs PCA and returns the dataset transformed to n-dimensions"""
+    """Performs PCA and returns the dataset transformed to n-dimensions as a DataFrame"""
     pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
     pca.fit(dataObjectArray)
     transformed = pca.transform(dataObjectArray)
-    return transformed
+    return pd.DataFrame(transformed, index=dataObjectArray.index)
