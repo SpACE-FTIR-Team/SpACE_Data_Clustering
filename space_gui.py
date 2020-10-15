@@ -51,7 +51,7 @@ class SpaceApp(tk.Frame):
         self.grid_columnconfigure(index=0, weight=0)
         self.grid_columnconfigure(index=1, weight=1)
         self.grid_rowconfigure(index=0, weight=1)
-        
+
         # OPTIONS FRAME, left column
         self._Frame_options = ttk.Frame(self)
 
@@ -70,7 +70,7 @@ class SpaceApp(tk.Frame):
         # -- normalize is by itself, no sub-frame --
         self._Var_normalize = tk.BooleanVar()
         self._Checkbutton_normalize = ttk.Checkbutton(self._LabelFrame_data, text="Normalize data during import",
-                                                     variable=self._Var_normalize)
+                                                      variable=self._Var_normalize)
         self._Checkbutton_normalize.grid(row=1, sticky=tk.W)
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
@@ -91,11 +91,11 @@ class SpaceApp(tk.Frame):
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans_clusters = tk.IntVar()
         self._Checkbutton_kmeans = ttk.Checkbutton(self._LabelFrame_kmeans, text="Perform K-means",
-                                                  variable=self._Var_kmeans)
+                                                   variable=self._Var_kmeans)
         self._Checkbutton_kmeans.grid(row=0, sticky=tk.W)
         self._Label_k = ttk.Label(self._LabelFrame_kmeans, text="Number of clusters (k):")
         self._Entry_k = ttk.Entry(self._LabelFrame_kmeans, width=5, justify="center",
-                                 textvariable=self._Var_kmeans_clusters)
+                                  textvariable=self._Var_kmeans_clusters)
         self._Label_k.grid(row=1, column=0, pady=(0, 5), sticky=tk.W)
         self._Entry_k.grid(row=1, column=1, pady=(0, 5))
         # - KMEANS widgets grid -
@@ -105,19 +105,20 @@ class SpaceApp(tk.Frame):
         self._LabelFrame_dbscan = ttk.LabelFrame(self._Frame_options, text="DBSCAN algorithm")
         self._Var_dbscan = tk.BooleanVar()
         self._Checkbutton_dbscan = ttk.Checkbutton(self._LabelFrame_dbscan, text="Perform DBSCAN",
-                                                  variable=self._Var_dbscan)
+                                                   variable=self._Var_dbscan)
         self._Checkbutton_dbscan.grid(row=0, sticky=tk.W)
         # -- dbscan parameters sub-frame --
         self._Frame_dbscan_parameters = ttk.Frame(self._LabelFrame_dbscan)
         self._Var_eps = tk.DoubleVar()
         self._Var_minpts = tk.IntVar()
         self._Label_eps = ttk.Label(self._Frame_dbscan_parameters, text="epsilon:")
-        self._Entry_eps = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center", textvariable=self._Var_eps)
+        self._Entry_eps = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
+                                    textvariable=self._Var_eps)
         self._Label_eps.grid(row=0, column=0, sticky=tk.E)
         self._Entry_eps.grid(row=0, column=1, sticky=tk.W)
         self._Label_minpts = ttk.Label(self._Frame_dbscan_parameters, text="MinPts:")
         self._Entry_minpts = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
-                                      textvariable=self._Var_minpts)
+                                       textvariable=self._Var_minpts)
         self._Label_minpts.grid(row=1, column=0, sticky=tk.E)
         self._Entry_minpts.grid(row=1, column=1, sticky=tk.W)
         self._Frame_dbscan_parameters.grid(row=1, pady=(0, 5), sticky=tk.W)
@@ -128,7 +129,7 @@ class SpaceApp(tk.Frame):
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
         self._Button_go = ttk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
         self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
-                                      state="disabled")
+                                       state="disabled")
         self._Button_go.grid(pady=10)
         self._Button_save.grid(pady=10)
         # - BUTTONS for actions grid -
@@ -151,17 +152,17 @@ class SpaceApp(tk.Frame):
         self._Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
         self._Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
         # log text box and scrollbars
-        self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient = tk.HORIZONTAL)
-        self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient = tk.VERTICAL)
-        self._Text_log = tk.Text(self._Tab_log, wrap = tk.NONE, width=72, height=36,
-                                xscrollcommand = self._Scroll_H.set,
-                                yscrollcommand = self._Scroll_V.set,
-                                bg="black", fg="gray")
+        self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient=tk.HORIZONTAL)
+        self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient=tk.VERTICAL)
+        self._Text_log = tk.Text(self._Tab_log, wrap=tk.NONE, width=72, height=36,
+                                 xscrollcommand=self._Scroll_H.set,
+                                 yscrollcommand=self._Scroll_V.set,
+                                 bg="black", fg="gray")
         self._Scroll_H["command"] = self._Text_log.xview
         self._Scroll_V["command"] = self._Text_log.yview
         self._Text_log.grid(row=0, column=0)
-        self._Scroll_H.grid(row=1, column=0, sticky=tk.E+tk.W)
-        self._Scroll_V.grid(row=0, column=1, sticky=tk.N+tk.S)
+        self._Scroll_H.grid(row=1, column=0, sticky=tk.E + tk.W)
+        self._Scroll_V.grid(row=0, column=1, sticky=tk.N + tk.S)
         # kmeans panel
         self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self)
         self._kmeans_viz_panel.get_frame_handle().grid()
@@ -172,8 +173,7 @@ class SpaceApp(tk.Frame):
         self._dbscan_viz_panel.disable_widgets()
 
         # end setup of NOTEBOOK (tabs), right column
-        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N+tk.S+tk.E+tk.W)
-
+        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N + tk.S + tk.E + tk.W)
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
@@ -289,19 +289,25 @@ class SpaceApp(tk.Frame):
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
 
+        # Normalization
+        if self._Var_normalize.get():
+            self.log('Normalizing data...')
+            self._data_objs = normalization.linear_normalize(self._data_objs)
+            self.log('Data normalized from range 0 to 1')
+
         fileops.save_files(self._Var_folder.get(), "align/", self._data_objs)
         
-        #PCA
-        if self._Var_pca.get():
-            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
-            normalization.PCAnormalize(self._data_objs, self._Var_pca_dimensions.get())
-            self.log('PCA applied')
-
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
+
+        # PCA
+        if self._Var_pca.get():
+            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
+            self._dataset = normalization.PCAnormalize(self._dataset, self._Var_pca_dimensions.get())
+            self.log('PCA applied')
+
         self.log("-- End data import and pre-processing --")
-        
-        # alignment
+       
 
     def _do_kmeans_clustering(self):
         self.log("-- Begin K-means clustering --")
@@ -321,15 +327,17 @@ class SpaceApp(tk.Frame):
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
 
+
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
         # while we do work
         self._Button_go.config(state="disabled")
         self.update()
         self.master.config(cursor="watch")
-        sleep(.5)   # cursor is sometimes not updating without this delay
+        sleep(.5)  # cursor is sometimes not updating without this delay
         self.master.update()
         self.log("user: pressed Go button")
+
         # disable visualization until we have new data
         self._kmeans_viz_panel.disable_widgets()
         self._dbscan_viz_panel.disable_widgets()
@@ -357,6 +365,7 @@ class SpaceApp(tk.Frame):
     def _on_close(self):
         self.master.destroy()
 
+
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
     visualization plots."""
@@ -367,8 +376,8 @@ class VisualizationPanel(object):
         self._Frame.grid()
         self._Var_dimensions = tk.StringVar()
         self._Combobox = ttk.Combobox(self._Frame, width=5, justify="center",
-                                        state="readonly", textvariable=self._Var_dimensions,
-                                        values=['2D', '3D'])
+                                      state="readonly", textvariable=self._Var_dimensions,
+                                      values=['2D', '3D'])
         self._Combobox.current(0)
         self._Combobox.grid(pady=10)
         self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot")

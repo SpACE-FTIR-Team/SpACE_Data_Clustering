@@ -4,22 +4,9 @@
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-
-
-def PCAnormalize(dataObjectArray, dimensions):
-    dataOb = dataObjectArray
-    dims = dimensions
-
-    for i in dataOb:
-        pca = PCA(n_components=dims, copy=False, svd_solver='full')
-        pca.fit(i.pairs)
-    # print("PCA done")
 
 
 def linear_normalize(dataObjectArray):
-    """This function normalizes each individual DataFrame's values to range 0 to 1
-    Takes the dataObjectArray as a parameter."""
     scaler = preprocessing.MinMaxScaler()
     for i in dataObjectArray:
         normalized_pairs = scaler.fit_transform(i.pairs)
@@ -27,3 +14,10 @@ def linear_normalize(dataObjectArray):
         i.pairs.drop(n, axis=1, inplace=True)
         i.pairs[n] = normalized_pairs
     return dataObjectArray
+
+
+def PCAnormalize(dataObjectArray, dimensions):
+    pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
+    pca.fit(dataObjectArray)
+    transformed = pca.transform(dataObjectArray)
+    return transformed
