@@ -7,6 +7,7 @@ import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
+import space_dbscan
 import space_random_data
 import space_plot_kmeans
 
@@ -164,7 +165,10 @@ class SpaceApp(tk.Frame):
             dataset = space_random_data.generateRandomData(1000)
             k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), dataset)
             space_plot_kmeans.plot(dataset, k_clusters)
-
+        if self._Var_dbscan.get():
+            dataset = space_random_data.generateRandomData(1000)
+            db = space_dbscan.do_dbscan(self._Var_eps.get(), self._Var_minpts.get(), dataset)
+            space_dbscan.plot_dbscan(db,dataset)
     def _on_save(self):
         self._quick_message_box("Congrats, you clicked the Save button.")
 
