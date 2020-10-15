@@ -166,7 +166,7 @@ class SpaceApp(tk.Frame):
         self._kmeans_viz_panel.get_frame_handle().grid()
         self._kmeans_viz_panel.disable_widgets()
         # dbscan panel
-        self._dbscan_viz_panel = VisualizationPanel(self._Tab_dbscan, self)
+        self._dbscan_viz_panel = VisualizationPanel(self._Tab_dbscan, self._on_generate_plot_dbscan)
         self._dbscan_viz_panel.get_frame_handle().grid()
         self._dbscan_viz_panel.disable_widgets()
 
@@ -364,6 +364,8 @@ class SpaceApp(tk.Frame):
     def _on_generate_plot_kmeans(self):
         self.log(self._kmeans_viz_panel.get_dimensions())
 
+    def _on_generate_plot_dbscan(self):
+        self.log(self._dbscan_viz_panel.get_dimensions())
 
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
