@@ -362,10 +362,12 @@ class SpaceApp(tk.Frame):
         self.master.destroy()
 
     def _on_generate_plot_kmeans(self):
-        self.log(self._kmeans_viz_panel.get_dimensions())
+        self.log("user: pressed Generate Plot button (kmeans)")
+        self.log("Plotting in %s dimensions" % self._kmeans_viz_panel.get_dimensions())
 
     def _on_generate_plot_dbscan(self):
-        self.log(self._dbscan_viz_panel.get_dimensions())
+        self.log("user: pressed Generate Plot button (dbscan)")
+        self.log("Plotting in %s dimensions" % self._dbscan_viz_panel.get_dimensions())
 
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
