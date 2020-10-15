@@ -5,24 +5,26 @@
 # into DataObjects (see DataObject.py), re-index dataframes,
 # find common range, truncate dataframes to common range,
 # align data to be in the same step, and add in missing values 
-# with interpolation
+# with interpolation, linear normalization (0 to 1), and PCA
 #
-# TODO: normalization, PCA?
 
 import pandas as pd
 from DataObject import DataObject
+from sklearn import preprocessing
+from sklearn.decomposition import PCA
 
 # columns include overflow for extra ":" characters found in the description field
 columns = ['descriptor', 'value', 'overflow', 'overflow2', 'overflow3']
 
-# Function: File to DataObject
-# Description: This function takes a list of files (files variable above) and converts them to two pandas
-# DataFrames, one of descriptive data, and one of float values for the xy_pairs. The DataFrames are used as
-# parameters to construct a DataObject. The function then returns an array of each file as a DataObject.
-#
-# Returns: DataObjects
-#
+
 def file_to_data_object(file_list):
+    """
+    Function: File to DataObject
+    Description: This function takes a list of files (files variable above) and converts them to two pandas
+    DataFrames, one of descriptive data, and one of float values for the xy_pairs. The DataFrames are used as
+    parameters to construct a DataObject. The function then returns an array of each file as a DataObject.
+    Returns: DataObjects array
+    """
     DataObjects = []
     # DataFrame conversion - one DF for descriptive data, and one DF for the (x, y) pairs
     for item in file_list:
@@ -97,6 +99,7 @@ def file_to_data_object(file_list):
 
     return DataObjects
 
+
 def reindex(data_objects):
     """This function takes a list of data objects, iterates over them,
     and changes the index in the 'pairs' dataframe of each data object.
@@ -111,8 +114,9 @@ def reindex(data_objects):
         wavelength_col_name = dataframe.columns[0]
         dataframe.rename(columns={wavelength_col_name: 'wavelength'}, inplace=True)
         dataframe.set_index('wavelength', inplace=True)
-        dataframe.sort_index(inplace = True)
+        dataframe.sort_index(inplace=True)
     return None
+
 
 def find_common_range(data_objects):
     """This function takes a list of data objects, iterates over them,
@@ -134,6 +138,7 @@ def find_common_range(data_objects):
     else:
         return None, None
 
+
 def truncate(data_objects, min, max):
     """This function takes a list of data objects, iterates over them,
     and truncates every 'pairs' dataframe to remove any rows (wavelengths)
@@ -145,9 +150,10 @@ def truncate(data_objects, min, max):
     with the new dataframe. Returns None."""
     for dobj in data_objects:
         original_dataframe = dobj.pairs
-        truncated_dataframe = original_dataframe.truncate(before=min, after=max, axis='index', copy = True)
+        truncated_dataframe = original_dataframe.truncate(before=min, after=max, axis='index', copy=True)
         dobj.pairs = truncated_dataframe
     return None
+
 
 def find_max_res(data_objects):
     """This function takes a list of data objects and the range common to them, iterates over them, and finds the
@@ -170,15 +176,35 @@ def align(data_objects, align_to):
 
     alignment_pairs = data_objects[align_to].pairs
     for dobj in data_objects:
-        ( _ ,dobj.pairs) = alignment_pairs.align(dobj.pairs, join="outer", axis = 0)
+        (_, dobj.pairs) = alignment_pairs.align(dobj.pairs, join="outer", axis=0)
         dobj.pairs = dobj.pairs.interpolate(limit_direction='both')
         # dobj.pairs = dobj.pairs.interpolate()
-        ( _ , dobj.pairs) = alignment_pairs.align(dobj.pairs, join ="left", axis = 0)
+        (_, dobj.pairs) = alignment_pairs.align(dobj.pairs, join="left", axis=0)
     return None
+
 
 def combine(data_objects):
     """This function takes a list of data objects all sharing a common x coordinate and outputs them all as one block
     This block will have each data_object taking up one row where each column is a different y coordinate.
     Returns a block of data"""
-    data_block = pd.concat([dobj.pairs.transpose() for dobj in data_objects], ignore_index = True)
+    data_block = pd.concat([dobj.pairs.transpose() for dobj in data_objects], ignore_index=True)
     return data_block
+
+
+def linear_normalize(dataObjectArray):
+    """Normalizes data from range 0 to 1 and returns the array of DataObjects normalized"""
+    scaler = preprocessing.MinMaxScaler()
+    for i in dataObjectArray:
+        normalized_pairs = scaler.fit_transform(i.pairs)
+        n = i.pairs.columns[0]
+        i.pairs.drop(n, axis=1, inplace=True)
+        i.pairs[n] = normalized_pairs
+    return dataObjectArray
+
+
+def pca(dataObjectArray, dimensions):
+    """Performs PCA and returns the dataset transformed to n-dimensions"""
+    pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
+    pca.fit(dataObjectArray)
+    transformed = pca.transform(dataObjectArray)
+    return transformed

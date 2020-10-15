@@ -9,10 +9,8 @@ import tkinter.filedialog as tkfd
 from time import sleep
 import space_file_ops as fileops
 import space_data_ops as dataops
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
 import space_plot_kmeans
-import normalization
 
 
 def launch_gui(cnf):
@@ -210,7 +208,7 @@ class SpaceApp(tk.Frame):
         # verify we have a good path in the input folder widget
         if not fileops.path_exists(self._Var_folder.get()):
             # a nonexistent path is a fatal error
-            
+
             self.log("Invalid path: %s" % self._Var_folder.get())
             self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
             return False
@@ -292,22 +290,21 @@ class SpaceApp(tk.Frame):
         # Normalization
         if self._Var_normalize.get():
             self.log('Normalizing data...')
-            self._data_objs = normalization.linear_normalize(self._data_objs)
+            self._data_objs = dataops.linear_normalize(self._data_objs)
             self.log('Data normalized from range 0 to 1')
 
         fileops.save_files(self._Var_folder.get(), "align/", self._data_objs)
-        
+
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
 
         # PCA
         if self._Var_pca.get():
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
-            self._dataset = normalization.PCAnormalize(self._dataset, self._Var_pca_dimensions.get())
+            self._dataset = dataops.pca(self._dataset, self._Var_pca_dimensions.get())
             self.log('PCA applied')
 
         self.log("-- End data import and pre-processing --")
-       
 
     def _do_kmeans_clustering(self):
         self.log("-- Begin K-means clustering --")
@@ -316,7 +313,7 @@ class SpaceApp(tk.Frame):
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
         # plotting broke, disable for now
-        #space_plot_kmeans.plot(self._dataset, k_clusters)
+        space_plot_kmeans.plot(self._dataset, k_clusters)
 
     def _do_dbscan_clustering(self):
         # epsilon: self._Var_eps.get()
@@ -326,7 +323,6 @@ class SpaceApp(tk.Frame):
         self.log("-- End DBSCAN clustering --")
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
-
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
@@ -352,15 +348,16 @@ class SpaceApp(tk.Frame):
             self._Button_save["state"] = "normal"
         else:
             # at least one input check failed
-            pass # this is here for possible future expansion
-        
+            pass  # this is here for possible future expansion
+
         # re-enable Go button and un-busy the cursor now that we're done
         self.master.config(cursor="")
         self._Button_go.config(state="normal")
         self.master.update()
 
     def _on_save(self):
-        self._quick_message_box("Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
+        self._quick_message_box(
+            "Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
 
     def _on_close(self):
         self.master.destroy()
