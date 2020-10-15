@@ -162,7 +162,7 @@ class SpaceApp(tk.Frame):
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E + tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N + tk.S)
         # kmeans panel
-        self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self)
+        self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self._on_generate_plot_kmeans)
         self._kmeans_viz_panel.get_frame_handle().grid()
         self._kmeans_viz_panel.disable_widgets()
         # dbscan panel
@@ -208,7 +208,6 @@ class SpaceApp(tk.Frame):
         # verify we have a good path in the input folder widget
         if not fileops.path_exists(self._Var_folder.get()):
             # a nonexistent path is a fatal error
-
             self.log("Invalid path: %s" % self._Var_folder.get())
             self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
             return False
@@ -362,12 +361,15 @@ class SpaceApp(tk.Frame):
     def _on_close(self):
         self.master.destroy()
 
+    def _on_generate_plot_kmeans(self):
+        self.log(self._kmeans_viz_panel.get_dimensions())
+
 
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
     visualization plots."""
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, button_handler):
         """Set up frame and widgets."""
         self._Frame = ttk.Frame(parent)
         self._Frame.grid()
@@ -377,11 +379,15 @@ class VisualizationPanel(object):
                                       values=['2D', '3D'])
         self._Combobox.current(0)
         self._Combobox.grid(pady=10)
-        self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot")
+        self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot",
+                                    command=button_handler)
         self._Button.grid()
 
     def get_frame_handle(self):
         return self._Frame
+
+    def get_dimensions(self):
+        return 2 if self._Var_dimensions.get() == '2D' else 3
 
     def disable_widgets(self):
         self._Combobox.config(state="disabled")
