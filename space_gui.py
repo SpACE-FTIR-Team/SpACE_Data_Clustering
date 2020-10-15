@@ -11,7 +11,6 @@ import space_file_ops as fileops
 import space_data_ops as dataops
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import space_kmeans
-import space_random_data
 import space_plot_kmeans
 import normalization
 
@@ -199,6 +198,45 @@ class SpaceApp(tk.Frame):
         """A quick and dirty messagebox for showing simple output for debugging."""
         tkmb.showinfo("Message", text)
 
+    def _validate_user_input(self):
+        """Check for valid input from user in the following controls:
+        - input folder entry
+        - kmeans number of clusters k
+        - dbscan epsilon
+        - dbscan minpts
+        Gives error message to user if anything is wrong.
+        Returns True if no errors, false if any error."""
+        self.log("-- Begin input validation --")
+        # verify we have a good path in the input folder widget
+        if not fileops.path_exists(self._Var_folder.get()):
+            # a nonexistent path is a fatal error
+            
+            self.log("Invalid path: %s" % self._Var_folder.get())
+            self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
+            return False
+        # verify kmeans number of clusters
+        if self._Var_kmeans.get():
+            if self._Var_kmeans_clusters.get() < 2:
+                # bad number of clusters is a fatal error
+                self.log("Number of clusters for K-means must be at least 2.")
+                self._quick_message_box("Number of clusters for K-means must be at least 2.")
+                return False
+        # verify dbscan epsilon and minpts
+        if self._Var_dbscan.get():
+            if self._Var_eps.get() < 0:
+                # bad epsilon is a fatal error
+                self.log("DBSCAN epsilon must be greater than zero.")
+                self._quick_message_box("DBSCAN epsilon must be greater than zero.")
+                return False
+            if self._Var_minpts.get() < 3:
+                # bad minpts is a fatal error
+                self.log("DBSCAN MinPts must be at least 3.")
+                self._quick_message_box("DBSCAN MinPts must be at least 3.")
+                return False
+        self.log("All user input OK.")
+        self.log("-- End input validation --")
+        return True
+
     def _on_browse(self):
         dir = tkfd.askdirectory(initialdir=self._Var_folder.get())
         # askdirectory returns '' if the user clicked cancel
@@ -210,13 +248,7 @@ class SpaceApp(tk.Frame):
     def _do_import_data(self):
         # reset everything, in case we are running multiple times
         self._data_objs = []
-        # verify we have a good path in the input folder widget
-        if not fileops.path_exists(self._Var_folder.get()):
-            # a nonexistent path is a fatal error
-            # log to console and pop up a messagebox
-            self.log("Invalid path: %s" % self._Var_folder.get())
-            self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
-            return
+        self.log("-- Begin data import and pre-processing --")
         # search for all files in input folder and subfolder
         file_list = fileops.collect_all_filenames(self._Var_folder.get())
         self.log("Found %s files and folders in %s" % (len(file_list), self._Var_folder.get()))
@@ -263,8 +295,9 @@ class SpaceApp(tk.Frame):
             self._data_objs = normalization.linear_normalize(self._data_objs)
             self.log('Data normalized from range 0 to 1')
 
+        fileops.save_files(self._Var_folder.get(), "align/", self._data_objs)
+        
         # final, pre-processed dataset
-        self.log("Done importing and pre-processing data files")
         self._dataset = dataops.combine(self._data_objs)
 
         # PCA
@@ -272,6 +305,28 @@ class SpaceApp(tk.Frame):
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
             self._dataset = normalization.PCAnormalize(self._dataset, self._Var_pca_dimensions.get())
             self.log('PCA applied')
+
+        self.log("-- End data import and pre-processing --")
+       
+
+    def _do_kmeans_clustering(self):
+        self.log("-- Begin K-means clustering --")
+        k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        self.log("-- End K-means clustering --")
+        # TODO: check the kmeans clustering succeeded before enabling plot widgets
+        self._kmeans_viz_panel.enable_widgets()
+        # plotting broke, disable for now
+        #space_plot_kmeans.plot(self._dataset, k_clusters)
+
+    def _do_dbscan_clustering(self):
+        # epsilon: self._Var_eps.get()
+        # minpts: self._Var_minpts.get()
+        self.log("-- Begin DBSCAN clustering --")
+        # call dbscan here
+        self.log("-- End DBSCAN clustering --")
+        # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
+        self._dbscan_viz_panel.enable_widgets()
+
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
@@ -282,28 +337,30 @@ class SpaceApp(tk.Frame):
         sleep(.5)  # cursor is sometimes not updating without this delay
         self.master.update()
         self.log("user: pressed Go button")
-        self._do_import_data()
-        # TODO: normalization
 
-        # kmeans
-        if self._Var_kmeans.get() and self._data_objs != []:
-            self.log("Performing K-means...")
-            k_clusters = space_kmeans.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
-            self.log("...done.")
-            # TODO: check the kmeans clustering succeeded before enabling plot widgets
-            self._kmeans_viz_panel.enable_widgets()
-
-            self.log('Plotting KMeans...')
-            # plotting broke, disable for now
-            space_plot_kmeans.plot(self._dataset, k_clusters)
-        # TODO: dbscan
+        # disable visualization until we have new data
+        self._kmeans_viz_panel.disable_widgets()
+        self._dbscan_viz_panel.disable_widgets()
+        if self._validate_user_input():
+            # all input checks passed
+            self._do_import_data()
+            if self._Var_kmeans.get() and self._data_objs != []:
+                self._do_kmeans_clustering()
+            if self._Var_dbscan.get() and self._data_objs != []:
+                self._do_dbscan_clustering()
+            # re-enable the save button
+            self._Button_save["state"] = "normal"
+        else:
+            # at least one input check failed
+            pass # this is here for possible future expansion
+        
         # re-enable Go button and un-busy the cursor now that we're done
         self.master.config(cursor="")
         self._Button_go.config(state="normal")
         self.master.update()
 
     def _on_save(self):
-        self._quick_message_box("Congrats, you clicked the Save button.")
+        self._quick_message_box("Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
 
     def _on_close(self):
         self.master.destroy()

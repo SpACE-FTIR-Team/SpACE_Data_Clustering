@@ -1,11 +1,9 @@
-##Insert standardized heading here
+# Normalization functions for SpACE
+# Currently includes PCA and linear normalization (0 to 1)
 
 import pandas as pd
-import space_preprocess_test
-import space_data_ops as dataops
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 
 
 def linear_normalize(dataObjectArray):

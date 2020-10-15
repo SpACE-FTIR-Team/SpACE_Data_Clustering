@@ -3,6 +3,7 @@ ecostress_data_files/
 
 # local vscode files
 .vscode/
+.vs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
