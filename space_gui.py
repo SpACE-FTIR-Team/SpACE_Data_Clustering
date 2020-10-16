@@ -135,6 +135,8 @@ class SpaceApp(tk.Frame):
         self._Frame_options.grid(row=0, column=0, sticky=tk.N)
 
         # NOTEBOOK (tabs), right column
+        style = ttk.Style()
+        style.configure("TNotebook.Tab", padding=(10, 5))
         self._Notebook_controller = ttk.Notebook(self)
         # the tabs
         self._Tab_log = ttk.Frame(self._Notebook_controller)
