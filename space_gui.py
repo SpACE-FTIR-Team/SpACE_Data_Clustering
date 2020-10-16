@@ -307,13 +307,15 @@ class SpaceApp(tk.Frame):
 
     def _do_kmeans_clustering(self):
         self.log("-- Begin K-means clustering --")
-        k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
-        composition = km.calculate_composition(k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
-        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", k_clusters, composition)
+        self.log("Clustering...")
+        self._k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        self.log("Calculating cluster compositions...")
+        composition = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
+        self.log("(..temporary file save..)")
+        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", self._k_clusters, composition)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
-        km.plot2D(self._dataset, k_clusters)
 
     def _do_dbscan_clustering(self):
         # epsilon: self._Var_eps.get()
@@ -365,7 +367,10 @@ class SpaceApp(tk.Frame):
     def _on_generate_plot_kmeans(self):
         self.log("user: pressed Generate Plot button (kmeans)")
         self.log("Plotting in %s dimensions" % self._kmeans_viz_panel.get_dimensions())
-        space_plot_kmeans.plot(self._dataset, self._k_clusters)
+        if self._kmeans_viz_panel.get_dimensions() == 2:
+            km.plot2D(self._dataset, self._k_clusters)
+        else:
+            km.plot3D(self._dataset, self._k_clusters)
 
     def _on_generate_plot_dbscan(self):
         self.log("user: pressed Generate Plot button (dbscan)")
