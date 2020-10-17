@@ -54,7 +54,12 @@ def plot3D(dataset, clusters):
     ax.scatter3D(xs = cx, ys = cy, zs = cz, marker = "x", color = "blue", s = 50)
     plt.show()
 
-def figure2D(dataset, clusters):
+def figure2D(dataset, clusters, embedded=False):
+    """This function plots clusters and cluster centers in 2D.
+    If embedded is False, the the plot is displayed in a standalone
+    modal window and the function returns None.
+    If embedded is True, the function returns a Figure object
+    to be displayed on a FigureCanvasTkAgg embedded in the GUI."""
     figure, axes = plt.subplots()
     cx = []
     cy = []
@@ -63,4 +68,8 @@ def figure2D(dataset, clusters):
         cy.append(i[1])
     axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="tab20")
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
-    plt.show()
+    if embedded:
+        return figure
+    else:
+        plt.show()
+        return None

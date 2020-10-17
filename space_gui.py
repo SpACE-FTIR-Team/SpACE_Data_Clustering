@@ -10,6 +10,8 @@ from time import sleep
 import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 def launch_gui(cnf):
     root = tk.Tk()
@@ -364,13 +366,15 @@ class SpaceApp(tk.Frame):
             "Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
 
     def _on_close(self):
+        self.master.quit()
         self.master.destroy()
 
     def _on_generate_plot_kmeans(self):
         self.log("user: pressed Generate Plot button (kmeans)")
         self.log("Plotting in %s dimensions" % self._kmeans_viz_panel.get_dimensions())
         if self._kmeans_viz_panel.get_dimensions() == 2:
-            km.figure2D(self._dataset, self._k_clusters)
+            figure = km.figure2D(self._dataset, self._k_clusters, embedded=True)
+            self._kmeans_viz_panel.display_figure(figure)
         else:
             km.plot3D(self._dataset, self._k_clusters)
 
@@ -384,17 +388,26 @@ class VisualizationPanel(object):
 
     def __init__(self, parent, button_handler):
         """Set up frame and widgets."""
+        # this is the 'main' frame
+        # either the 'controls' frame or the 'canvas' frame
+        # will be gridded into this 'main' frame
         self._Frame = ttk.Frame(parent)
-        self._Frame.grid()
+        # this is the 'controls' frame
+        self._Frame_controls = ttk.Frame(self._Frame)
+        self._Frame_controls.grid(row=0, column=0)
         self._Var_dimensions = tk.StringVar()
-        self._Combobox = ttk.Combobox(self._Frame, width=5, justify="center",
+        self._Combobox = ttk.Combobox(self._Frame_controls, width=5, justify="center",
                                       state="readonly", textvariable=self._Var_dimensions,
                                       values=['2D', '3D'])
         self._Combobox.current(0)
         self._Combobox.grid(pady=10)
-        self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot",
-                                    command=button_handler)
+        self._Button = ttk.Button(self._Frame_controls, width=15, text="Generate Plot",
+                                  command=button_handler)
         self._Button.grid()
+        # this is the 'canvas' frame
+        # it just gets created at instantiation, it doesn't
+        # get gridded until it's actually needed
+        self._Frame_canvas = ttk.Frame(self._Frame)
 
     def get_frame_handle(self):
         return self._Frame
@@ -409,3 +422,13 @@ class VisualizationPanel(object):
     def enable_widgets(self):
         self._Combobox.config(state="readonly")
         self._Button.config(state="normal")
+
+    def display_figure(self, figure):
+        canvas = FigureCanvasTkAgg(figure, master=self._Frame_canvas)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        toolbar = NavigationToolbar2Tk(canvas, self._Frame_canvas)
+        toolbar.update()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self._Frame_canvas.grid(row=0, column=0)
+
