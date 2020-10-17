@@ -156,7 +156,7 @@ class SpaceApp(tk.Frame):
         # log text box and scrollbars
         self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient=tk.HORIZONTAL)
         self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient=tk.VERTICAL)
-        self._Text_log = tk.Text(self._Tab_log, wrap=tk.NONE, width=75, height=30,
+        self._Text_log = tk.Text(self._Tab_log, wrap=tk.NONE, width=78, height=32,
                                  xscrollcommand=self._Scroll_H.set,
                                  yscrollcommand=self._Scroll_V.set,
                                  bg="black", fg="gray")
