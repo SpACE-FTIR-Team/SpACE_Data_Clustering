@@ -370,7 +370,7 @@ class SpaceApp(tk.Frame):
         self.log("user: pressed Generate Plot button (kmeans)")
         self.log("Plotting in %s dimensions" % self._kmeans_viz_panel.get_dimensions())
         if self._kmeans_viz_panel.get_dimensions() == 2:
-            km.plot2D(self._dataset, self._k_clusters)
+            km.figure2D(self._dataset, self._k_clusters)
         else:
             km.plot3D(self._dataset, self._k_clusters)
 
