@@ -372,13 +372,20 @@ class SpaceApp(tk.Frame):
         self.master.destroy()
 
     def _on_generate_plot_kmeans(self):
-        self.log("user: pressed Generate Plot button (kmeans)")
-        self.log("Plotting in %s dimensions" % self._kmeans_viz_panel.get_dimensions())
+        self.log("user: pressed Generate Plot button (K-means)")
+        self.log("-- Begin K-means plotting in %sD --" % self._kmeans_viz_panel.get_dimensions())
         if self._kmeans_viz_panel.get_dimensions() == 2:
+            self.log("PCA reducing cluster data to 2 dimensions...")
+            # TODO: PCA to 2 dimensions here
+            self.log("Plotting...")
             figure = km.figure2D(self._dataset, self._k_clusters, embedded=True)
             self._kmeans_viz_panel.display_figure(figure)
         else:
+            self.log("PCA reducing cluster data to 3 dimensions...")
+            # TODO: PCA to 3 dimensions here
+            self.log("Plotting...")
             km.plot3D(self._dataset, self._k_clusters)
+        self.log("-- End K-means plotting --")
 
     def _on_generate_plot_dbscan(self):
         self.log("user: pressed Generate Plot button (dbscan)")
@@ -432,5 +439,5 @@ class VisualizationPanel(object):
         toolbar = NavigationToolbar2Tk(canvas, self._Frame_canvas)
         toolbar.update()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self._Frame_canvas.grid(row=0, column=0)
+        self._Frame_canvas.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
 
