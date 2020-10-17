@@ -167,11 +167,11 @@ class SpaceApp(tk.Frame):
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N + tk.S)
         # kmeans panel
         self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self._on_generate_plot_kmeans)
-        self._kmeans_viz_panel.get_frame_handle().grid()
+        self._kmeans_viz_panel.get_frame_handle().grid(sticky=tk.N + tk.S + tk.E + tk.W)
         self._kmeans_viz_panel.disable_widgets()
         # dbscan panel
         self._dbscan_viz_panel = VisualizationPanel(self._Tab_dbscan, self._on_generate_plot_dbscan)
-        self._dbscan_viz_panel.get_frame_handle().grid()
+        self._dbscan_viz_panel.get_frame_handle().grid(sticky=tk.N + tk.S + tk.E + tk.W)
         self._dbscan_viz_panel.disable_widgets()
 
         # end setup of NOTEBOOK (tabs), right column
@@ -401,9 +401,11 @@ class VisualizationPanel(object):
         # either the 'controls' frame or the 'canvas' frame
         # will be gridded into this 'main' frame
         self._Frame = ttk.Frame(parent)
+        self._Frame.grid_columnconfigure(0, weight=1)
+        self._Frame.grid_rowconfigure(0, weight=1)
         # this is the 'controls' frame
         self._Frame_controls = ttk.Frame(self._Frame)
-        self._Frame_controls.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+        self._Frame_controls.grid(row=0, column=0)
         self._Var_dimensions = tk.StringVar()
         self._Combobox = ttk.Combobox(self._Frame_controls, width=5, justify="center",
                                       state="readonly", textvariable=self._Var_dimensions,
@@ -417,6 +419,8 @@ class VisualizationPanel(object):
         # it just gets created at instantiation, it doesn't
         # get gridded until it's actually needed
         self._Frame_canvas = ttk.Frame(self._Frame)
+        self._Frame_canvas.grid_columnconfigure(0, weight=1)
+        self._Frame_canvas.grid_rowconfigure(0, weight=1)
 
     def get_frame_handle(self):
         return self._Frame
