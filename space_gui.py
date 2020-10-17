@@ -26,12 +26,14 @@ class SpaceApp(tk.Frame):
         """Set up the root window and instantiate the main frame."""
         super().__init__(master)
         self.master = master
+        self.master.grid_columnconfigure(0, weight=1)
+        self.master.grid_rowconfigure(0, weight=1)
         self.app_config = app_config
         if app_config != {}:
             self.master.title("%s v. %s" %
                               (self.app_config.get("APP_NAME", 'Application'),
                                self.app_config.get("APP_VERSION", 'Unknown')))
-        self.grid()
+        self.grid(sticky=tk.N + tk.S + tk.E + tk.W)
 
         # attach handler for exiting the program
         self.master.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -154,13 +156,13 @@ class SpaceApp(tk.Frame):
         # log text box and scrollbars
         self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient=tk.HORIZONTAL)
         self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient=tk.VERTICAL)
-        self._Text_log = tk.Text(self._Tab_log, wrap=tk.NONE, width=72, height=36,
+        self._Text_log = tk.Text(self._Tab_log, wrap=tk.NONE, width=75, height=30,
                                  xscrollcommand=self._Scroll_H.set,
                                  yscrollcommand=self._Scroll_V.set,
                                  bg="black", fg="gray")
         self._Scroll_H["command"] = self._Text_log.xview
         self._Scroll_V["command"] = self._Text_log.yview
-        self._Text_log.grid(row=0, column=0)
+        self._Text_log.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E + tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N + tk.S)
         # kmeans panel
@@ -394,7 +396,7 @@ class VisualizationPanel(object):
         self._Frame = ttk.Frame(parent)
         # this is the 'controls' frame
         self._Frame_controls = ttk.Frame(self._Frame)
-        self._Frame_controls.grid(row=0, column=0)
+        self._Frame_controls.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self._Var_dimensions = tk.StringVar()
         self._Combobox = ttk.Combobox(self._Frame_controls, width=5, justify="center",
                                       state="readonly", textvariable=self._Var_dimensions,
