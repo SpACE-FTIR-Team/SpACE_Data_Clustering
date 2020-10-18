@@ -179,6 +179,8 @@ class SpaceApp(tk.Frame):
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
+        self._Var_normalize.set(self.app_config["NORMALIZE_BY_DEFAULT"])
+        self._Var_pca.set(self.app_config["PCA_BY_DEFAULT"])
         self._Var_pca_dimensions.set(self.app_config["DEFAULT_PCA_DIMENSIONS"])
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
         self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
