@@ -31,16 +31,6 @@ def calculate_composition(km, num_clusters, data_objects):
 
     return comp
 
-def plot2D(dataset, clusters):
-    cx = []
-    cy = []
-    for i in clusters.cluster_centers_:
-        cx.append(i[0])
-        cy.append(i[1])
-    plt.scatter(x= dataset[0], y= dataset[1], c=clusters.labels_, cmap = "tab20")
-    plt.scatter(x = cx, y = cy, marker = "x", color = "black", s = 50)
-    plt.show()
-
 def plot3D(dataset, clusters):
     cx = []
     cy = []
