@@ -342,12 +342,14 @@ class SpaceApp(tk.Frame):
         self.update()
         self.master.config(cursor="watch")
         sleep(.5)  # cursor is sometimes not updating without this delay
-        self.master.update()
+        self.master.update_idletasks()
         self.log("user: pressed Go button")
 
+        # destroy any existing visualization and
         # disable visualization until we have new data
-        self._kmeans_viz_panel.disable_widgets()
-        self._dbscan_viz_panel.disable_widgets()
+        for viz_panel in [self._kmeans_viz_panel, self._dbscan_viz_panel]:
+            viz_panel.destroy_canvas()
+            viz_panel.disable_widgets()
         if self._validate_user_input():
             # all input checks passed
             self._do_import_data()
@@ -402,9 +404,14 @@ class VisualizationPanel(object):
         self._Frame = ttk.Frame(parent)
         self._Frame.grid_columnconfigure(0, weight=1)
         self._Frame.grid_rowconfigure(0, weight=1)
+        # this is the 'canvas' frame
+        # it's empty at instantiation
+        self._Frame_canvas = ttk.Frame(self._Frame)
+        self._Frame_canvas.grid_columnconfigure(0, weight=1)
+        self._Frame_canvas.grid_rowconfigure(0, weight=1)
+        self._Frame_canvas.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         # this is the 'controls' frame
         self._Frame_controls = ttk.Frame(self._Frame)
-        self._Frame_controls.grid(row=0, column=0)
         self._Var_dimensions = tk.StringVar()
         self._Combobox = ttk.Combobox(self._Frame_controls, width=5, justify="center",
                                       state="readonly", textvariable=self._Var_dimensions,
@@ -414,33 +421,43 @@ class VisualizationPanel(object):
         self._Button = ttk.Button(self._Frame_controls, width=15, text="Generate Plot",
                                   command=button_handler)
         self._Button.grid()
-        # this is the 'canvas' frame
-        # it just gets created at instantiation, it doesn't
-        # get gridded until it's actually needed
-        self._Frame_canvas = ttk.Frame(self._Frame)
-        self._Frame_canvas.grid_columnconfigure(0, weight=1)
-        self._Frame_canvas.grid_rowconfigure(0, weight=1)
+        self._Frame_controls.grid(row=0, column=0)
 
     def get_frame_handle(self):
+        """Return handle to the 'main' frame so it can be gridded
+        into the calling application."""
         return self._Frame
 
     def get_dimensions(self):
+        """Return the number of dimensions selected by the combobox."""
         return 2 if self._Var_dimensions.get() == '2D' else 3
 
     def disable_widgets(self):
+        """Disable the dimensions combobox and Generate Plot button
+        so that user can't try to plot before clusters data is available."""
         self._Combobox.config(state="disabled")
         self._Button.config(state="disabled")
 
     def enable_widgets(self):
+        """Enable the dimensions combobox and Generate Plot button."""
         self._Combobox.config(state="readonly")
         self._Button.config(state="normal")
 
     def display_figure(self, figure):
+        """Set up a canvas, display a matplotlib figure on it, and
+        set up the plot toolbar."""
+        self._Frame_controls.lower() # hide 'controls' frame
         canvas = FigureCanvasTkAgg(figure, master=self._Frame_canvas)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         toolbar = NavigationToolbar2Tk(canvas, self._Frame_canvas)
         toolbar.update()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self._Frame_canvas.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
 
+    def destroy_canvas(self):
+        """Remove any existing canvas plot and then re-grid the
+        'controls' frame into the 'main' frame to reset things so
+        the user can plot again with new data."""
+        for widget in self._Frame_canvas.winfo_children():
+            widget.destroy()
+        self._Frame_canvas.lower() # hide 'canvas' frame
