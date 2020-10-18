@@ -376,19 +376,14 @@ class SpaceApp(tk.Frame):
 
     def _on_generate_plot_kmeans(self):
         self.log("user: pressed Generate Plot button (K-means)")
-        self.log("-- Begin K-means plotting in %sD --" % self._kmeans_viz_panel.get_dimensions())
-        if self._kmeans_viz_panel.get_dimensions() == 2:
-            self.log("PCA reducing cluster data to 2 dimensions...")
-            # TODO: PCA to 2 dimensions here
-            self.log("Plotting...")
-            figure = km.plot2D(self._dataset, self._k_clusters, embedded=True)
-            self._kmeans_viz_panel.display_figure(figure)
-        else:
-            self.log("PCA reducing cluster data to 3 dimensions...")
-            # TODO: PCA to 3 dimensions here
-            self.log("Plotting...")
-            figure = km.plot3D(self._dataset, self._k_clusters, embedded=True)
-            self._kmeans_viz_panel.display_figure(figure)
+        dimensions = self._kmeans_viz_panel.get_dimensions()
+        self.log("-- Begin K-means plotting in %sD --" % dimensions)
+        plot = km.plot2D if dimensions == 2 else km.plot3D
+        self.log("PCA reducing cluster data to %s dimensions..." % dimensions)
+        # TODO: PCA here
+        self.log("Plotting...")
+        figure = plot(self._dataset, self._k_clusters, embedded=True)
+        self._kmeans_viz_panel.display_figure(figure)
         self.log("-- End K-means plotting --")
 
     def _on_generate_plot_dbscan(self):
