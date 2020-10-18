@@ -279,6 +279,7 @@ class SpaceApp(tk.Frame):
             # log to console and pop up a messagebox
             self.log("No range in common!")
             self._quick_message_box("No range in common!")
+            self._data_objs = []
             return
         else:
             self.log("All files have this wavelength range in common: %s to %s" % (min, max))
