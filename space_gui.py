@@ -10,6 +10,8 @@ from time import sleep
 import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 def launch_gui(cnf):
     root = tk.Tk()
@@ -24,12 +26,14 @@ class SpaceApp(tk.Frame):
         """Set up the root window and instantiate the main frame."""
         super().__init__(master)
         self.master = master
+        self.master.grid_columnconfigure(0, weight=1)
+        self.master.grid_rowconfigure(0, weight=1)
         self.app_config = app_config
         if app_config != {}:
             self.master.title("%s v. %s" %
                               (self.app_config.get("APP_NAME", 'Application'),
                                self.app_config.get("APP_VERSION", 'Unknown')))
-        self.grid()
+        self.grid(sticky=tk.N + tk.S + tk.E + tk.W)
 
         # attach handler for exiting the program
         self.master.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -135,6 +139,8 @@ class SpaceApp(tk.Frame):
         self._Frame_options.grid(row=0, column=0, sticky=tk.N)
 
         # NOTEBOOK (tabs), right column
+        style = ttk.Style()
+        style.configure("TNotebook.Tab", padding=(10, 5))
         self._Notebook_controller = ttk.Notebook(self)
         # the tabs
         self._Tab_log = ttk.Frame(self._Notebook_controller)
@@ -150,22 +156,22 @@ class SpaceApp(tk.Frame):
         # log text box and scrollbars
         self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient=tk.HORIZONTAL)
         self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient=tk.VERTICAL)
-        self._Text_log = tk.Text(self._Tab_log, wrap=tk.NONE, width=72, height=36,
+        self._Text_log = tk.Text(self._Tab_log, wrap=tk.NONE, width=78, height=32,
                                  xscrollcommand=self._Scroll_H.set,
                                  yscrollcommand=self._Scroll_V.set,
                                  bg="black", fg="gray")
         self._Scroll_H["command"] = self._Text_log.xview
         self._Scroll_V["command"] = self._Text_log.yview
-        self._Text_log.grid(row=0, column=0)
+        self._Text_log.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E + tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N + tk.S)
         # kmeans panel
-        self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self)
-        self._kmeans_viz_panel.get_frame_handle().grid()
+        self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self._on_generate_plot_kmeans)
+        self._kmeans_viz_panel.get_frame_handle().grid(sticky=tk.N + tk.S + tk.E + tk.W)
         self._kmeans_viz_panel.disable_widgets()
         # dbscan panel
-        self._dbscan_viz_panel = VisualizationPanel(self._Tab_dbscan, self)
-        self._dbscan_viz_panel.get_frame_handle().grid()
+        self._dbscan_viz_panel = VisualizationPanel(self._Tab_dbscan, self._on_generate_plot_dbscan)
+        self._dbscan_viz_panel.get_frame_handle().grid(sticky=tk.N + tk.S + tk.E + tk.W)
         self._dbscan_viz_panel.disable_widgets()
 
         # end setup of NOTEBOOK (tabs), right column
@@ -173,6 +179,8 @@ class SpaceApp(tk.Frame):
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
+        self._Var_normalize.set(self.app_config["NORMALIZE_BY_DEFAULT"])
+        self._Var_pca.set(self.app_config["PCA_BY_DEFAULT"])
         self._Var_pca_dimensions.set(self.app_config["DEFAULT_PCA_DIMENSIONS"])
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
         self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
@@ -206,7 +214,6 @@ class SpaceApp(tk.Frame):
         # verify we have a good path in the input folder widget
         if not fileops.path_exists(self._Var_folder.get()):
             # a nonexistent path is a fatal error
-
             self.log("Invalid path: %s" % self._Var_folder.get())
             self._quick_message_box("Invalid path:\n%s" % self._Var_folder.get())
             return False
@@ -272,6 +279,7 @@ class SpaceApp(tk.Frame):
             # log to console and pop up a messagebox
             self.log("No range in common!")
             self._quick_message_box("No range in common!")
+            self._data_objs = []
             return
         else:
             self.log("All files have this wavelength range in common: %s to %s" % (min, max))
@@ -308,13 +316,15 @@ class SpaceApp(tk.Frame):
 
     def _do_kmeans_clustering(self):
         self.log("-- Begin K-means clustering --")
-        k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
-        composition = km.calculate_composition(k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
-        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", k_clusters, composition)
+        self.log("Clustering...")
+        self._k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
+        self.log("Calculating cluster compositions...")
+        composition = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
+        self.log("(..temporary file save..)")
+        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", self._k_clusters, composition)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
-        km.plot2D(self._dataset, k_clusters)
 
     def _do_dbscan_clustering(self):
         # epsilon: self._Var_eps.get()
@@ -332,12 +342,14 @@ class SpaceApp(tk.Frame):
         self.update()
         self.master.config(cursor="watch")
         sleep(.5)  # cursor is sometimes not updating without this delay
-        self.master.update()
+        self.master.update_idletasks()
         self.log("user: pressed Go button")
 
+        # destroy any existing visualization and
         # disable visualization until we have new data
-        self._kmeans_viz_panel.disable_widgets()
-        self._dbscan_viz_panel.disable_widgets()
+        for viz_panel in [self._kmeans_viz_panel, self._dbscan_viz_panel]:
+            viz_panel.destroy_canvas()
+            viz_panel.disable_widgets()
         if self._validate_user_input():
             # all input checks passed
             self._do_import_data()
@@ -361,33 +373,91 @@ class SpaceApp(tk.Frame):
             "Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
 
     def _on_close(self):
+        self.master.quit()
         self.master.destroy()
 
+    def _on_generate_plot_kmeans(self):
+        self.log("user: pressed Generate Plot button (K-means)")
+        dimensions = self._kmeans_viz_panel.get_dimensions()
+        self.log("-- Begin K-means plotting in %sD --" % dimensions)
+        plot = km.plot2D if dimensions == 2 else km.plot3D
+        self.log("PCA reducing cluster data to %s dimensions..." % dimensions)
+        # TODO: PCA here
+        self.log("Plotting...")
+        figure = plot(self._dataset, self._k_clusters, embedded=True)
+        self._kmeans_viz_panel.display_figure(figure)
+        self.log("-- End K-means plotting --")
+
+    def _on_generate_plot_dbscan(self):
+        self.log("user: pressed Generate Plot button (dbscan)")
+        self.log("Plotting in %s dimensions" % self._dbscan_viz_panel.get_dimensions())
 
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
     visualization plots."""
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, button_handler):
         """Set up frame and widgets."""
+        # this is the 'main' frame
+        # either the 'controls' frame or the 'canvas' frame
+        # will be gridded into this 'main' frame
         self._Frame = ttk.Frame(parent)
-        self._Frame.grid()
+        self._Frame.grid_columnconfigure(0, weight=1)
+        self._Frame.grid_rowconfigure(0, weight=1)
+        # this is the 'canvas' frame
+        # it's empty at instantiation
+        self._Frame_canvas = ttk.Frame(self._Frame)
+        self._Frame_canvas.grid_columnconfigure(0, weight=1)
+        self._Frame_canvas.grid_rowconfigure(0, weight=1)
+        self._Frame_canvas.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+        # this is the 'controls' frame
+        self._Frame_controls = ttk.Frame(self._Frame)
         self._Var_dimensions = tk.StringVar()
-        self._Combobox = ttk.Combobox(self._Frame, width=5, justify="center",
+        self._Combobox = ttk.Combobox(self._Frame_controls, width=5, justify="center",
                                       state="readonly", textvariable=self._Var_dimensions,
                                       values=['2D', '3D'])
         self._Combobox.current(0)
         self._Combobox.grid(pady=10)
-        self._Button = ttk.Button(self._Frame, width=15, text="Generate Plot")
+        self._Button = ttk.Button(self._Frame_controls, width=15, text="Generate Plot",
+                                  command=button_handler)
         self._Button.grid()
+        self._Frame_controls.grid(row=0, column=0)
 
     def get_frame_handle(self):
+        """Return handle to the 'main' frame so it can be gridded
+        into the calling application."""
         return self._Frame
 
+    def get_dimensions(self):
+        """Return the number of dimensions selected by the combobox."""
+        return 2 if self._Var_dimensions.get() == '2D' else 3
+
     def disable_widgets(self):
+        """Disable the dimensions combobox and Generate Plot button
+        so that user can't try to plot before clusters data is available."""
         self._Combobox.config(state="disabled")
         self._Button.config(state="disabled")
 
     def enable_widgets(self):
+        """Enable the dimensions combobox and Generate Plot button."""
         self._Combobox.config(state="readonly")
         self._Button.config(state="normal")
+
+    def display_figure(self, figure):
+        """Set up a canvas, display a matplotlib figure on it, and
+        set up the plot toolbar."""
+        self._Frame_controls.lower() # hide 'controls' frame
+        canvas = FigureCanvasTkAgg(figure, master=self._Frame_canvas)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        toolbar = NavigationToolbar2Tk(canvas, self._Frame_canvas)
+        toolbar.update()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+    def destroy_canvas(self):
+        """Remove any existing canvas plot and then re-grid the
+        'controls' frame into the 'main' frame to reset things so
+        the user can plot again with new data."""
+        for widget in self._Frame_canvas.winfo_children():
+            widget.destroy()
+        self._Frame_canvas.lower() # hide 'canvas' frame
