@@ -35,3 +35,22 @@ def plot2D(db, dataset):
       plt.scatter(x=cx, y=cy, color="black", s=50)
   
       plt.show() 
+
+# #############################################################################
+# Plot 3D result
+def plot3D(db, dataset):
+      figure, axes = plt.subplots(subplot_kw={"projection": "3d"})
+      labels = db.labels_
+      cx = []
+      cy = []
+      cz = []
+
+      for i in labels:
+            cx.append(0)
+            cy.append(1)
+            cz.append(2)
+      axes.scatter3D(xs=dataset[0],ys=dataset[1], zs=dataset[2],
+                    c=labels, cmap="tab20")
+      axes.scatter3D(xs=cx, ys=cy, zs=cz, color="black", s=50)
+
+      plt.show() 
