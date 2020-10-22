@@ -452,15 +452,18 @@ class VisualizationPanel(object):
         self._Frame_controls.lower() # hide 'controls' frame
         canvas = FigureCanvasTkAgg(figure, master=self._Frame_canvas)
         canvas.draw()
+        # NOTE: must use pack geometry manager instead of grid here.
+        # FigureCanvasTkAgg and NavigationToolbar2Tk appear to be using
+        # pack internally and mixing it with grid is causing problems.
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         toolbar = NavigationToolbar2Tk(canvas, self._Frame_canvas)
         toolbar.update()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
     def destroy_canvas(self):
-        """Remove any existing canvas plot and then re-grid the
-        'controls' frame into the 'main' frame to reset things so
-        the user can plot again with new data."""
+        """Remove any existing canvas plot and then hide the
+        'canvas' frame so the 'controls' frame becomes visible
+        again and the user can plot again with new data."""
         for widget in self._Frame_canvas.winfo_children():
             widget.destroy()
         self._Frame_canvas.lower() # hide 'canvas' frame
