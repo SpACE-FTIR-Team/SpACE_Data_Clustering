@@ -313,12 +313,15 @@ class SpaceApp(tk.Frame):
 
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
+        fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
 
         # PCA
         if self._Var_pca.get():
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
             self._dataset = dataops.pca(self._dataset, self._Var_pca_dimensions.get())
             self.log('PCA applied')
+
+            fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Var_pca.get() + "/", self._dataset)
 
         self.log("-- End data import and pre-processing --")
 
