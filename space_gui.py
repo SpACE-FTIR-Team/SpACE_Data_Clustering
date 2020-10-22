@@ -301,11 +301,8 @@ class SpaceApp(tk.Frame):
         fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
 
         # Normalization
-        if self._Var_normalize.get():
-            self.log('Normalizing data...')
-            self._data_objs = dataops.linear_normalize(self._data_objs)
-            self.log('Data normalized from range 0 to 1')
-
+        self.log("Normalizing data with method: %s" % self._Var_normalize.get())
+        self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
         fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
 
         # final, pre-processed dataset
