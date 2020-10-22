@@ -13,6 +13,7 @@ from DataObject import DataObject
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 
+
 # columns include overflow for extra ":" characters found in the description field
 columns = ['descriptor', 'value', 'overflow', 'overflow2', 'overflow3']
 
@@ -208,3 +209,14 @@ def pca(dataObjectArray, dimensions):
     pca.fit(dataObjectArray)
     transformed = pca.transform(dataObjectArray)
     return pd.DataFrame(transformed, index=dataObjectArray.index)
+
+def no_normalize(data_objects):
+    """This function is a no-op; it does no normalization.
+    Null data pattern in action!"""
+    return data_objects
+
+# Normalization types that are implemented
+NORMALIZATION_TYPES = {
+    "None":     no_normalize,
+    "0-to-1":   linear_normalize,
+}

@@ -67,11 +67,17 @@ class SpaceApp(tk.Frame):
         self._Entry_folder.grid(row=1, column=0, padx=(5, 0), sticky=tk.W)
         self._Button_browse.grid(row=1, column=1, padx=5)
         self._Frame_input.grid(row=0, sticky=tk.W)
-        # -- normalize is by itself, no sub-frame --
-        self._Var_normalize = tk.BooleanVar()
-        self._Checkbutton_normalize = ttk.Checkbutton(self._LabelFrame_data, text="Normalize data during import",
-                                                      variable=self._Var_normalize)
-        self._Checkbutton_normalize.grid(row=1, sticky=tk.W)
+        # -- normalize sub-frame --
+        Frame_normalize = ttk.Frame(self._LabelFrame_data)
+        Label_normalize = ttk.Label(Frame_normalize, text="Normalization:")
+        self._Var_normalize = tk.StringVar()
+        Combobox_normalize = ttk.Combobox(Frame_normalize, width=10, justify="center",
+                                      state="readonly", textvariable=self._Var_normalize,
+                                      values=list(dataops.NORMALIZATION_TYPES.keys()))
+        Combobox_normalize.current(0)
+        Label_normalize.grid(row=0, column=0, sticky=tk.W)
+        Combobox_normalize.grid(row=0, column=1, sticky=tk.W)
+        Frame_normalize.grid(row=1, pady=5, sticky=tk.W)
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
         self._Var_pca = tk.BooleanVar()
@@ -179,7 +185,6 @@ class SpaceApp(tk.Frame):
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
-        self._Var_normalize.set(self.app_config["NORMALIZE_BY_DEFAULT"])
         self._Var_pca.set(self.app_config["PCA_BY_DEFAULT"])
         self._Var_pca_dimensions.set(self.app_config["DEFAULT_PCA_DIMENSIONS"])
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])

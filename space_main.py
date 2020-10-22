@@ -7,7 +7,6 @@ import space_gui as gui
 CONFIG = {
     "APP_NAME": "SpACE",
     "APP_VERSION": "0.0.7",
-    "NORMALIZE_BY_DEFAULT": True,
     "PCA_BY_DEFAULT": True,
     "DEFAULT_PCA_DIMENSIONS": 2,
     "DEFAULT_KMEANS_K": 8,
