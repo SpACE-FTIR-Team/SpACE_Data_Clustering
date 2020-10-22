@@ -369,6 +369,7 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
+        self._Text_log.delete(1.0, tk.END)
         self._quick_message_box(
             "Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
 
