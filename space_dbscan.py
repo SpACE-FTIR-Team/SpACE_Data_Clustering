@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler
 
 # Compute DBSCAN
 def do_dbscan(epsilon, minimum, dataset):
+    # TODO: research StandardScaler and if we need it
     dataset = StandardScaler().fit_transform(dataset)
     db = DBSCAN(eps=epsilon, min_samples=minimum).fit(dataset)
     return db
@@ -41,7 +42,8 @@ def plot2D(db, dataset):
     plt.show()
 
 
-# Plot 3D result - not functional
+# TODO: Plot 3D result
+# Currently not functional
 def plot3D(db, dataset):
     figure, axes = plt.subplots(subplot_kw={"projection": "3d"})
     labels = db.labels_
