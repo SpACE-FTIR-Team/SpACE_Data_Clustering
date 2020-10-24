@@ -148,18 +148,18 @@ class SpaceApp(tk.Frame):
         # NOTEBOOK (tabs), right column
         style = ttk.Style()
         style.configure("TNotebook.Tab", padding=(10, 5))
-        self._Notebook_controller = ttk.Notebook(self)
+        Notebook_controller = ttk.Notebook(self)
         # the tabs
-        self._Tab_log = ttk.Frame(self._Notebook_controller)
-        self._Tab_kmeans = ttk.Frame(self._Notebook_controller)
-        self._Tab_dbscan = ttk.Frame(self._Notebook_controller)
+        self._Tab_log = ttk.Frame(Notebook_controller)
+        self._Tab_kmeans = ttk.Frame(Notebook_controller)
+        self._Tab_dbscan = ttk.Frame(Notebook_controller)
         # rezise setup
         for tab in (self._Tab_log, self._Tab_kmeans, self._Tab_dbscan):
             tab.grid_columnconfigure(index=0, weight=1)
             tab.grid_rowconfigure(index=0, weight=1)
-        self._Notebook_controller.add(self._Tab_log, text="Log")
-        self._Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
-        self._Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
+        Notebook_controller.add(self._Tab_log, text="Log")
+        Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
+        Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
         # log text box and scrollbars
         self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient=tk.HORIZONTAL)
         self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient=tk.VERTICAL)
@@ -172,6 +172,8 @@ class SpaceApp(tk.Frame):
         self._Text_log.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E + tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N + tk.S)
+        Button_clear_log = ttk.Button(self._Tab_log, text="Clear Log", width=15, command=self._on_clear_log)
+        Button_clear_log.grid(row=2, columnspan=2, pady=5)
         # kmeans panel
         self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self._on_generate_plot_kmeans)
         self._kmeans_viz_panel.get_frame_handle().grid(sticky=tk.N + tk.S + tk.E + tk.W)
@@ -182,7 +184,7 @@ class SpaceApp(tk.Frame):
         self._dbscan_viz_panel.disable_widgets()
 
         # end setup of NOTEBOOK (tabs), right column
-        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N + tk.S + tk.E + tk.W)
+        Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N + tk.S + tk.E + tk.W)
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
@@ -253,6 +255,9 @@ class SpaceApp(tk.Frame):
         if dir != '':
             self.log("user: changed input folder to %s" % dir)
             self._Var_folder.set(dir)
+
+    def _on_clear_log(self):
+        self._Text_log.delete(1.0, tk.END)
 
     def _do_import_data(self):
         # reset everything, in case we are running multiple times
@@ -375,7 +380,6 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
-        self._Text_log.delete(1.0, tk.END)
         self._quick_message_box(
             "Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
 
