@@ -10,6 +10,7 @@ from time import sleep
 import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
+import space_dbscan as db
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
@@ -332,7 +333,10 @@ class SpaceApp(tk.Frame):
         # epsilon: self._Var_eps.get()
         # minpts: self._Var_minpts.get()
         self.log("-- Begin DBSCAN clustering --")
-        # call dbscan here
+        self.log("Clustering...")
+        self._db_clusters = db.do_dbscan(self._Var_eps.get(), self._Var_minpts.get(), self._dataset)
+        self.log("Calculating cluster compositions...")
+        
         self.log("-- End DBSCAN clustering --")
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
@@ -393,7 +397,15 @@ class SpaceApp(tk.Frame):
 
     def _on_generate_plot_dbscan(self):
         self.log("user: pressed Generate Plot button (dbscan)")
+        dimensions = self._dbscan_viz_panel.get_dimensions()
         self.log("Plotting in %s dimensions" % self._dbscan_viz_panel.get_dimensions())
+        plot = db.plot2D if dimensions == 2 else db.plot3D
+        self.log("PCA reducing cluster data to %s dimensions..." % dimensions)
+        self._reduced_set = dataops.pca(self._dataset, dimensions)
+        self.log("Plotting...")
+        figure = plot(self._db_clusters, self._reduced_set)
+        self._dbscan_viz_panel.display_figure(figure)
+        self.log("-- End DBSCAN plotting --")
 
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
