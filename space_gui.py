@@ -389,13 +389,18 @@ class SpaceApp(tk.Frame):
 
     def _on_generate_plot_kmeans(self):
         self.log("user: pressed Generate Plot button (K-means)")
+        plot_dataset = None
         dimensions = self._kmeans_viz_panel.get_dimensions()
         self.log("-- Begin K-means plotting in %sD --" % dimensions)
         plot = km.plot2D if dimensions == 2 else km.plot3D
-        self.log("PCA reducing cluster data to %s dimensions..." % dimensions)
-        self._reduced_set = dataops.pca(self._dataset, dimensions)
+        if self._dataset.shape[1] == dimensions:
+            self.log("Skipping PCA because data set is already %s dimensions" % dimensions)
+            plot_dataset = self._dataset
+        else:
+            self.log("PCA reducing data to %s dimensions..." % dimensions)
+            plot_dataset = dataops.pca(self._dataset, dimensions)
         self.log("Plotting...")
-        figure = plot(self._reduced_set, self._k_clusters, embedded=True)
+        figure = plot(plot_dataset, self._k_clusters, embedded=True)
         self._kmeans_viz_panel.display_figure(figure)
         self.log("-- End K-means plotting --")
 
