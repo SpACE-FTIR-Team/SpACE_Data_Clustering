@@ -19,7 +19,7 @@ def plot2D(dataset, db, embedded=False):
     db = db.fit(dataset)  # refit to reduced data for plotting
     labels = db.labels_  # dbscan labels represent the cluster each index belongs to
     unique_labels = set(labels)  # get number of unique labels (equal to number of clusters + 1 for noise)
-    colors = [plt.get_cmap('nipy_spectral')(each)  # colors for each cluster and noise
+    colors = [plt.cm.Spectral(each)  # colors for each cluster and noise
               for each in np.linspace(0, 1, len(unique_labels))]
     samples_mask = np.zeros_like(db.labels_, dtype=bool)  # create an array of booleans to represent the labels
     samples_mask[db.core_sample_indices_] = True  # match booleans to index of clusters
