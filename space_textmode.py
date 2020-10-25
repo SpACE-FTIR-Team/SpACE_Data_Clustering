@@ -4,6 +4,13 @@
 
 import space_file_ops as fileops
 import space_data_ops as dataops
+import DataObject
+
+all_dobjs = []
+reindexed_dobjs = []
+truncated_dobjs = []
+aligned_dobjs = []
+normalized_dobjs = []
 
 def one_dobj(folder):
     """Get one data object.
@@ -19,7 +26,7 @@ def one_dobj(folder):
     print("Parsed into %s data objects" % len(df))
     return df[0]
 
-def all_dobj(folder):
+def get_all_dobj(folder):
     """Get all data objects.
     Accepts a path to the data files. Parses all the files found in that path
     that match the filespec (tir, nicolet, specturm, .txt).
@@ -47,11 +54,28 @@ def get_file_list(folder):
     print("Found %s files matching the filename filter criteria" % len(filtered_file_list))
     return filtered_file_list
 
+def copy_dobjs(data_objects_list):
+    copied = []
+    for d_o in data_objects_list:
+        desc = d_o.descriptive
+        prs  = d_o.pairs
+        fn = d_o.filename
+        new_dobj = DataObject.DataObject(desc, prs, fn)
+        copied.append(new_dobj)
+    return copied
+
 def simulate_go(folder):
     """Run the same basic steps that the GUI go button would do."""
-    data_objects = all_dobj(folder)
+
+    global all_dobjs, reindexed_dobjs, truncated_dobjs, aligned_dobjs, normalized_dobjs
+
+    data_objects = get_all_dobj(folder)
+
     print("Re-indexing...")
     dataops.reindex(data_objects)
+    reindexed_dobjs = copy_dobjs(data_objects)
+    print("** <module>.reindexed_dobjs now contains re-indexed data objects")
+
     print("Calculating common range...")
     min, max = dataops.find_common_range(data_objects)
     if (min, max) == (None, None):
@@ -59,6 +83,25 @@ def simulate_go(folder):
         return None
     else:
         print("Common wavelength range is %s to %s" % (min, max))
+
     print("Truncating data to range %s to %s..." % (min, max))
     dataops.truncate(data_objects, min, max)
-    return data_objects
+    truncated_dobjs = copy_dobjs(data_objects)
+    print("** <module>.truncated_dobjs now contains truncated data objects")
+
+    print("Finding highest resolution file...")
+    max_res_index = dataops.find_max_res(data_objects)
+    print("Aligning the data...")
+    dataops.align(data_objects, max_res_index)
+    aligned_dobjs = copy_dobjs(data_objects)
+    print("** <module>.aligned_dobjs now contains aligned data objects")
+
+    print('Normalizing data...')
+    data_objects = dataops.linear_normalize(data_objects)
+    normalized_dobjs = copy_dobjs(data_objects)
+    print("** <module>.normalized_dobjs now contains normalized data objects")
+
+    print("Combining...")
+    dataset = dataops.combine(data_objects)
+
+    return dataset
