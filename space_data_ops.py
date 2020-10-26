@@ -13,6 +13,7 @@ from DataObject import DataObject
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 
+
 # columns include overflow for extra ":" characters found in the description field
 columns = ['descriptor', 'value', 'overflow', 'overflow2', 'overflow3']
 
@@ -208,3 +209,35 @@ def pca(dataObjectArray, dimensions):
     pca.fit(dataObjectArray)
     transformed = pca.transform(dataObjectArray)
     return pd.DataFrame(transformed, index=dataObjectArray.index)
+
+def no_normalize(data_objects):
+    """This function is a no-op; it does no normalization.
+    Null design pattern in action!"""
+    return data_objects
+
+def other1_normalize(data_objects):
+    """Some other type of normalization.
+    Rename me to something appropriate."""
+    # do stuff
+    return data_objects
+
+def other2_normalize(data_objects):
+    """Some other type of normalization.
+    Rename me to something appropriate."""
+    # do stuff
+    return data_objects
+
+# Normalization types that are implemented
+#
+# NOTE: This dictionary MUST be at the bottom, after all the
+# normalization implementation functions are defined!
+# Otherwise these function names are unknown.
+#
+# Key is the name that will appear in the GUI combobox.
+# Value is the function that will be called.
+NORMALIZATION_TYPES = {
+    "None":     no_normalize,
+    "0-to-1":   linear_normalize,
+    "other1":   other1_normalize,
+    "other2":   other2_normalize,
+}

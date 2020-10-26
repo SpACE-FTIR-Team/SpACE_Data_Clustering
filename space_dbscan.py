@@ -13,7 +13,9 @@ def do_dbscan(epsilon, minimum, dataset):
 
 
 # Plot 2D result
-def plot2D(db, dataset):
+def plot2D(dataset, db, embedded=False):
+    figure, axes = plt.subplots()
+
     db = db.fit(dataset)  # refit to reduced data for plotting
     labels = db.labels_  # dbscan labels represent the cluster each index belongs to
     unique_labels = set(labels)  # get number of unique labels (equal to number of clusters + 1 for noise)
@@ -30,16 +32,21 @@ def plot2D(db, dataset):
         class_mask = (labels == k)  # array of booleans to match clusters
 
         xy = set_np[class_mask & samples_mask]
-        plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(color),
+        axes.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(color),
                  markeredgecolor='k', markersize=14)
 
         # ~samples_mask = samples_mask inverted
         xy = set_np[class_mask & ~samples_mask]
-        plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(color),
+        axes.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(color),
                  markeredgecolor='k', markersize=6)
 
-    plt.title('DBSCAN')
-    plt.show()
+    if embedded:
+        return figure
+    else:
+        plt.title('DBSCAN')
+        plt.show()
+        return None
+
 
 
 # TODO: Plot 3D result

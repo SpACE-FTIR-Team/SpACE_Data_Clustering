@@ -68,11 +68,17 @@ class SpaceApp(tk.Frame):
         self._Entry_folder.grid(row=1, column=0, padx=(5, 0), sticky=tk.W)
         self._Button_browse.grid(row=1, column=1, padx=5)
         self._Frame_input.grid(row=0, sticky=tk.W)
-        # -- normalize is by itself, no sub-frame --
-        self._Var_normalize = tk.BooleanVar()
-        self._Checkbutton_normalize = ttk.Checkbutton(self._LabelFrame_data, text="Normalize data during import",
-                                                      variable=self._Var_normalize)
-        self._Checkbutton_normalize.grid(row=1, sticky=tk.W)
+        # -- normalize sub-frame --
+        Frame_normalize = ttk.Frame(self._LabelFrame_data)
+        Label_normalize = ttk.Label(Frame_normalize, text="Normalization:")
+        self._Var_normalize = tk.StringVar()
+        Combobox_normalize = ttk.Combobox(Frame_normalize, width=10, justify="center",
+                                      state="readonly", textvariable=self._Var_normalize,
+                                      values=list(dataops.NORMALIZATION_TYPES.keys()))
+        Combobox_normalize.current(0)
+        Label_normalize.grid(row=0, column=0, sticky=tk.W)
+        Combobox_normalize.grid(row=0, column=1, sticky=tk.W)
+        Frame_normalize.grid(row=1, pady=5, sticky=tk.W)
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
         self._Var_pca = tk.BooleanVar()
@@ -142,18 +148,18 @@ class SpaceApp(tk.Frame):
         # NOTEBOOK (tabs), right column
         style = ttk.Style()
         style.configure("TNotebook.Tab", padding=(10, 5))
-        self._Notebook_controller = ttk.Notebook(self)
+        Notebook_controller = ttk.Notebook(self)
         # the tabs
-        self._Tab_log = ttk.Frame(self._Notebook_controller)
-        self._Tab_kmeans = ttk.Frame(self._Notebook_controller)
-        self._Tab_dbscan = ttk.Frame(self._Notebook_controller)
+        self._Tab_log = ttk.Frame(Notebook_controller)
+        self._Tab_kmeans = ttk.Frame(Notebook_controller)
+        self._Tab_dbscan = ttk.Frame(Notebook_controller)
         # rezise setup
         for tab in (self._Tab_log, self._Tab_kmeans, self._Tab_dbscan):
             tab.grid_columnconfigure(index=0, weight=1)
             tab.grid_rowconfigure(index=0, weight=1)
-        self._Notebook_controller.add(self._Tab_log, text="Log")
-        self._Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
-        self._Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
+        Notebook_controller.add(self._Tab_log, text="Log")
+        Notebook_controller.add(self._Tab_kmeans, text="K-means plot")
+        Notebook_controller.add(self._Tab_dbscan, text="DBSCAN plot")
         # log text box and scrollbars
         self._Scroll_H = ttk.Scrollbar(self._Tab_log, orient=tk.HORIZONTAL)
         self._Scroll_V = ttk.Scrollbar(self._Tab_log, orient=tk.VERTICAL)
@@ -166,6 +172,8 @@ class SpaceApp(tk.Frame):
         self._Text_log.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self._Scroll_H.grid(row=1, column=0, sticky=tk.E + tk.W)
         self._Scroll_V.grid(row=0, column=1, sticky=tk.N + tk.S)
+        Button_clear_log = ttk.Button(self._Tab_log, text="Clear Log", width=15, command=self._on_clear_log)
+        Button_clear_log.grid(row=2, columnspan=2, pady=5)
         # kmeans panel
         self._kmeans_viz_panel = VisualizationPanel(self._Tab_kmeans, self._on_generate_plot_kmeans)
         self._kmeans_viz_panel.get_frame_handle().grid(sticky=tk.N + tk.S + tk.E + tk.W)
@@ -176,11 +184,10 @@ class SpaceApp(tk.Frame):
         self._dbscan_viz_panel.disable_widgets()
 
         # end setup of NOTEBOOK (tabs), right column
-        self._Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N + tk.S + tk.E + tk.W)
+        Notebook_controller.grid(row=0, column=1, padx=10, pady=10, sticky=tk.N + tk.S + tk.E + tk.W)
 
     def _set_defaults(self):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
-        self._Var_normalize.set(self.app_config["NORMALIZE_BY_DEFAULT"])
         self._Var_pca.set(self.app_config["PCA_BY_DEFAULT"])
         self._Var_pca_dimensions.set(self.app_config["DEFAULT_PCA_DIMENSIONS"])
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
@@ -249,6 +256,9 @@ class SpaceApp(tk.Frame):
             self.log("user: changed input folder to %s" % dir)
             self._Var_folder.set(dir)
 
+    def _on_clear_log(self):
+        self._Text_log.delete(1.0, tk.END)
+
     def _do_import_data(self):
         # reset everything, in case we are running multiple times
         self._data_objs = []
@@ -297,11 +307,8 @@ class SpaceApp(tk.Frame):
         fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
 
         # Normalization
-        if self._Var_normalize.get():
-            self.log('Normalizing data...')
-            self._data_objs = dataops.linear_normalize(self._data_objs)
-            self.log('Data normalized from range 0 to 1')
-
+        self.log("Normalizing data with method: %s" % self._Var_normalize.get())
+        self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
         fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
 
         # final, pre-processed dataset
@@ -382,25 +389,35 @@ class SpaceApp(tk.Frame):
 
     def _on_generate_plot_kmeans(self):
         self.log("user: pressed Generate Plot button (K-means)")
+        plot_dataset = None
         dimensions = self._kmeans_viz_panel.get_dimensions()
         self.log("-- Begin K-means plotting in %sD --" % dimensions)
         plot = km.plot2D if dimensions == 2 else km.plot3D
-        self.log("PCA reducing cluster data to %s dimensions..." % dimensions)
-        self._reduced_set = dataops.pca(self._dataset, dimensions)
+        if self._dataset.shape[1] == dimensions:
+            self.log("Skipping PCA because data set is already %s dimensions" % dimensions)
+            plot_dataset = self._dataset
+        else:
+            self.log("PCA reducing data to %s dimensions..." % dimensions)
+            plot_dataset = dataops.pca(self._dataset, dimensions)
         self.log("Plotting...")
-        figure = plot(self._reduced_set, self._k_clusters, embedded=True)
+        figure = plot(plot_dataset, self._k_clusters, embedded=True)
         self._kmeans_viz_panel.display_figure(figure)
         self.log("-- End K-means plotting --")
 
     def _on_generate_plot_dbscan(self):
         self.log("user: pressed Generate Plot button (dbscan)")
+        plot_dataset = None
         dimensions = self._dbscan_viz_panel.get_dimensions()
         self.log("Plotting in %s dimensions" % self._dbscan_viz_panel.get_dimensions())
         plot = db.plot2D if dimensions == 2 else db.plot3D
-        self.log("PCA reducing cluster data to %s dimensions..." % dimensions)
-        self._reduced_set = dataops.pca(self._dataset, dimensions)
+        if self._dataset.shape[1] == dimensions:
+            self.log("Skipping PCA because data set is already %s dimensions" % dimensions)
+            plot_dataset = self._dataset
+        else:
+            self.log("PCA reducing data to %s dimensions..." % dimensions)
+            plot_dataset = dataops.pca(self._dataset, dimensions)
         self.log("Plotting...")
-        figure = plot(self._db_clusters, self._reduced_set)
+        figure = plot(plot_dataset, self._db_clusters, embedded=True)
         self._dbscan_viz_panel.display_figure(figure)
         self.log("-- End DBSCAN plotting --")
 
@@ -461,15 +478,18 @@ class VisualizationPanel(object):
         self._Frame_controls.lower() # hide 'controls' frame
         canvas = FigureCanvasTkAgg(figure, master=self._Frame_canvas)
         canvas.draw()
+        # NOTE: must use pack geometry manager instead of grid here.
+        # FigureCanvasTkAgg and NavigationToolbar2Tk appear to be using
+        # pack internally and mixing it with grid is causing problems.
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         toolbar = NavigationToolbar2Tk(canvas, self._Frame_canvas)
         toolbar.update()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
     def destroy_canvas(self):
-        """Remove any existing canvas plot and then re-grid the
-        'controls' frame into the 'main' frame to reset things so
-        the user can plot again with new data."""
+        """Remove any existing canvas plot and then hide the
+        'canvas' frame so the 'controls' frame becomes visible
+        again and the user can plot again with new data."""
         for widget in self._Frame_canvas.winfo_children():
             widget.destroy()
         self._Frame_canvas.lower() # hide 'canvas' frame
