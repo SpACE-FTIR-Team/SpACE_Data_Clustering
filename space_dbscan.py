@@ -23,8 +23,7 @@ def scatter_plot2D(dataset, db, embedded=False):
     # e.g. -1 becomes 0, 0 becomes 1, 1 becomes 2...
     plot_labels = []
     for label in db.labels_:
-        modified_label = 0 if label == -1 else (label + 1)
-        plot_labels.append(modified_label)
+        plot_labels.append(label + 1)
 
     # now, fix our colormap so that the first color (for 0, the new
     # noise points) is black
