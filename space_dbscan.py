@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.colors import ListedColormap
 import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
@@ -10,6 +12,35 @@ def do_dbscan(epsilon, minimum, dataset):
     dataset = StandardScaler().fit_transform(dataset)
     db = DBSCAN(eps=epsilon, min_samples=minimum).fit(dataset)
     return db
+
+def scatter_plot2D(dataset, db, embedded=False):
+    """Attempt to write a 2D DBSCAN plot that is the same as K-means,
+    so we can then figure out how to modify it like K-means to plot 3D."""
+    figure, axes = plt.subplots()
+
+    # dbscan labels contain some -1s, which is wreaking havoc,
+    # so let's change -1 to 0 and shift all other labels by +1
+    # e.g. -1 becomes 0, 0 becomes 1, 1 becomes 2...
+    plot_labels = []
+    for label in db.labels_:
+        modified_label = 0 if label == -1 else (label + 1)
+        plot_labels.append(modified_label)
+
+    # now, fix our colormap so that the first color (for 0, the new
+    # noise points) is black
+    colormap = cm.get_cmap('tab20')(np.linspace(0,1,20))
+    black = [0, 0, 0, 1]
+    new_colors = np.insert(colormap, 0, black, axis=0)
+    new_colormap = ListedColormap(new_colors)
+
+    axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
+
+    if embedded:
+        return figure
+    else:
+        plt.title('DBSCAN')
+        plt.show()
+        return None
 
 
 # Plot 2D result

@@ -419,6 +419,7 @@ class SpaceApp(tk.Frame):
         self.log("Plotting...")
         figure = plot(plot_dataset, self._db_clusters, embedded=True)
         self._dbscan_viz_panel.display_figure(figure)
+        db.scatter_plot2D(plot_dataset, self._db_clusters)
         self.log("-- End DBSCAN plotting --")
 
 class VisualizationPanel(object):
