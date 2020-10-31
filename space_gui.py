@@ -58,6 +58,7 @@ class SpaceApp(tk.Frame):
 
         # - DATA widgets -
         self._LabelFrame_data = ttk.LabelFrame(self._Frame_options, text="Data")
+
         # -- input sub-frame --
         self._Frame_input = ttk.Frame(self._LabelFrame_data)
         self._Label_data_text = ttk.Label(self._Frame_input, text="Input from folder:")
@@ -68,6 +69,7 @@ class SpaceApp(tk.Frame):
         self._Entry_folder.grid(row=1, column=0, padx=(5, 0), sticky=tk.W)
         self._Button_browse.grid(row=1, column=1, padx=5)
         self._Frame_input.grid(row=0, sticky=tk.W)
+
         # -- normalize sub-frame --
         Frame_normalize = ttk.Frame(self._LabelFrame_data)
         Label_normalize = ttk.Label(Frame_normalize, text="Normalization:")
@@ -79,6 +81,7 @@ class SpaceApp(tk.Frame):
         Label_normalize.grid(row=0, column=0, sticky=tk.W)
         Combobox_normalize.grid(row=0, column=1, sticky=tk.W)
         Frame_normalize.grid(row=1, pady=5, sticky=tk.W)
+
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
         self._Var_pca = tk.BooleanVar()
@@ -90,6 +93,7 @@ class SpaceApp(tk.Frame):
         self._Label_pca_text.grid(row=1, column=0, sticky=tk.W)
         self._Entry_pca.grid(row=1, column=1)
         self._Frame_pca.grid(row=2, pady=(0, 5), sticky=tk.W)
+
         # - DATA widgets grid -
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
 
@@ -381,7 +385,7 @@ class SpaceApp(tk.Frame):
 
     def _on_save(self):
         self._quick_message_box(
-            "Congrats, you clicked the Save button.  This actuall does nothing now, but eventually might!")
+            "Congrats, you clicked the Save button.  This actually does nothing now, but eventually might!")
 
     def _on_close(self):
         self.master.quit()

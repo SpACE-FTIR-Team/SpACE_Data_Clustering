@@ -9,9 +9,12 @@
 #
 
 import pandas as pd
+import numpy as np
 from DataObject import DataObject
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
+from scipy.stats import zscore
+from sklearn.preprocessing import MinMaxScaler
 
 
 # columns include overflow for extra ":" characters found in the description field
@@ -215,16 +218,17 @@ def no_normalize(data_objects):
     Null design pattern in action!"""
     return data_objects
 
-def other1_normalize(data_objects):
-    """Some other type of normalization.
-    Rename me to something appropriate."""
-    # do stuff
+def zScore_normalize(data_objects):
+    """Rescales data based on how many standard deviations the point is away from the 
+    mean of the dataset"""
+    for df in data_objects:
+        df.pairs = df.pairs.apply(zscore)
     return data_objects
 
-def other2_normalize(data_objects):
-    """Some other type of normalization.
-    Rename me to something appropriate."""
-    # do stuff
+def log_normalize(data_objects):
+    """Log scaling computes the log of your values to compress a wide range to a narrow range."""
+    for df in data_objects:
+        df.pairs = np.log(df.pairs)
     return data_objects
 
 # Normalization types that are implemented
@@ -235,9 +239,10 @@ def other2_normalize(data_objects):
 #
 # Key is the name that will appear in the GUI combobox.
 # Value is the function that will be called.
+
 NORMALIZATION_TYPES = {
     "None":     no_normalize,
     "0-to-1":   linear_normalize,
-    "other1":   other1_normalize,
-    "other2":   other2_normalize,
+    "Z-Score":  zScore_normalize,
+    "Log":   log_normalize
 }
