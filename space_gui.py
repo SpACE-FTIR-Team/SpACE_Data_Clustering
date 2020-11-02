@@ -317,12 +317,15 @@ class SpaceApp(tk.Frame):
 
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
+        fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
 
         # PCA
         if self._Var_pca.get():
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
             self._dataset = dataops.pca(self._dataset, self._Var_pca_dimensions.get())
             self.log('PCA applied')
+
+            fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Var_pca.get() + "/", self._dataset)
 
         self.log("-- End data import and pre-processing --")
 
@@ -331,9 +334,11 @@ class SpaceApp(tk.Frame):
         self.log("Clustering...")
         self._k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
         self.log("Calculating cluster compositions...")
-        composition = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs)
+        composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
+        composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
         self.log("(..temporary file save..)")
-        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", self._k_clusters, composition)
+        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_type", self._k_clusters, composition_by_type)
+        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_class", self._k_clusters, composition_by_class)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
