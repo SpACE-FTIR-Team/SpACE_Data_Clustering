@@ -21,7 +21,8 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
     dataframe is of shape clusters x categories. Each row is a cluster, and each column is a category """
     comp = pd.DataFrame(index=range(num_clusters))
     for i in range(len(data_objects)):
-        category = data_objects[i].descriptive.loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'][1].upper()
+        #The most complicated line of code I have ever written in my entire life.  Basically it just accesses the value where the descriptor = sortcategory
+        category = data_objects[i].descriptive.loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[km.labels_[i], category] = 1
@@ -75,3 +76,4 @@ def plot2D(dataset, clusters, embedded=False):
     else:
         plt.show()
         return None
+
