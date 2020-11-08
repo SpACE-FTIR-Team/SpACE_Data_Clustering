@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-This is a temporary kmeans clustering file
+Contains functions related to the Kmeans clustering algorithm.
+Currently performs Kmeans, calculates the composition of Kmeans clusters, and plots 2D and 3D results.
 """
 from sklearn.cluster import KMeans
 import pandas as pd
@@ -16,13 +17,16 @@ def do_Kmeans(num_clusters, dataset):
 
 
 def calculate_composition(km, num_clusters, data_objects, sort_category):
-    """This function accepts a kmeans object, a number of clusters and a list of data objects, and a category to sort by
-     and calculates the composition of each cluster, it returns a pandas dataframe with the composition of each cluster.  Composition
-    dataframe is of shape clusters x categories. Each row is a cluster, and each column is a category """
+    """This function accepts a kmeans object, a number of clusters and a list of data objects, and a category to sort
+    by and calculates the composition of each cluster, it returns a pandas dataframe with the composition of each
+    cluster.  Composition dataframe is of shape clusters x categories. Each row is a cluster, and each column is a
+    category """
     comp = pd.DataFrame(index=range(num_clusters))
     for i in range(len(data_objects)):
-        #The most complicated line of code I have ever written in my entire life.  Basically it just accesses the value where the descriptor = sortcategory
-        category = data_objects[i].descriptive.loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
+        # The most complicated line of code I have ever written in my entire life.  Basically it just accesses the
+        # value where the descriptor = sort_category
+        category = data_objects[i].descriptive.\
+            loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[km.labels_[i], category] = 1
@@ -76,4 +80,3 @@ def plot2D(dataset, clusters, embedded=False):
     else:
         plt.show()
         return None
-
