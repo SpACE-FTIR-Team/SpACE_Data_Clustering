@@ -65,10 +65,10 @@ class SpaceApp(tk.Frame):
         self._Var_folder = tk.StringVar()
         self._Entry_folder = ttk.Entry(self._Frame_input, width=30, textvariable=self._Var_folder)
         self._Button_browse = ttk.Button(self._Frame_input, text="Browse...", command=self._on_browse)
-        self._Label_data_text.grid(row=0, column=0, padx=(0, 0), sticky=tk.W)
-        self._Entry_folder.grid(row=1, column=0, padx=(5, 0), sticky=tk.W)
-        self._Button_browse.grid(row=1, column=1, padx=5)
-        self._Frame_input.grid(row=0, sticky=tk.W)
+        self._Label_data_text.grid(row=0, column=0, sticky=tk.W)
+        self._Entry_folder.grid(row=1, column=0, sticky=tk.W)
+        self._Button_browse.grid(row=1, column=1, padx=(5, 0))
+        self._Frame_input.grid(row=0, padx=5, pady=(5, 0), sticky=tk.W)
 
         # -- normalize sub-frame --
         Frame_normalize = ttk.Frame(self._LabelFrame_data)
@@ -79,8 +79,8 @@ class SpaceApp(tk.Frame):
                                       values=list(dataops.NORMALIZATION_TYPES.keys()))
         Combobox_normalize.current(0)
         Label_normalize.grid(row=0, column=0, sticky=tk.W)
-        Combobox_normalize.grid(row=0, column=1, sticky=tk.W)
-        Frame_normalize.grid(row=1, pady=5, sticky=tk.W)
+        Combobox_normalize.grid(row=0, column=1, padx=(5, 0), sticky=tk.W)
+        Frame_normalize.grid(row=1, padx=5, pady=(10, 0), sticky=tk.W)
 
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
@@ -91,8 +91,14 @@ class SpaceApp(tk.Frame):
         self._Entry_pca = ttk.Entry(self._Frame_pca, width=5, justify="center", textvariable=self._Var_pca_dimensions)
         self._Checkbutton_pca.grid(row=0, sticky=tk.W)
         self._Label_pca_text.grid(row=1, column=0, sticky=tk.W)
-        self._Entry_pca.grid(row=1, column=1)
-        self._Frame_pca.grid(row=2, pady=(0, 5), sticky=tk.W)
+        self._Entry_pca.grid(row=1, column=1, padx=5)
+        self._Frame_pca.grid(row=2, padx=5, pady=(10, 0), sticky=tk.W)
+
+        # -- save after processing steps --
+        self._Var_save_after_modify = tk.BooleanVar()
+        Checkbutton_save_after_modify = ttk.Checkbutton(self._LabelFrame_data, text="Save after each data transformation",
+                                                        variable=self._Var_save_after_modify)
+        Checkbutton_save_after_modify.grid(row=3, padx=5, pady=10, sticky=tk.W)
 
         # - DATA widgets grid -
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
