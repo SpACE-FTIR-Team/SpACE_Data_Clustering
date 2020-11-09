@@ -96,7 +96,7 @@ class SpaceApp(tk.Frame):
 
         # -- save after processing steps --
         self._Var_save_after_modify = tk.BooleanVar()
-        Checkbutton_save_after_modify = ttk.Checkbutton(self._LabelFrame_data, text="Save after each data transformation",
+        Checkbutton_save_after_modify = ttk.Checkbutton(self._LabelFrame_data, text="Save after each data modification",
                                                         variable=self._Var_save_after_modify)
         Checkbutton_save_after_modify.grid(row=3, padx=5, pady=10, sticky=tk.W)
 
@@ -200,6 +200,7 @@ class SpaceApp(tk.Frame):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
         self._Var_pca.set(self.app_config["PCA_BY_DEFAULT"])
         self._Var_pca_dimensions.set(self.app_config["DEFAULT_PCA_DIMENSIONS"])
+        self._Var_save_after_modify.set(self.app_config["SAVE_AFTER_DATA_MODIFICATION_BY_DEFAULT"])
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
         self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
         self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
