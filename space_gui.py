@@ -314,25 +314,28 @@ class SpaceApp(tk.Frame):
         # align the pairs dataframes to dataframe with highest resolution
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
-
-        fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
-
+        if self._Var_save_after_modify.get():
+            self.log("Saving aligned data...")
+            fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
         # Normalization
         self.log("Normalizing data with method: %s" % self._Var_normalize.get())
         self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
-        fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
-
+        if self._Var_save_after_modify.get():
+            self.log("Saving normalized data...")
+            fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
-        fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
-
+        if self._Var_save_after_modify.get():
+            self.log("Saving final combined dataframe...")
+            fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
         # PCA
         if self._Var_pca.get():
-            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
+            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions...')
             self._dataset = dataops.pca(self._dataset, self._Var_pca_dimensions.get())
             self.log('PCA applied')
-
-            fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Var_pca.get() + "/", self._dataset)
+            if self._Var_save_after_modify.get():
+                self.log("Saving PCA-reduced data...")
+                fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Entry_pca.get() + "/", self._dataset)
 
         self.log("-- End data import and pre-processing --")
 
