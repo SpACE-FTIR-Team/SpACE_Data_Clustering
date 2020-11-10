@@ -204,6 +204,8 @@ class SpaceApp(tk.Frame):
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
         self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
         self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
+        self.saving_params = {  "kmeans": self.app_config["KMEANS_SAVING"],
+                                "dbscan": self.app_config["DBSCAN_SAVING"]}
 
     def log(self, text):
         """A simple logging facility for status messages
@@ -399,10 +401,7 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
-        SaveDialog(self.master, title="Save Cluster Composition")
-        #self.master.wait_window(d)
-        #self._quick_message_box(
-        #    "Congrats, you clicked the Save button.  This actually does nothing now, but eventually might!")
+        SaveDialog(self.master, params=self.saving_params, title="Save Cluster Composition")
 
     def _on_close(self):
         self.master.quit()
@@ -519,19 +518,16 @@ class SaveDialog(tk.Toplevel):
     """A modal dialog for saving cluster composition."""
     # This is largely based on effbot's dialog box class at
     # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
-    def __init__(self, parent, title = None):
+    def __init__(self, parent, params, title = None):
         tk.Toplevel.__init__(self, parent)
         self.transient(parent)
         if title:
             self.title(title)
         self.parent = parent
-        self.result = None
+        self._parameters = params
 
-        Frame = ttk.Frame(self)
-        #self.initial_focus = self.body(Frame)
-        Frame.grid()
-
-        self._create_buttons()
+        self._create_vars()
+        self._create_widgets()
 
         self.grab_set()
 
@@ -543,17 +539,40 @@ class SaveDialog(tk.Toplevel):
         self.initial_focus.focus_set()
         self.wait_window(self)
 
-    #
-    # construction hooks
+    def _create_vars(self):
+        self._Var_kmeans = tk.BooleanVar()
+        self._Var_kmeans.set(self._parameters["kmeans"]["save"])
+        self._Var_kmeans_type = tk.BooleanVar()
+        self._Var_kmeans_type.set(self._parameters["kmeans"]["by_type"])
+        self._Var_kmeans_class = tk.BooleanVar()
+        self._Var_kmeans_class.set(self._parameters["kmeans"]["by_class"])
+        self._Var_kmeans_subclass = tk.BooleanVar()
+        self._Var_kmeans_subclass.set(self._parameters["kmeans"]["by_subclass"])
+        self._Var_dbscan = tk.BooleanVar()
+        self._Var_dbscan.set(self._parameters["dbscan"]["save"])
+        self._Var_dbscan_type = tk.BooleanVar()
+        self._Var_dbscan_type.set(self._parameters["dbscan"]["by_type"])
+        self._Var_dbscan_class = tk.BooleanVar()
+        self._Var_dbscan_class.set(self._parameters["dbscan"]["by_class"])
+        self._Var_dbscan_subclass = tk.BooleanVar()
+        self._Var_dbscan_subclass.set(self._parameters["dbscan"]["by_subclass"])
 
-    def body(self, master):
-        # create dialog body.  return widget that should have
-        # initial focus.  this method should be overridden
+    def _create_widgets(self):
+        Frame = ttk.Frame(self)
+        
+        Frame_checkbuttons = ttk.Frame(Frame)
+        w = ttk.Checkbutton(Frame_checkbuttons, text="K-means", variable=self._Var_kmeans)
+        w.grid(row=0, column=1, sticky=tk.W)
+        w = ttk.Checkbutton(Frame_checkbuttons, text="By Type", variable=self._Var_kmeans_type)
+        w.grid(row=1, column=1, sticky=tk.W)
+        w = ttk.Checkbutton(Frame_checkbuttons, text="By Class", variable=self._Var_kmeans_class)
+        w.grid(row=2, column=1, sticky=tk.W)
+        w = ttk.Checkbutton(Frame_checkbuttons, text="By Subclass", variable=self._Var_kmeans_subclass)
+        w.grid(row=3, column=1, sticky=tk.W)
 
-        pass
+        Frame_checkbuttons.grid()
 
-    def _create_buttons(self):
-        Frame_buttons = ttk.Frame(self)
+        Frame_buttons = ttk.Frame(Frame)
         Button_save = ttk.Button(Frame_buttons, text="Save", width=15, command=self._on_save, default=tk.ACTIVE)
         Button_cancel = ttk.Button(Frame_buttons, text="Cancel", width=15, command=self._on_cancel)
         Button_save.grid(row=0, column=0)
@@ -563,9 +582,7 @@ class SaveDialog(tk.Toplevel):
         self.bind("<Escape>", self._on_cancel)
 
         Frame_buttons.grid()
-
-    #
-    # standard button semantics
+        Frame.grid()
 
     def _on_save(self, event=None):
 
