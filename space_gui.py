@@ -203,7 +203,7 @@ class SpaceApp(tk.Frame):
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
         self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
         self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
-        #self._Button_save["state"] = "disabled"
+        self._Button_save["state"] = "disabled"
         self.saving_params = {  "kmeans": self.app_config["KMEANS_SAVING"],
                                 "dbscan": self.app_config["DBSCAN_SAVING"]}
 
@@ -553,10 +553,10 @@ class SaveDialog(tk.Toplevel):
 
         self._create_vars()
         self._create_widgets()
-        # if not kmeans:
-        #     self._disable_widgets(self._kmeans_checkbuttons)
-        # if not dbscan:
-        #     self._disable_widgets(self._dbscan_checkbuttons)
+        if not kmeans:
+            self._disable_widgets(self._kmeans_checkbuttons)
+        if not dbscan:
+            self._disable_widgets(self._dbscan_checkbuttons)
 
         self.grab_set()
         self.initial_focus = self
@@ -621,6 +621,9 @@ class SaveDialog(tk.Toplevel):
         w.grid(padx=10, pady=(0,10), sticky=tk.W)
         Labelframe.grid(row=1, column=1, padx=5)
         Frame_checkbuttons.grid(padx=5)
+
+        w = ttk.Label(Frame, text="Select a folder to save in:")
+        w.grid(row=2, columnspan=2, pady=10)
 
         Frame_buttons = ttk.Frame(Frame)
         Button_save = ttk.Button(Frame_buttons, text="Save", width=15, command=self._on_save, default=tk.ACTIVE)
