@@ -66,10 +66,10 @@ class SpaceApp(tk.Frame):
         self._Var_folder = tk.StringVar()
         self._Entry_folder = ttk.Entry(self._Frame_input, width=30, textvariable=self._Var_folder)
         self._Button_browse = ttk.Button(self._Frame_input, text="Browse...", command=self._on_browse)
-        self._Label_data_text.grid(row=0, column=0, padx=(0, 0), sticky=tk.W)
-        self._Entry_folder.grid(row=1, column=0, padx=(5, 0), sticky=tk.W)
-        self._Button_browse.grid(row=1, column=1, padx=5)
-        self._Frame_input.grid(row=0, sticky=tk.W)
+        self._Label_data_text.grid(row=0, column=0, sticky=tk.W)
+        self._Entry_folder.grid(row=1, column=0, sticky=tk.W)
+        self._Button_browse.grid(row=1, column=1, padx=(5, 0))
+        self._Frame_input.grid(row=0, padx=5, pady=(5, 0), sticky=tk.W)
 
         # -- normalize sub-frame --
         Frame_normalize = ttk.Frame(self._LabelFrame_data)
@@ -80,8 +80,8 @@ class SpaceApp(tk.Frame):
                                           values=list(dataops.NORMALIZATION_TYPES.keys()))
         Combobox_normalize.current(0)
         Label_normalize.grid(row=0, column=0, sticky=tk.W)
-        Combobox_normalize.grid(row=0, column=1, sticky=tk.W)
-        Frame_normalize.grid(row=1, pady=5, sticky=tk.W)
+        Combobox_normalize.grid(row=0, column=1, padx=(5, 0), sticky=tk.W)
+        Frame_normalize.grid(row=1, padx=5, pady=(10, 0), sticky=tk.W)
 
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
@@ -92,8 +92,14 @@ class SpaceApp(tk.Frame):
         self._Entry_pca = ttk.Entry(self._Frame_pca, width=5, justify="center", textvariable=self._Var_pca_dimensions)
         self._Checkbutton_pca.grid(row=0, sticky=tk.W)
         self._Label_pca_text.grid(row=1, column=0, sticky=tk.W)
-        self._Entry_pca.grid(row=1, column=1)
-        self._Frame_pca.grid(row=2, pady=(0, 5), sticky=tk.W)
+        self._Entry_pca.grid(row=1, column=1, padx=5)
+        self._Frame_pca.grid(row=2, padx=5, pady=(10, 0), sticky=tk.W)
+
+        # -- save after processing steps --
+        self._Var_save_after_modify = tk.BooleanVar()
+        Checkbutton_save_after_modify = ttk.Checkbutton(self._LabelFrame_data, text="Save after each data modification",
+                                                        variable=self._Var_save_after_modify)
+        Checkbutton_save_after_modify.grid(row=3, padx=5, pady=10, sticky=tk.W)
 
         # - DATA widgets grid -
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
@@ -140,8 +146,7 @@ class SpaceApp(tk.Frame):
         # - BUTTONS for actions -
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
         self._Button_go = ttk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
-        self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
-                                       state="disabled")
+        self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save)
         self._Button_go.grid(pady=10)
         self._Button_save.grid(pady=10)
         # - BUTTONS for actions grid -
@@ -195,9 +200,13 @@ class SpaceApp(tk.Frame):
         self._Var_folder.set(self.app_config["DEFAULT_INPUT_PATH"])
         self._Var_pca.set(self.app_config["PCA_BY_DEFAULT"])
         self._Var_pca_dimensions.set(self.app_config["DEFAULT_PCA_DIMENSIONS"])
+        self._Var_save_after_modify.set(self.app_config["SAVE_AFTER_DATA_MODIFICATION_BY_DEFAULT"])
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
         self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
         self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
+        self._Button_save["state"] = "disabled"
+        self.saving_params = {  "kmeans": self.app_config["KMEANS_SAVING"],
+                                "dbscan": self.app_config["DBSCAN_SAVING"]}
 
     def log(self, text):
         """A simple logging facility for status messages
@@ -308,25 +317,28 @@ class SpaceApp(tk.Frame):
         # align the pairs dataframes to dataframe with highest resolution
         self.log("Aligning the data...")
         dataops.align(self._data_objs, max_res_index)
-
-        fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
-
+        if self._Var_save_after_modify.get():
+            self.log("Saving aligned data...")
+            fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
         # Normalization
         self.log("Normalizing data with method: %s" % self._Var_normalize.get())
         self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
-        fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
-
+        if self._Var_save_after_modify.get():
+            self.log("Saving normalized data...")
+            fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
-        fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
-
+        if self._Var_save_after_modify.get():
+            self.log("Saving final combined dataframe...")
+            fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
         # PCA
         if self._Var_pca.get():
-            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions')
+            self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions...')
             self._dataset = dataops.pca(self._dataset, self._Var_pca_dimensions.get())
             self.log('PCA applied')
-
-            fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Var_pca.get() + "/", self._dataset)
+            if self._Var_save_after_modify.get():
+                self.log("Saving PCA-reduced data...")
+                fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Entry_pca.get() + "/", self._dataset)
 
         self.log("-- End data import and pre-processing --")
 
@@ -355,6 +367,27 @@ class SpaceApp(tk.Frame):
         self.log("-- End DBSCAN clustering --")
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
+
+    def _do_save_cluster_composition(self):
+        """This function is the button handler for the Save button in the save dialog box."""
+        self.log("user: pressed Save button in save dialog")
+        # remove next log line when done debugging
+        self.log(self.saving_params)
+
+        if self.saving_params["kmeans"]["save"]:
+            if self.saving_params["kmeans"]["by_type"]:
+                pass
+            if self.saving_params["kmeans"]["by_class"]:
+                pass
+            if self.saving_params["kmeans"]["by_subclass"]:
+                pass
+        if self.saving_params["dbscan"]["save"]:
+            if self.saving_params["dbscan"]["by_type"]:
+                pass
+            if self.saving_params["dbscan"]["by_class"]:
+                pass
+            if self.saving_params["dbscan"]["by_subclass"]:
+                pass
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
@@ -390,8 +423,10 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
-        self._quick_message_box(
-            "Congrats, you clicked the Save button.  This actually does nothing now, but eventually might!")
+        SaveDialog(self.master, params=self.saving_params,
+                    handler=self._do_save_cluster_composition,
+                    title="Save Cluster Composition",
+                    kmeans=self._Var_kmeans.get(), dbscan=self._Var_dbscan.get())
 
     def _on_close(self):
         self.master.quit()
@@ -503,4 +538,138 @@ class VisualizationPanel(object):
         again and the user can plot again with new data."""
         for widget in self._Frame_canvas.winfo_children():
             widget.destroy()
+
+        self._Frame_canvas.lower() # hide 'canvas' frame
+
+class SaveDialog(tk.Toplevel):
+    """A modal dialog for saving cluster composition."""
+    # This is largely based on effbot's dialog box class at
+    # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
+    def __init__(self, parent, params, handler, title=None, kmeans=False, dbscan=False):
+        tk.Toplevel.__init__(self, parent)
+        self.transient(parent)
+        if title:
+            self.title(title)
+        self.parent = parent
+        self._parameters = params
+        self._save_handler = handler
+
+        self._create_vars()
+        self._create_widgets()
+        if not kmeans:
+            self._disable_widgets(self._kmeans_checkbuttons)
+        if not dbscan:
+            self._disable_widgets(self._dbscan_checkbuttons)
+
+        self.grab_set()
+        self.initial_focus = self
+        self.protocol("WM_DELETE_WINDOW", self._on_cancel)
+        self.geometry("+%d+%d" % (parent.winfo_rootx()+50,
+                                  parent.winfo_rooty()+50))
+        self.initial_focus.focus_set()
+        self.wait_window(self)
+
+    def _create_vars(self):
+        self._Var_kmeans = tk.BooleanVar()
+        self._Var_kmeans.set(self._parameters["kmeans"]["save"])
+        self._Var_kmeans_type = tk.BooleanVar()
+        self._Var_kmeans_type.set(self._parameters["kmeans"]["by_type"])
+        self._Var_kmeans_class = tk.BooleanVar()
+        self._Var_kmeans_class.set(self._parameters["kmeans"]["by_class"])
+        self._Var_kmeans_subclass = tk.BooleanVar()
+        self._Var_kmeans_subclass.set(self._parameters["kmeans"]["by_subclass"])
+        self._Var_dbscan = tk.BooleanVar()
+        self._Var_dbscan.set(self._parameters["dbscan"]["save"])
+        self._Var_dbscan_type = tk.BooleanVar()
+        self._Var_dbscan_type.set(self._parameters["dbscan"]["by_type"])
+        self._Var_dbscan_class = tk.BooleanVar()
+        self._Var_dbscan_class.set(self._parameters["dbscan"]["by_class"])
+        self._Var_dbscan_subclass = tk.BooleanVar()
+        self._Var_dbscan_subclass.set(self._parameters["dbscan"]["by_subclass"])
+
+    def _create_widgets(self):
+        Frame = ttk.Frame(self)
+
+        w = ttk.Label(Frame, text="Select what to save:")
+        w.grid(row=0, columnspan=2, pady=10)
+        
+        Frame_checkbuttons = ttk.Frame(Frame)
+        self._kmeans_checkbuttons = []
+        self._dbscan_checkbuttons = []
+        w = ttk.Checkbutton(Frame_checkbuttons, text="K-means", variable=self._Var_kmeans)
+        self._kmeans_checkbuttons.append(w)
+        Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_kmeans_type)
+        self._kmeans_checkbuttons.append(w)
+        w.grid(padx=10, pady=(10,0), sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Class", variable=self._Var_kmeans_class)
+        self._kmeans_checkbuttons.append(w)
+        w.grid(padx=10, sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Subclass", variable=self._Var_kmeans_subclass)
+        self._kmeans_checkbuttons.append(w)
+        w.grid(padx=10, pady=(0,10), sticky=tk.W)
+        Labelframe.grid(row=1, column=0, padx=5)
+
+        w = ttk.Checkbutton(Frame_checkbuttons, text="DBSCAN", variable=self._Var_dbscan)
+        self._dbscan_checkbuttons.append(w)
+        Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_dbscan_type)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(padx=10, pady=(10,0), sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Class", variable=self._Var_dbscan_class)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(padx=10, sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Subclass", variable=self._Var_dbscan_subclass)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(padx=10, pady=(0,10), sticky=tk.W)
+        Labelframe.grid(row=1, column=1, padx=5)
+        Frame_checkbuttons.grid(padx=5)
+
+        w = ttk.Label(Frame, text="Select a folder to save in:")
+        w.grid(row=2, columnspan=2, pady=10)
+
+        Frame_buttons = ttk.Frame(Frame)
+        Button_save = ttk.Button(Frame_buttons, text="Save", width=15, command=self._on_save, default=tk.ACTIVE)
+        Button_cancel = ttk.Button(Frame_buttons, text="Cancel", width=15, command=self._on_cancel)
+        Button_save.grid(row=0, column=0)
+        Button_cancel.grid(row=0, column=1)
+
+        self.bind("<Return>", self._on_save)
+        self.bind("<Escape>", self._on_cancel)
+
+        Frame_buttons.grid()
+        Frame.grid()
+
+    def _disable_widgets(self, widgets):
+        for w in widgets:
+            w["state"] = "disabled"
+
+    def _on_save(self, event=None):
+        if not self.validate():
+            self.initial_focus.focus_set() # put focus back
+            return
+        self.withdraw()
+        self.update_idletasks()
+
+        self._parameters["kmeans"]["save"] = self._Var_kmeans.get()
+        self._parameters["kmeans"]["by_type"] = self._Var_kmeans_type.get()
+        self._parameters["kmeans"]["by_class"] = self._Var_kmeans_class.get()
+        self._parameters["kmeans"]["by_subclass"] = self._Var_kmeans_subclass.get()
+        self._parameters["dbscan"]["save"] = self._Var_dbscan.get()
+        self._parameters["dbscan"]["by_type"] = self._Var_dbscan_type.get()
+        self._parameters["dbscan"]["by_class"] = self._Var_dbscan_class.get()
+        self._parameters["dbscan"]["by_subclass"] = self._Var_dbscan_subclass.get()
+
+        self._save_handler()
+        self._on_cancel()
+
+    def _on_cancel(self, event=None):
+        # put focus back to the parent window
+        self.parent.focus_set()
+        self.destroy()
+
+    def validate(self):
+        return 1 # override
+
         self._Frame_canvas.lower()  # hide 'canvas' frame
+

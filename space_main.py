@@ -9,10 +9,19 @@ CONFIG = {
     "APP_VERSION": "0.0.7",
     "PCA_BY_DEFAULT": True,
     "DEFAULT_PCA_DIMENSIONS": 2,
+    "SAVE_AFTER_DATA_MODIFICATION_BY_DEFAULT": False,
     "DEFAULT_KMEANS_K": 8,
     "DEFAULT_DBSCAN_EPS": 1.0,
     "DEFAULT_DBSCAN_MINPTS": 3,
     "DEFAULT_INPUT_PATH": None,
+    "KMEANS_SAVING": {  "save": True,
+                        "by_type": True,
+                        "by_class": True,
+                        "by_subclass": True},
+    "DBSCAN_SAVING": {  "save": True,
+                        "by_type": True,
+                        "by_class": True,
+                        "by_subclass": True},
 }
 
 
