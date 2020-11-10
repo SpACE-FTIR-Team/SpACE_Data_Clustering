@@ -145,8 +145,7 @@ class SpaceApp(tk.Frame):
         # - BUTTONS for actions -
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
         self._Button_go = ttk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
-        self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
-                                       state="disabled")
+        self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save)
         self._Button_go.grid(pady=10)
         self._Button_save.grid(pady=10)
         # - BUTTONS for actions grid -
@@ -204,6 +203,7 @@ class SpaceApp(tk.Frame):
         self._Var_kmeans_clusters.set(self.app_config["DEFAULT_KMEANS_K"])
         self._Var_eps.set(self.app_config["DEFAULT_DBSCAN_EPS"])
         self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
+        #self._Button_save["state"] = "disabled"
         self.saving_params = {  "kmeans": self.app_config["KMEANS_SAVING"],
                                 "dbscan": self.app_config["DBSCAN_SAVING"]}
 
@@ -553,15 +553,13 @@ class SaveDialog(tk.Toplevel):
 
         self._create_vars()
         self._create_widgets()
-        if not kmeans:
-            self._disable_widgets(self._kmeans_checkbuttons)
-        if not dbscan:
-            self._disable_widgets(self._dbscan_checkbuttons)
+        # if not kmeans:
+        #     self._disable_widgets(self._kmeans_checkbuttons)
+        # if not dbscan:
+        #     self._disable_widgets(self._dbscan_checkbuttons)
 
         self.grab_set()
-
         self.initial_focus = self
-
         self.protocol("WM_DELETE_WINDOW", self._on_cancel)
         self.geometry("+%d+%d" % (parent.winfo_rootx()+50,
                                   parent.winfo_rooty()+50))
@@ -588,35 +586,41 @@ class SaveDialog(tk.Toplevel):
 
     def _create_widgets(self):
         Frame = ttk.Frame(self)
+
+        w = ttk.Label(Frame, text="Select what to save:")
+        w.grid(row=0, columnspan=2, pady=10)
         
         Frame_checkbuttons = ttk.Frame(Frame)
         self._kmeans_checkbuttons = []
         self._dbscan_checkbuttons = []
         w = ttk.Checkbutton(Frame_checkbuttons, text="K-means", variable=self._Var_kmeans)
         self._kmeans_checkbuttons.append(w)
-        w.grid(row=0, column=1, sticky=tk.W)
-        w = ttk.Checkbutton(Frame_checkbuttons, text="By Type", variable=self._Var_kmeans_type)
+        Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_kmeans_type)
         self._kmeans_checkbuttons.append(w)
-        w.grid(row=1, column=1, sticky=tk.W)
-        w = ttk.Checkbutton(Frame_checkbuttons, text="By Class", variable=self._Var_kmeans_class)
+        w.grid(padx=10, pady=(10,0), sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Class", variable=self._Var_kmeans_class)
         self._kmeans_checkbuttons.append(w)
-        w.grid(row=2, column=1, sticky=tk.W)
-        w = ttk.Checkbutton(Frame_checkbuttons, text="By Subclass", variable=self._Var_kmeans_subclass)
+        w.grid(padx=10, sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Subclass", variable=self._Var_kmeans_subclass)
         self._kmeans_checkbuttons.append(w)
-        w.grid(row=3, column=1, sticky=tk.W)
+        w.grid(padx=10, pady=(0,10), sticky=tk.W)
+        Labelframe.grid(row=1, column=0, padx=5)
+
         w = ttk.Checkbutton(Frame_checkbuttons, text="DBSCAN", variable=self._Var_dbscan)
         self._dbscan_checkbuttons.append(w)
-        w.grid(row=0, column=2, sticky=tk.W)
-        w = ttk.Checkbutton(Frame_checkbuttons, text="By Type", variable=self._Var_dbscan_type)
+        Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_dbscan_type)
         self._dbscan_checkbuttons.append(w)
-        w.grid(row=1, column=2, sticky=tk.W)
-        w = ttk.Checkbutton(Frame_checkbuttons, text="By Class", variable=self._Var_dbscan_class)
+        w.grid(padx=10, pady=(10,0), sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Class", variable=self._Var_dbscan_class)
         self._dbscan_checkbuttons.append(w)
-        w.grid(row=2, column=2, sticky=tk.W)
-        w = ttk.Checkbutton(Frame_checkbuttons, text="By Subclass", variable=self._Var_dbscan_subclass)
+        w.grid(padx=10, sticky=tk.W)
+        w = ttk.Checkbutton(Labelframe, text="By Subclass", variable=self._Var_dbscan_subclass)
         self._dbscan_checkbuttons.append(w)
-        w.grid(row=3, column=2, sticky=tk.W)
-        Frame_checkbuttons.grid()
+        w.grid(padx=10, pady=(0,10), sticky=tk.W)
+        Labelframe.grid(row=1, column=1, padx=5)
+        Frame_checkbuttons.grid(padx=5)
 
         Frame_buttons = ttk.Frame(Frame)
         Button_save = ttk.Button(Frame_buttons, text="Save", width=15, command=self._on_save, default=tk.ACTIVE)
