@@ -51,8 +51,8 @@ def plot3D(dataset, clusters, embedded=False):
         cx.append(i[0])
         cy.append(i[1])
         cz.append(i[2])
-    axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=clusters.labels_, cmap="tab20")
-    axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="blue", s=50)
+    axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=clusters.labels_, cmap="plasma")
+    axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="black", s=50)
     if embedded:
         return figure
     else:
@@ -73,7 +73,7 @@ def plot2D(dataset, clusters, embedded=False):
     for i in clusters.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
-    axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="tab20")
+    axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="plasma")
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
     if embedded:
         return figure

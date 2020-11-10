@@ -14,6 +14,7 @@ import space_dbscan as db
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
+
 def launch_gui(cnf):
     root = tk.Tk()
     app = SpaceApp(master=root, app_config=cnf)
@@ -75,8 +76,8 @@ class SpaceApp(tk.Frame):
         Label_normalize = ttk.Label(Frame_normalize, text="Normalization:")
         self._Var_normalize = tk.StringVar()
         Combobox_normalize = ttk.Combobox(Frame_normalize, width=10, justify="center",
-                                      state="readonly", textvariable=self._Var_normalize,
-                                      values=list(dataops.NORMALIZATION_TYPES.keys()))
+                                          state="readonly", textvariable=self._Var_normalize,
+                                          values=list(dataops.NORMALIZATION_TYPES.keys()))
         Combobox_normalize.current(0)
         Label_normalize.grid(row=0, column=0, sticky=tk.W)
         Combobox_normalize.grid(row=0, column=1, padx=(5, 0), sticky=tk.W)
@@ -362,7 +363,7 @@ class SpaceApp(tk.Frame):
         self.log("Clustering...")
         self._db_clusters = db.do_dbscan(self._Var_eps.get(), self._Var_minpts.get(), self._dataset)
         self.log("Calculating cluster compositions...")
-        
+
         self.log("-- End DBSCAN clustering --")
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
@@ -465,6 +466,7 @@ class SpaceApp(tk.Frame):
         self._dbscan_viz_panel.display_figure(figure)
         self.log("-- End DBSCAN plotting --")
 
+
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
     visualization plots."""
@@ -519,7 +521,7 @@ class VisualizationPanel(object):
     def display_figure(self, figure):
         """Set up a canvas, display a matplotlib figure on it, and
         set up the plot toolbar."""
-        self._Frame_controls.lower() # hide 'controls' frame
+        self._Frame_controls.lower()  # hide 'controls' frame
         canvas = FigureCanvasTkAgg(figure, master=self._Frame_canvas)
         canvas.draw()
         # NOTE: must use pack geometry manager instead of grid here.
@@ -536,6 +538,7 @@ class VisualizationPanel(object):
         again and the user can plot again with new data."""
         for widget in self._Frame_canvas.winfo_children():
             widget.destroy()
+
         self._Frame_canvas.lower() # hide 'canvas' frame
 
 class SaveDialog(tk.Toplevel):
@@ -667,3 +670,6 @@ class SaveDialog(tk.Toplevel):
 
     def validate(self):
         return 1 # override
+
+        self._Frame_canvas.lower()  # hide 'canvas' frame
+
