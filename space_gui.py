@@ -146,7 +146,7 @@ class SpaceApp(tk.Frame):
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
         self._Button_go = ttk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
         self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
-                                       state="disabled")
+                                       state="enabled")
         self._Button_go.grid(pady=10)
         self._Button_save.grid(pady=10)
         # - BUTTONS for actions grid -
@@ -399,8 +399,10 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
-        self._quick_message_box(
-            "Congrats, you clicked the Save button.  This actually does nothing now, but eventually might!")
+        SaveDialog(self.master, title="Save Cluster Composition")
+        #self.master.wait_window(d)
+        #self._quick_message_box(
+        #    "Congrats, you clicked the Save button.  This actually does nothing now, but eventually might!")
 
     def _on_close(self):
         self.master.quit()
@@ -512,3 +514,86 @@ class VisualizationPanel(object):
         for widget in self._Frame_canvas.winfo_children():
             widget.destroy()
         self._Frame_canvas.lower() # hide 'canvas' frame
+
+class SaveDialog(tk.Toplevel):
+    """A modal dialog for saving cluster composition."""
+    # This is largely based on effbot's dialog box class at
+    # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
+    def __init__(self, parent, title = None):
+        tk.Toplevel.__init__(self, parent)
+        self.transient(parent)
+        if title:
+            self.title(title)
+        self.parent = parent
+        self.result = None
+
+        Frame = ttk.Frame(self)
+        self.initial_focus = self.body(Frame)
+        Frame.grid()
+
+        self._create_buttons()
+
+        self.grab_set()
+
+        if not self.initial_focus:
+            self.initial_focus = self
+
+        self.protocol("WM_DELETE_WINDOW", self._on_cancel)
+        self.geometry("+%d+%d" % (parent.winfo_rootx()+50,
+                                  parent.winfo_rooty()+50))
+        self.initial_focus.focus_set()
+        self.wait_window(self)
+
+    #
+    # construction hooks
+
+    def body(self, master):
+        # create dialog body.  return widget that should have
+        # initial focus.  this method should be overridden
+
+        pass
+
+    def _create_buttons(self):
+        Frame_buttons = ttk.Frame(self)
+        Button_save = ttk.Button(Frame_buttons, text="Save", width=15, command=self._on_save, default=tk.ACTIVE)
+        Button_cancel = ttk.Button(Frame_buttons, text="Cancel", width=15, command=self._on_cancel)
+        Button_save.grid(row=0, column=0)
+        Button_cancel.grid(row=0, column=1)
+
+        self.bind("<Return>", self._on_save)
+        self.bind("<Escape>", self._on_cancel)
+
+        Frame_buttons.grid()
+
+    #
+    # standard button semantics
+
+    def _on_save(self, event=None):
+
+        if not self.validate():
+            self.initial_focus.focus_set() # put focus back
+            return
+
+        self.withdraw()
+        self.update_idletasks()
+
+        self.apply()
+
+        self._on_cancel()
+
+    def _on_cancel(self, event=None):
+
+        # put focus back to the parent window
+        self.parent.focus_set()
+        self.destroy()
+
+    #
+    # command hooks
+
+    def validate(self):
+
+        return 1 # override
+
+    def apply(self):
+
+        pass # override    
