@@ -528,15 +528,14 @@ class SaveDialog(tk.Toplevel):
         self.result = None
 
         Frame = ttk.Frame(self)
-        self.initial_focus = self.body(Frame)
+        #self.initial_focus = self.body(Frame)
         Frame.grid()
 
         self._create_buttons()
 
         self.grab_set()
 
-        if not self.initial_focus:
-            self.initial_focus = self
+        self.initial_focus = self
 
         self.protocol("WM_DELETE_WINDOW", self._on_cancel)
         self.geometry("+%d+%d" % (parent.winfo_rootx()+50,
