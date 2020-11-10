@@ -146,7 +146,7 @@ class SpaceApp(tk.Frame):
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
         self._Button_go = ttk.Button(self._Frame_action_buttons, text="Go", width=15, command=self._on_go)
         self._Button_save = ttk.Button(self._Frame_action_buttons, text="Save", width=15, command=self._on_save,
-                                       state="enabled")
+                                       state="disabled")
         self._Button_go.grid(pady=10)
         self._Button_save.grid(pady=10)
         # - BUTTONS for actions grid -
@@ -401,7 +401,8 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
-        SaveDialog(self.master, params=self.saving_params, title="Save Cluster Composition")
+        SaveDialog(self.master, params=self.saving_params, title="Save Cluster Composition",
+                    kmeans=self._Var_kmeans.get(), dbscan=self._Var_dbscan.get())
 
     def _on_close(self):
         self.master.quit()
@@ -518,7 +519,7 @@ class SaveDialog(tk.Toplevel):
     """A modal dialog for saving cluster composition."""
     # This is largely based on effbot's dialog box class at
     # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
-    def __init__(self, parent, params, title = None):
+    def __init__(self, parent, params, title=None, kmeans=False, dbscan=False):
         tk.Toplevel.__init__(self, parent)
         self.transient(parent)
         if title:
@@ -528,6 +529,10 @@ class SaveDialog(tk.Toplevel):
 
         self._create_vars()
         self._create_widgets()
+        if not kmeans:
+            self._disable_widgets(self._kmeans_checkbuttons)
+        if not dbscan:
+            self._disable_widgets(self._dbscan_checkbuttons)
 
         self.grab_set()
 
@@ -561,15 +566,32 @@ class SaveDialog(tk.Toplevel):
         Frame = ttk.Frame(self)
         
         Frame_checkbuttons = ttk.Frame(Frame)
+        self._kmeans_checkbuttons = []
+        self._dbscan_checkbuttons = []
         w = ttk.Checkbutton(Frame_checkbuttons, text="K-means", variable=self._Var_kmeans)
+        self._kmeans_checkbuttons.append(w)
         w.grid(row=0, column=1, sticky=tk.W)
         w = ttk.Checkbutton(Frame_checkbuttons, text="By Type", variable=self._Var_kmeans_type)
+        self._kmeans_checkbuttons.append(w)
         w.grid(row=1, column=1, sticky=tk.W)
         w = ttk.Checkbutton(Frame_checkbuttons, text="By Class", variable=self._Var_kmeans_class)
+        self._kmeans_checkbuttons.append(w)
         w.grid(row=2, column=1, sticky=tk.W)
         w = ttk.Checkbutton(Frame_checkbuttons, text="By Subclass", variable=self._Var_kmeans_subclass)
+        self._kmeans_checkbuttons.append(w)
         w.grid(row=3, column=1, sticky=tk.W)
-
+        w = ttk.Checkbutton(Frame_checkbuttons, text="DBSCAN", variable=self._Var_dbscan)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(row=0, column=2, sticky=tk.W)
+        w = ttk.Checkbutton(Frame_checkbuttons, text="By Type", variable=self._Var_dbscan_type)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(row=1, column=2, sticky=tk.W)
+        w = ttk.Checkbutton(Frame_checkbuttons, text="By Class", variable=self._Var_dbscan_class)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(row=2, column=2, sticky=tk.W)
+        w = ttk.Checkbutton(Frame_checkbuttons, text="By Subclass", variable=self._Var_dbscan_subclass)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(row=3, column=2, sticky=tk.W)
         Frame_checkbuttons.grid()
 
         Frame_buttons = ttk.Frame(Frame)
@@ -584,6 +606,10 @@ class SaveDialog(tk.Toplevel):
         Frame_buttons.grid()
         Frame.grid()
 
+    def _disable_widgets(self, widgets):
+        for w in widgets:
+            w["state"] = "disabled"
+
     def _on_save(self, event=None):
 
         if not self.validate():
@@ -593,8 +619,6 @@ class SaveDialog(tk.Toplevel):
         self.withdraw()
         self.update_idletasks()
 
-        self.apply()
-
         self._on_cancel()
 
     def _on_cancel(self, event=None):
@@ -603,13 +627,6 @@ class SaveDialog(tk.Toplevel):
         self.parent.focus_set()
         self.destroy()
 
-    #
-    # command hooks
-
     def validate(self):
 
         return 1 # override
-
-    def apply(self):
-
-        pass # override    
