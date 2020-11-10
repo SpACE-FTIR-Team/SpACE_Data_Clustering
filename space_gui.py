@@ -196,7 +196,8 @@ class SpaceApp(tk.Frame):
         self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
         self._Button_save["state"] = "disabled"
         self.saving_params = {  "kmeans": self.app_config["KMEANS_SAVING"],
-                                "dbscan": self.app_config["DBSCAN_SAVING"]}
+                                "dbscan": self.app_config["DBSCAN_SAVING"],
+                                "folder": self.app_config["DEFAULT_INPUT_PATH"]}
 
     def log(self, text):
         """A simple logging facility for status messages
@@ -412,6 +413,10 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
+        # reset default folder for saving to be the same folder as input
+        # SaveDialog will append the /cluster_composition (or whatever
+        # the user selects)
+        self.saving_params["folder"] = self._Var_folder.get()
         SaveDialog(self.master, params=self.saving_params,
                     handler=self._do_save_cluster_composition,
                     title="Save Cluster Composition",
@@ -559,6 +564,8 @@ class SaveDialog(tk.Toplevel):
         self.wait_window(self)
 
     def _create_vars(self):
+        self._Var_folder = tk.StringVar()
+        self._Var_folder.set(self._parameters["folder"])
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans.set(self._parameters["kmeans"]["save"])
         self._Var_kmeans_type = tk.BooleanVar()
@@ -580,7 +587,7 @@ class SaveDialog(tk.Toplevel):
         Frame = ttk.Frame(self)
 
         w = ttk.Label(Frame, text="Select what to save:")
-        w.grid(row=0, columnspan=2, pady=10)
+        w.grid(row=0, columnspan=2, pady=(10,5))
         
         Frame_checkbuttons = ttk.Frame(Frame)
         self._kmeans_checkbuttons = []
@@ -615,23 +622,32 @@ class SaveDialog(tk.Toplevel):
         Frame_checkbuttons.grid(padx=5)
 
         w = ttk.Label(Frame, text="Select a folder to save in:")
-        w.grid(row=2, columnspan=2, pady=10)
+        w.grid(row=2, columnspan=2, pady=(10,5))
+        Frame_folder = ttk.Frame(Frame)
+        w = ttk.Entry(Frame_folder, width=30, textvariable=self._Var_folder)
+        w.grid(row=0, column=0, sticky=tk.E)
+        w = ttk.Button(Frame_folder, text="Browse...", command=self._on_browse)
+        w.grid(row=0, column=1, padx=(5, 0))
+        Frame_folder.grid(padx=10)
 
         Frame_buttons = ttk.Frame(Frame)
         Button_save = ttk.Button(Frame_buttons, text="Save", width=15, command=self._on_save, default=tk.ACTIVE)
         Button_cancel = ttk.Button(Frame_buttons, text="Cancel", width=15, command=self._on_cancel)
-        Button_save.grid(row=0, column=0)
+        Button_save.grid(row=0, column=0, padx=(0,5))
         Button_cancel.grid(row=0, column=1)
 
         self.bind("<Return>", self._on_save)
         self.bind("<Escape>", self._on_cancel)
 
-        Frame_buttons.grid()
+        Frame_buttons.grid(pady=20)
         Frame.grid()
 
     def _disable_widgets(self, widgets):
         for w in widgets:
             w["state"] = "disabled"
+
+    def _on_browse(self):
+        pass
 
     def _on_save(self, event=None):
         if not self.validate():
