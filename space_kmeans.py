@@ -25,8 +25,11 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
     for i in range(len(data_objects)):
         # The most complicated line of code I have ever written in my entire life.  Basically it just accesses the
         # value where the descriptor = sort_category
-        category = data_objects[i].descriptive.\
-            loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
+        if sort_category in data_objects[i].descriptive.descriptor.values:
+            category = data_objects[i].descriptive.\
+                loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
+        else:
+            category = "None specified"
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[km.labels_[i], category] = 1
