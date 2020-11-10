@@ -346,12 +346,6 @@ class SpaceApp(tk.Frame):
         self.log("-- Begin K-means clustering --")
         self.log("Clustering...")
         self._k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
-        self.log("Calculating cluster compositions...")
-        composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
-        composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
-        self.log("(..temporary file save..)")
-        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_type", self._k_clusters, composition_by_type)
-        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_class", self._k_clusters, composition_by_class)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
@@ -375,12 +369,17 @@ class SpaceApp(tk.Frame):
         self.log(self.saving_params)
 
         if self.saving_params["kmeans"]["save"]:
+            self.log("Calculating K-Means cluster compositions...")
             if self.saving_params["kmeans"]["by_type"]:
-                pass
+                composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
+                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_type", composition_by_type)
             if self.saving_params["kmeans"]["by_class"]:
-                pass
+                composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
+                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_class", composition_by_class)
             if self.saving_params["kmeans"]["by_subclass"]:
-                pass
+                composition_by_subclass = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Subclass")
+                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_subclass", composition_by_subclass)
+        self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
             if self.saving_params["dbscan"]["by_type"]:
                 pass
