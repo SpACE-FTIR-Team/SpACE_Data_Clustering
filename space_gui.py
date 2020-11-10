@@ -367,6 +367,11 @@ class SpaceApp(tk.Frame):
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
 
+    def _do_save_cluster_composition(self):
+        """This function is the button handler for the Save button in the save dialog box."""
+        self.log("user: pressed Save button in save dialog")
+        self.log(self.saving_params)
+
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
         # while we do work
@@ -401,7 +406,9 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
-        SaveDialog(self.master, params=self.saving_params, title="Save Cluster Composition",
+        SaveDialog(self.master, params=self.saving_params,
+                    handler=self._do_save_cluster_composition,
+                    title="Save Cluster Composition",
                     kmeans=self._Var_kmeans.get(), dbscan=self._Var_dbscan.get())
 
     def _on_close(self):
@@ -519,13 +526,14 @@ class SaveDialog(tk.Toplevel):
     """A modal dialog for saving cluster composition."""
     # This is largely based on effbot's dialog box class at
     # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
-    def __init__(self, parent, params, title=None, kmeans=False, dbscan=False):
+    def __init__(self, parent, params, handler, title=None, kmeans=False, dbscan=False):
         tk.Toplevel.__init__(self, parent)
         self.transient(parent)
         if title:
             self.title(title)
         self.parent = parent
         self._parameters = params
+        self._save_handler = handler
 
         self._create_vars()
         self._create_widgets()
@@ -611,22 +619,28 @@ class SaveDialog(tk.Toplevel):
             w["state"] = "disabled"
 
     def _on_save(self, event=None):
-
         if not self.validate():
             self.initial_focus.focus_set() # put focus back
             return
-
         self.withdraw()
         self.update_idletasks()
 
+        self._parameters["kmeans"]["save"] = self._Var_kmeans.get()
+        self._parameters["kmeans"]["by_type"] = self._Var_kmeans_type.get()
+        self._parameters["kmeans"]["by_class"] = self._Var_kmeans_class.get()
+        self._parameters["kmeans"]["by_subclass"] = self._Var_kmeans_subclass.get()
+        self._parameters["dbscan"]["save"] = self._Var_dbscan.get()
+        self._parameters["dbscan"]["by_type"] = self._Var_dbscan_type.get()
+        self._parameters["dbscan"]["by_class"] = self._Var_dbscan_class.get()
+        self._parameters["dbscan"]["by_subclass"] = self._Var_dbscan_subclass.get()
+
+        self._save_handler()
         self._on_cancel()
 
     def _on_cancel(self, event=None):
-
         # put focus back to the parent window
         self.parent.focus_set()
         self.destroy()
 
     def validate(self):
-
         return 1 # override
