@@ -58,7 +58,7 @@ class SpaceApp(tk.Frame):
         self._Frame_options = ttk.Frame(self)
 
         # - DATA widgets -
-        self._LabelFrame_data = ttk.LabelFrame(self._Frame_options, text="Data")
+        self._LabelFrame_data = tk.LabelFrame(self._Frame_options, text="Data")
 
         # -- input sub-frame --
         self._Frame_input = ttk.Frame(self._LabelFrame_data)
@@ -105,43 +105,33 @@ class SpaceApp(tk.Frame):
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
 
         # - KMEANS widgets -
-        self._LabelFrame_kmeans = ttk.LabelFrame(self._Frame_options, text="K-means algorithm")
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans_clusters = tk.IntVar()
-        self._Checkbutton_kmeans = ttk.Checkbutton(self._LabelFrame_kmeans, text="Perform K-means",
-                                                   variable=self._Var_kmeans)
-        self._Checkbutton_kmeans.grid(row=0, sticky=tk.W)
-        self._Label_k = ttk.Label(self._LabelFrame_kmeans, text="Number of clusters (k):")
-        self._Entry_k = ttk.Entry(self._LabelFrame_kmeans, width=5, justify="center",
-                                  textvariable=self._Var_kmeans_clusters)
-        self._Label_k.grid(row=1, column=0, pady=(0, 5), sticky=tk.W)
-        self._Entry_k.grid(row=1, column=1, pady=(0, 5))
+        w = ttk.Checkbutton(self._Frame_options, text="K-means algorithm", variable=self._Var_kmeans)
+        Labelframe = tk.LabelFrame(self._Frame_options, labelwidget=w)
+        w = ttk.Label(Labelframe, text="Number of clusters (k):")
+        w.grid(row=0, column=0, padx=5, pady=(5,10), sticky=tk.W)
+        w = ttk.Entry(Labelframe, width=5, justify="center", textvariable=self._Var_kmeans_clusters)
+        w.grid(row=0, column=1, pady=(5,10))
         # - KMEANS widgets grid -
-        self._LabelFrame_kmeans.grid(row=1, column=0, padx=(10, 0), pady=(30, 0), sticky=tk.EW)
+        Labelframe.grid(row=1, column=0, padx=(10, 0), pady=(40, 5), sticky=tk.EW)
 
         # - DBSCAN widgets -
-        self._LabelFrame_dbscan = ttk.LabelFrame(self._Frame_options, text="DBSCAN algorithm")
         self._Var_dbscan = tk.BooleanVar()
-        self._Checkbutton_dbscan = ttk.Checkbutton(self._LabelFrame_dbscan, text="Perform DBSCAN",
-                                                   variable=self._Var_dbscan)
-        self._Checkbutton_dbscan.grid(row=0, sticky=tk.W)
-        # -- dbscan parameters sub-frame --
-        self._Frame_dbscan_parameters = ttk.Frame(self._LabelFrame_dbscan)
+        w = ttk.Checkbutton(self._Frame_options, text="DBSCAN algorithm", variable=self._Var_dbscan)
+        Labelframe = tk.LabelFrame(self._Frame_options, labelwidget=w)
         self._Var_eps = tk.DoubleVar()
         self._Var_minpts = tk.IntVar()
-        self._Label_eps = ttk.Label(self._Frame_dbscan_parameters, text="epsilon:")
-        self._Entry_eps = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
-                                    textvariable=self._Var_eps)
-        self._Label_eps.grid(row=0, column=0, sticky=tk.E)
-        self._Entry_eps.grid(row=0, column=1, sticky=tk.W)
-        self._Label_minpts = ttk.Label(self._Frame_dbscan_parameters, text="MinPts:")
-        self._Entry_minpts = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
-                                       textvariable=self._Var_minpts)
-        self._Label_minpts.grid(row=1, column=0, sticky=tk.E)
-        self._Entry_minpts.grid(row=1, column=1, sticky=tk.W)
-        self._Frame_dbscan_parameters.grid(row=1, pady=(0, 5), sticky=tk.W)
+        w = ttk.Label(Labelframe, text="Epsilon:")
+        w.grid(row=0, column=0, padx=5, pady=(10,5), sticky=tk.E)
+        w = ttk.Entry(Labelframe, width=5, justify="center", textvariable=self._Var_eps)
+        w.grid(row=0, column=1, pady=(10,5), sticky=tk.W)
+        w = ttk.Label(Labelframe, text="MinPts:")
+        w.grid(row=1, column=0, padx=5, pady=(0,10), sticky=tk.E)
+        w = ttk.Entry(Labelframe, width=5, justify="center", textvariable=self._Var_minpts)
+        w.grid(row=1, column=1, pady=(0,10), sticky=tk.W)
         # - DBSCAN grid -
-        self._LabelFrame_dbscan.grid(row=2, column=0, padx=(10, 0), pady=(5, 0), sticky=tk.EW)
+        Labelframe.grid(row=2, column=0, padx=(10, 0), pady=(5, 0), sticky=tk.EW)
 
         # - BUTTONS for actions -
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
@@ -669,6 +659,3 @@ class SaveDialog(tk.Toplevel):
 
     def validate(self):
         return 1 # override
-
-        self._Frame_canvas.lower()  # hide 'canvas' frame
-
