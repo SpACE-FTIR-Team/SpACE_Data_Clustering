@@ -370,7 +370,23 @@ class SpaceApp(tk.Frame):
     def _do_save_cluster_composition(self):
         """This function is the button handler for the Save button in the save dialog box."""
         self.log("user: pressed Save button in save dialog")
+        # remove next log line when done debugging
         self.log(self.saving_params)
+
+        if self.saving_params["kmeans"]["save"]:
+            if self.saving_params["kmeans"]["by_type"]:
+                pass
+            if self.saving_params["kmeans"]["by_class"]:
+                pass
+            if self.saving_params["kmeans"]["by_subclass"]:
+                pass
+        if self.saving_params["dbscan"]["save"]:
+            if self.saving_params["dbscan"]["by_type"]:
+                pass
+            if self.saving_params["dbscan"]["by_class"]:
+                pass
+            if self.saving_params["dbscan"]["by_subclass"]:
+                pass
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor

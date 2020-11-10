@@ -18,10 +18,10 @@ CONFIG = {
                         "by_type": True,
                         "by_class": True,
                         "by_subclass": True},
-    "DBSCAN_SAVING": {  "save": False,
-                        "by_type": False,
-                        "by_class": False,
-                        "by_subclass": False},
+    "DBSCAN_SAVING": {  "save": True,
+                        "by_type": True,
+                        "by_class": True,
+                        "by_subclass": True},
 }
 
 
