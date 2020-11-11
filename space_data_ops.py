@@ -41,7 +41,12 @@ def file_to_data_object(file_list):
         for value in first_col:
             # find the index where xy_pairs begin
             # I noticed that all the pairs contain tabs, so search each file for the first occurrence of \t
-            if "\t" in value:
+            if "\t" in value and len(value.split("\t")) == 2:
+                for val in value.split("\t"):
+                    try:
+                        float(val)
+                    except ValueError:
+                        print(f"{item} contains an invalid or missing input at pair: {value}")
                 pairs.append(value.split("\t"))
                 if pair_index == 0:
                     pair_index = first_col[first_col == value].index[0]
