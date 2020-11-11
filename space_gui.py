@@ -363,7 +363,8 @@ class SpaceApp(tk.Frame):
         self.log("Clustering...")
         self._db_clusters = db.do_dbscan(self._Var_eps.get(), self._Var_minpts.get(), self._dataset)
         self.log("Calculating cluster compositions...")
-
+        composition_by_type = db.db_comp(self._db_clusters, self._data_objs, "Type")
+        composition_by_class = db.db_comp(self._db_clusters, self._data_objs, "Class")
         self.log("-- End DBSCAN clustering --")
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()

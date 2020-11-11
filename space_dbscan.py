@@ -2,17 +2,36 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
 import numpy as np
+import pandas as pd
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 
 
 # Compute DBSCAN
 def do_dbscan(epsilon, minimum, dataset):
-    # TODO: research StandardScaler and if we need it
-    dataset = StandardScaler().fit_transform(dataset)
     db = DBSCAN(eps=epsilon, min_samples=minimum).fit(dataset)
     return db
 
+# Compute cluster composition
+def db_comp(db, data_objects, sort_category):
+    labels = db.labels_
+    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    comp = pd.DataFrame(index=range(n_clusters))
+    for i in range(len(data_objects)):
+       
+        category = data_objects[i].descriptive.\
+            loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
+        if labels[i] == -1:
+            continue
+        if not (category in comp.columns):
+            comp.insert(0, category, 0)
+            comp.at[labels[i], category] = 1
+        else:
+            comp.at[labels[i], category] += 1
+        
+
+    print(comp)
+    #return comp
 
 def plot2D(dataset, db, embedded=False):
     """Attempt to write a 2D DBSCAN plot that is the same as K-means,
