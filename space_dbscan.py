@@ -29,9 +29,7 @@ def db_comp(db, data_objects, sort_category):
         else:
             comp.at[labels[i], category] += 1
         
-
-    print(comp)
-    #return comp
+    return comp
 
 def plot2D(dataset, db, embedded=False):
     """Attempt to write a 2D DBSCAN plot that is the same as K-means,
