@@ -390,9 +390,10 @@ class SpaceApp(tk.Frame):
                 pass
 
     def _on_go(self):
-        # this might take a while, so disable the Go button and busy the cursor
+        # this might take a while, so disable the buttons and busy the cursor
         # while we do work
         self._Button_go.config(state="disabled")
+        self._Button_save.config(state="disabled")
         self.update()
         self.master.config(cursor="watch")
         sleep(.5)  # cursor is sometimes not updating without this delay
@@ -414,8 +415,9 @@ class SpaceApp(tk.Frame):
                 self._do_kmeans_clustering()
             if self._Var_dbscan.get() and self._data_objs != []:
                 self._do_dbscan_clustering()
-            # re-enable the save button
-            self._Button_save["state"] = "normal"
+            # re-enable the save button if at least one algorithm was selected
+            if self._Var_kmeans.get() or self._Var_dbscan.get():
+                self._Button_save["state"] = "normal"
         else:
             # at least one input check failed
             pass  # this is here for possible future expansion
@@ -656,6 +658,11 @@ class SaveDialog(tk.Toplevel):
 
     def _disable_widgets(self, widgets):
         for w in widgets:
+            # get tkVar associated with the widget
+            tkvar = w["variable"]
+            # set tkVar to False (uncheck the box)
+            w.setvar(tkvar, False)
+            # disable the widget (grays it out)
             w["state"] = "disabled"
 
     def _on_browse(self):
