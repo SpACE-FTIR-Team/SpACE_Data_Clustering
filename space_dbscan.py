@@ -22,6 +22,7 @@ def db_comp(db, data_objects, sort_category):
         start = 0 
         end = len(set(labels))
     comp = pd.DataFrame(index=range(start,end))
+    comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
         if sort_category in data_objects[i].descriptive.descriptor.values:
             category = data_objects[i].descriptive.\
