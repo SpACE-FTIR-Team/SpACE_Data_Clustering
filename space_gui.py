@@ -397,6 +397,9 @@ class SpaceApp(tk.Frame):
         for viz_panel in [self._kmeans_viz_panel, self._dbscan_viz_panel]:
             viz_panel.destroy_canvas()
             viz_panel.disable_widgets()
+        # reset defaut cluster save location in case user is using
+        # new input data from a new path
+        self.saving_params["folder"] = self._Var_folder.get()
         if self._validate_user_input():
             # all input checks passed
             self._do_import_data()
@@ -419,7 +422,6 @@ class SpaceApp(tk.Frame):
         # reset default folder for saving to be the same folder as input
         # SaveDialog will append the /cluster_composition (or whatever
         # the user selects)
-        self.saving_params["folder"] = self._Var_folder.get()
         SaveDialog(self.master, params=self.saving_params,
                     handler=self._do_save_cluster_composition,
                     title="Save Cluster Composition",
