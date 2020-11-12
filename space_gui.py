@@ -368,20 +368,17 @@ class SpaceApp(tk.Frame):
     def _do_save_cluster_composition(self):
         """This function is the button handler for the Save button in the save dialog box."""
         self.log("user: pressed Save button in save dialog")
-        # remove next log line when done debugging
-        self.log(self.saving_params)
-
         if self.saving_params["kmeans"]["save"]:
             self.log("Calculating K-Means cluster compositions...")
             if self.saving_params["kmeans"]["by_type"]:
                 composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
-                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "cluster_composition", "by_type", composition_by_type)
+                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_type", composition_by_type)
             if self.saving_params["kmeans"]["by_class"]:
                 composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
-                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "cluster_composition", "by_class", composition_by_class)
+                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_class", composition_by_class)
             if self.saving_params["kmeans"]["by_subclass"]:
                 composition_by_subclass = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Subclass")
-                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "cluster_composition", "by_subclass", composition_by_subclass)
+                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_subclass", composition_by_subclass)
         self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
             if self.saving_params["dbscan"]["by_type"]:

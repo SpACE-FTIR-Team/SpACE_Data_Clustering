@@ -59,15 +59,14 @@ def save_block_data(folder, suffix, dataset):
 	save_string = os.path.join(dir_name, "data_block.csv")
 	dataset.to_csv(save_string)  # other arguments can be supplied, check pandas docs
 
-def save_kmeans_cluster_files(folder, suffix, file_suffix, c):
-	"""Accepts a specified filepath, a suffix to add to it,
-	a filename suffix, and a cluster compositon dataframe.
+def save_kmeans_cluster_files(folder, file_suffix, c):
+	"""Accepts a specified filepath, a filename suffix,
+	and a cluster compositon dataframe.
 	Saves the cluster composition info.
 	Might want to do more in this folder, but for now it creates
 	a folder and adds some imporant info."""
-	dir_name = os.path.join(folder, suffix)
-	if not path_exists(dir_name):
-		os.mkdir(dir_name)
+	if not path_exists(folder):
+		os.mkdir(folder)
 	file_name = "kmeans_clusters_" + file_suffix + ".csv"
-	save_string = os.path.join(dir_name, file_name)
+	save_string = os.path.join(folder, file_name)
 	c.to_csv(save_string)  # other arguments can be supplied, check pandas docs
