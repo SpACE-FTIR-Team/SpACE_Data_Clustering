@@ -359,9 +359,6 @@ class SpaceApp(tk.Frame):
         self.log("-- Begin DBSCAN clustering --")
         self.log("Clustering...")
         self._db_clusters = db.do_dbscan(self._Var_eps.get(), self._Var_minpts.get(), self._dataset)
-        self.log("Calculating cluster compositions...")
-        composition_by_type = db.db_comp(self._db_clusters, self._data_objs, "Type")
-        composition_by_class = db.db_comp(self._db_clusters, self._data_objs, "Class")
         self.log("-- End DBSCAN clustering --")
         # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
@@ -384,11 +381,13 @@ class SpaceApp(tk.Frame):
         if self.saving_params["dbscan"]["save"]:
             if self.saving_params["dbscan"]["by_type"]:
                 composition_by_type = db.db_comp(self._db_clusters, self._data_objs, "Type")
-                fileops.save_composition(self.saving_params["folder"], "by_subclass", composition_by_class)
+                fileops.save_composition(self.saving_params["folder"], "dbscan", "by_type", composition_by_type)
             if self.saving_params["dbscan"]["by_class"]:
                 composition_by_class = db.db_comp(self._db_clusters, self._data_objs, "Class")
+                fileops.save_composition(self.saving_params["folder"], "dbscan", "by_class", composition_by_class)
             if self.saving_params["dbscan"]["by_subclass"]:
                 composition_by_subclass = db.db_comp(self._db_clusters, self._data_objs, "Subclass")
+                fileops.save_composition(self.saving_params["folder"], "dbscan", "by_subclass", composition_by_subclass)
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor

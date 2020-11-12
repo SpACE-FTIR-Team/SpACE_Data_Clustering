@@ -67,6 +67,6 @@ def save_composition(folder, clustering_type, file_suffix, c):
 	a folder and adds some imporant info."""
 	if not path_exists(folder):
 		os.mkdir(folder)
-	file_name = clustering_type + "_clustering_" + file_suffix + ".csv"
+	file_name = clustering_type + "_composition_" + file_suffix + ".csv"
 	save_string = os.path.join(folder, file_name)
 	c.to_csv(save_string)  # other arguments can be supplied, check pandas docs
