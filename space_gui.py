@@ -7,6 +7,7 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 from time import sleep
+import os.path
 import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
@@ -198,6 +199,14 @@ class SpaceApp(tk.Frame):
         self.saving_params = {  "kmeans": self.app_config["KMEANS_SAVING"],
                                 "dbscan": self.app_config["DBSCAN_SAVING"],
                                 "folder": self.app_config["DEFAULT_INPUT_PATH"]}
+
+    def _reset_default_save_path(self):
+        """Reset the default save path for cluster compositions to
+        subfolder /cluster_composition/ under the input folder.
+        e.g. if selected input folder is D:/INPUT
+        the default save path with be D:/INPUT/cluster_composition/"""
+        self.saving_params["folder"] = os.path.join(self._Var_folder.get(),
+                                                    "cluster_composition")
 
     def log(self, text):
         """A simple logging facility for status messages
@@ -399,7 +408,7 @@ class SpaceApp(tk.Frame):
             viz_panel.disable_widgets()
         # reset defaut cluster save location in case user is using
         # new input data from a new path
-        self.saving_params["folder"] = self._Var_folder.get()
+        self._reset_default_save_path()
         if self._validate_user_input():
             # all input checks passed
             self._do_import_data()
