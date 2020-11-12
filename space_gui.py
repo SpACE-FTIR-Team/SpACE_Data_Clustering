@@ -373,21 +373,21 @@ class SpaceApp(tk.Frame):
             self.log("Calculating K-Means cluster compositions...")
             if self.saving_params["kmeans"]["by_type"]:
                 composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
-                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_type", composition_by_type)
+                fileops.save_composition(self.saving_params["folder"], "by_type", composition_by_type)
             if self.saving_params["kmeans"]["by_class"]:
                 composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
-                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_class", composition_by_class)
+                fileops.save_composition(self.saving_params["folder"], "by_class", composition_by_class)
             if self.saving_params["kmeans"]["by_subclass"]:
                 composition_by_subclass = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Subclass")
-                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_subclass", composition_by_subclass)
+                fileops.save_composition(self.saving_params["folder"], "by_subclass", composition_by_subclass)
         self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
             if self.saving_params["dbscan"]["by_type"]:
-                pass
+                composition_by_type = db.db_comp(self._db_clusters, self._data_objs, "Type")
             if self.saving_params["dbscan"]["by_class"]:
-                pass
+                composition_by_class = db.db_comp(self._db_clusters, self._data_objs, "Class")
             if self.saving_params["dbscan"]["by_subclass"]:
-                pass
+                composition_by_subclass = db.db_comp(self._db_clusters, self._data_objs, "Subclass")
 
     def _on_go(self):
         # this might take a while, so disable the Go button and busy the cursor
