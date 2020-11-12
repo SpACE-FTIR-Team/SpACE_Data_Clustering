@@ -310,18 +310,18 @@ class SpaceApp(tk.Frame):
         dataops.align(self._data_objs, max_res_index)
         if self._Var_save_after_modify.get():
             self.log("Saving aligned data...")
-            fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
+            fileops.save_data_files(self._Var_folder.get(), "aligned", self._data_objs)
         # Normalization
         self.log("Normalizing data with method: %s" % self._Var_normalize.get())
         self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
         if self._Var_save_after_modify.get():
             self.log("Saving normalized data...")
-            fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
+            fileops.save_data_files(self._Var_folder.get(), "normalized", self._data_objs)
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
         if self._Var_save_after_modify.get():
             self.log("Saving final combined dataframe...")
-            fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
+            fileops.save_block_data(self._Var_folder.get(), "block", self._dataset)
         # PCA
         if self._Var_pca.get():
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions...')
@@ -329,7 +329,10 @@ class SpaceApp(tk.Frame):
             self.log('PCA applied')
             if self._Var_save_after_modify.get():
                 self.log("Saving PCA-reduced data...")
-                fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Entry_pca.get() + "/", self._dataset)
+                # the folder suffix here is a nested subfolder path like:
+                # \block\PCA-<number of dimensions> so the individual
+                # path components are passed as a tuple
+                fileops.save_block_data(self._Var_folder.get(), ("block", "PCA-" + self._Entry_pca.get()), self._dataset)
 
         self.log("-- End data import and pre-processing --")
 
@@ -363,13 +366,13 @@ class SpaceApp(tk.Frame):
             self.log("Calculating K-Means cluster compositions...")
             if self.saving_params["kmeans"]["by_type"]:
                 composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
-                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_type", composition_by_type)
+                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "cluster_composition", "by_type", composition_by_type)
             if self.saving_params["kmeans"]["by_class"]:
                 composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
-                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_class", composition_by_class)
+                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "cluster_composition", "by_class", composition_by_class)
             if self.saving_params["kmeans"]["by_subclass"]:
                 composition_by_subclass = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Subclass")
-                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_subclass", composition_by_subclass)
+                fileops.save_kmeans_cluster_files(self._Var_folder.get(), "cluster_composition", "by_subclass", composition_by_subclass)
         self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
             if self.saving_params["dbscan"]["by_type"]:

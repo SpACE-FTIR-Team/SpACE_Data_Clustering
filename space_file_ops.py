@@ -30,28 +30,44 @@ def filter_filenames(file_list):
 								file_list))
 
 def save_data_files(folder, suffix, data_objects):
-	"""Accepts a specified filepath, a suffix to add to it, and a list of data_objects.  Iterates
-	through them all and saves them to the filepath with the suffix added on. Saves as .csv"""
-	dir_name = folder + suffix
-	if not os.path.isdir(dir_name):
+	"""Accepts a specified filepath, a suffix to add to it,
+	and a list of data_objects. Iterates through them all 
+	and saves them to the filepath with the suffix added on.
+	Saves as .csv"""
+	dir_name = os.path.join(folder, suffix)
+	if not path_exists(dir_name):
 		os.mkdir(dir_name)
 	for dobj in data_objects:
-		save_string = (dir_name + dobj.filename).rstrip("txt") + "csv"
+		file_name = dobj.filename.rstrip("txt") + "csv"
+		save_string = os.path.join(dir_name, file_name)
 		dobj.pairs.to_csv(save_string)  # other arguments can be supplied, check pandas docs
 
 def save_block_data(folder, suffix, dataset):
-	"""Accepts a block of data and saves it to a csv"""
-	dir_name = folder + suffix
-	if not os.path.isdir(dir_name):
+	"""Accepts a specified filepath, a suffix to add to it,
+	and a single combined dataframe.
+	Saves as .csv"""
+	# suffix might be a single string in the case of saving
+	# the combine datablock, or it might be a tuple containing
+	# multiple strings (nested subfolder names) in the case
+	# of saving PCA data
+	if isinstance(suffix, tuple):
+		dir_name = os.path.join(folder, *suffix)
+	else:
+		dir_name = os.path.join(folder, suffix)
+	if not path_exists(dir_name):
 		os.mkdir(dir_name)
-	save_string = (dir_name + "data_block.csv")
+	save_string = os.path.join(dir_name, "data_block.csv")
 	dataset.to_csv(save_string)  # other arguments can be supplied, check pandas docs
 
-def save_kmeans_cluster_files(folder, folder_name, suffix, c):
-	"""Accepts a specified filepath, a folder name to create, a suffix to add to it, and a cluster compositon dataframe.
-	Saves the cluster composition info.  Might want to do more in this folder, but for now it creates a folder and adds some imporant info"""
-	dir_name = folder + folder_name
-	if not os.path.isdir(dir_name):
+def save_kmeans_cluster_files(folder, suffix, file_suffix, c):
+	"""Accepts a specified filepath, a suffix to add to it,
+	a filename suffix, and a cluster compositon dataframe.
+	Saves the cluster composition info.
+	Might want to do more in this folder, but for now it creates
+	a folder and adds some imporant info."""
+	dir_name = os.path.join(folder, suffix)
+	if not path_exists(dir_name):
 		os.mkdir(dir_name)
-	save_string = (dir_name + "_cluster_composition_" + suffix + ".csv")
+	file_name = "kmeans_clusters_" + file_suffix + ".csv"
+	save_string = os.path.join(dir_name, file_name)
 	c.to_csv(save_string)  # other arguments can be supplied, check pandas docs
