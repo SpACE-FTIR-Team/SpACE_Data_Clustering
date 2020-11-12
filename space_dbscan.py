@@ -17,12 +17,14 @@ def db_comp(db, data_objects, sort_category):
     labels = db.labels_
     n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
     comp = pd.DataFrame(index=range(n_clusters))
+    if -1 in labels:
+        comp.append([-1])
     for i in range(len(data_objects)):
-       
-        category = data_objects[i].descriptive.\
-            loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
-        if labels[i] == -1:
-            continue
+        if sort_category in data_objects[i].descriptive.descriptor.values:
+            category = data_objects[i].descriptive.\
+                loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
+        else:
+            category = "None specified"
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[labels[i], category] = 1
