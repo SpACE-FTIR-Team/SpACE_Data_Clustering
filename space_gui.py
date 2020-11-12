@@ -661,7 +661,12 @@ class SaveDialog(tk.Toplevel):
             w["state"] = "disabled"
 
     def _on_browse(self):
-        pass
+        dir = tkfd.askdirectory(initialdir=self._Var_folder.get())
+        # askdirectory returns '' if the user clicked cancel
+        # so only update the folder path if the user actually selected something
+        if dir != '':
+            self._Var_folder.set(dir)
+            self._parameters["folder"] = dir
 
     def _on_save(self, event=None):
         if not self.validate():
