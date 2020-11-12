@@ -7,6 +7,7 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 from time import sleep
+import os.path
 import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
@@ -58,7 +59,7 @@ class SpaceApp(tk.Frame):
         self._Frame_options = ttk.Frame(self)
 
         # - DATA widgets -
-        self._LabelFrame_data = ttk.LabelFrame(self._Frame_options, text="Data")
+        self._LabelFrame_data = tk.LabelFrame(self._Frame_options, text="Data")
 
         # -- input sub-frame --
         self._Frame_input = ttk.Frame(self._LabelFrame_data)
@@ -105,43 +106,33 @@ class SpaceApp(tk.Frame):
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
 
         # - KMEANS widgets -
-        self._LabelFrame_kmeans = ttk.LabelFrame(self._Frame_options, text="K-means algorithm")
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans_clusters = tk.IntVar()
-        self._Checkbutton_kmeans = ttk.Checkbutton(self._LabelFrame_kmeans, text="Perform K-means",
-                                                   variable=self._Var_kmeans)
-        self._Checkbutton_kmeans.grid(row=0, sticky=tk.W)
-        self._Label_k = ttk.Label(self._LabelFrame_kmeans, text="Number of clusters (k):")
-        self._Entry_k = ttk.Entry(self._LabelFrame_kmeans, width=5, justify="center",
-                                  textvariable=self._Var_kmeans_clusters)
-        self._Label_k.grid(row=1, column=0, pady=(0, 5), sticky=tk.W)
-        self._Entry_k.grid(row=1, column=1, pady=(0, 5))
+        w = ttk.Checkbutton(self._Frame_options, text="K-means algorithm", variable=self._Var_kmeans)
+        Labelframe = tk.LabelFrame(self._Frame_options, labelwidget=w)
+        w = ttk.Label(Labelframe, text="Number of clusters (k):")
+        w.grid(row=0, column=0, padx=5, pady=(5,10), sticky=tk.W)
+        w = ttk.Entry(Labelframe, width=5, justify="center", textvariable=self._Var_kmeans_clusters)
+        w.grid(row=0, column=1, pady=(5,10))
         # - KMEANS widgets grid -
-        self._LabelFrame_kmeans.grid(row=1, column=0, padx=(10, 0), pady=(30, 0), sticky=tk.EW)
+        Labelframe.grid(row=1, column=0, padx=(10, 0), pady=(40, 5), sticky=tk.EW)
 
         # - DBSCAN widgets -
-        self._LabelFrame_dbscan = ttk.LabelFrame(self._Frame_options, text="DBSCAN algorithm")
         self._Var_dbscan = tk.BooleanVar()
-        self._Checkbutton_dbscan = ttk.Checkbutton(self._LabelFrame_dbscan, text="Perform DBSCAN",
-                                                   variable=self._Var_dbscan)
-        self._Checkbutton_dbscan.grid(row=0, sticky=tk.W)
-        # -- dbscan parameters sub-frame --
-        self._Frame_dbscan_parameters = ttk.Frame(self._LabelFrame_dbscan)
+        w = ttk.Checkbutton(self._Frame_options, text="DBSCAN algorithm", variable=self._Var_dbscan)
+        Labelframe = tk.LabelFrame(self._Frame_options, labelwidget=w)
         self._Var_eps = tk.DoubleVar()
         self._Var_minpts = tk.IntVar()
-        self._Label_eps = ttk.Label(self._Frame_dbscan_parameters, text="epsilon:")
-        self._Entry_eps = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
-                                    textvariable=self._Var_eps)
-        self._Label_eps.grid(row=0, column=0, sticky=tk.E)
-        self._Entry_eps.grid(row=0, column=1, sticky=tk.W)
-        self._Label_minpts = ttk.Label(self._Frame_dbscan_parameters, text="MinPts:")
-        self._Entry_minpts = ttk.Entry(self._Frame_dbscan_parameters, width=5, justify="center",
-                                       textvariable=self._Var_minpts)
-        self._Label_minpts.grid(row=1, column=0, sticky=tk.E)
-        self._Entry_minpts.grid(row=1, column=1, sticky=tk.W)
-        self._Frame_dbscan_parameters.grid(row=1, pady=(0, 5), sticky=tk.W)
+        w = ttk.Label(Labelframe, text="Epsilon:")
+        w.grid(row=0, column=0, padx=5, pady=(10,5), sticky=tk.E)
+        w = ttk.Entry(Labelframe, width=5, justify="center", textvariable=self._Var_eps)
+        w.grid(row=0, column=1, pady=(10,5), sticky=tk.W)
+        w = ttk.Label(Labelframe, text="MinPts:")
+        w.grid(row=1, column=0, padx=5, pady=(0,10), sticky=tk.E)
+        w = ttk.Entry(Labelframe, width=5, justify="center", textvariable=self._Var_minpts)
+        w.grid(row=1, column=1, pady=(0,10), sticky=tk.W)
         # - DBSCAN grid -
-        self._LabelFrame_dbscan.grid(row=2, column=0, padx=(10, 0), pady=(5, 0), sticky=tk.EW)
+        Labelframe.grid(row=2, column=0, padx=(10, 0), pady=(5, 0), sticky=tk.EW)
 
         # - BUTTONS for actions -
         self._Frame_action_buttons = ttk.Frame(self._Frame_options)
@@ -206,7 +197,16 @@ class SpaceApp(tk.Frame):
         self._Var_minpts.set(self.app_config["DEFAULT_DBSCAN_MINPTS"])
         self._Button_save["state"] = "disabled"
         self.saving_params = {  "kmeans": self.app_config["KMEANS_SAVING"],
-                                "dbscan": self.app_config["DBSCAN_SAVING"]}
+                                "dbscan": self.app_config["DBSCAN_SAVING"],
+                                "folder": self.app_config["DEFAULT_INPUT_PATH"]}
+
+    def _reset_default_save_path(self):
+        """Reset the default save path for cluster compositions to
+        subfolder /cluster_composition/ under the input folder.
+        e.g. if selected input folder is D:/INPUT
+        the default save path with be D:/INPUT/cluster_composition/"""
+        self.saving_params["folder"] = os.path.join(self._Var_folder.get(),
+                                                    "cluster_composition")
 
     def log(self, text):
         """A simple logging facility for status messages
@@ -319,18 +319,18 @@ class SpaceApp(tk.Frame):
         dataops.align(self._data_objs, max_res_index)
         if self._Var_save_after_modify.get():
             self.log("Saving aligned data...")
-            fileops.save_data_files(self._Var_folder.get(), "/align/", self._data_objs)
+            fileops.save_data_files(self._Var_folder.get(), "aligned", self._data_objs)
         # Normalization
         self.log("Normalizing data with method: %s" % self._Var_normalize.get())
         self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
         if self._Var_save_after_modify.get():
             self.log("Saving normalized data...")
-            fileops.save_data_files(self._Var_folder.get(), "/normalized/", self._data_objs)
+            fileops.save_data_files(self._Var_folder.get(), "normalized", self._data_objs)
         # final, pre-processed dataset
         self._dataset = dataops.combine(self._data_objs)
         if self._Var_save_after_modify.get():
             self.log("Saving final combined dataframe...")
-            fileops.save_block_data(self._Var_folder.get(), "/block/", self._dataset)
+            fileops.save_block_data(self._Var_folder.get(), "block", self._dataset)
         # PCA
         if self._Var_pca.get():
             self.log('Performing PCA to ' + str(self._Var_pca_dimensions.get()) + ' dimensions...')
@@ -338,7 +338,10 @@ class SpaceApp(tk.Frame):
             self.log('PCA applied')
             if self._Var_save_after_modify.get():
                 self.log("Saving PCA-reduced data...")
-                fileops.save_block_data(self._Var_folder.get(), "/block/PCA" + self._Entry_pca.get() + "/", self._dataset)
+                # the folder suffix here is a nested subfolder path like:
+                # \block\PCA-<number of dimensions> so the individual
+                # path components are passed as a tuple
+                fileops.save_block_data(self._Var_folder.get(), ("block", "PCA-" + self._Entry_pca.get()), self._dataset)
 
         self.log("-- End data import and pre-processing --")
 
@@ -346,12 +349,6 @@ class SpaceApp(tk.Frame):
         self.log("-- Begin K-means clustering --")
         self.log("Clustering...")
         self._k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
-        self.log("Calculating cluster compositions...")
-        composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
-        composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
-        self.log("(..temporary file save..)")
-        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_type", self._k_clusters, composition_by_type)
-        fileops.save_kmeans_cluster_files(self._Var_folder.get(), "/kmeans_clustering/", "by_class", self._k_clusters, composition_by_class)
         self.log("-- End K-means clustering --")
         # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
@@ -372,16 +369,18 @@ class SpaceApp(tk.Frame):
     def _do_save_cluster_composition(self):
         """This function is the button handler for the Save button in the save dialog box."""
         self.log("user: pressed Save button in save dialog")
-        # remove next log line when done debugging
-        self.log(self.saving_params)
-
         if self.saving_params["kmeans"]["save"]:
+            self.log("Calculating K-Means cluster compositions...")
             if self.saving_params["kmeans"]["by_type"]:
-                pass
+                composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Type")
+                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_type", composition_by_type)
             if self.saving_params["kmeans"]["by_class"]:
-                pass
+                composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Class")
+                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_class", composition_by_class)
             if self.saving_params["kmeans"]["by_subclass"]:
-                pass
+                composition_by_subclass = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Subclass")
+                fileops.save_kmeans_cluster_files(self.saving_params["folder"], "by_subclass", composition_by_subclass)
+        self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
             if self.saving_params["dbscan"]["by_type"]:
                 pass
@@ -405,6 +404,9 @@ class SpaceApp(tk.Frame):
         for viz_panel in [self._kmeans_viz_panel, self._dbscan_viz_panel]:
             viz_panel.destroy_canvas()
             viz_panel.disable_widgets()
+        # reset defaut cluster save location in case user is using
+        # new input data from a new path
+        self._reset_default_save_path()
         if self._validate_user_input():
             # all input checks passed
             self._do_import_data()
@@ -424,6 +426,9 @@ class SpaceApp(tk.Frame):
         self.master.update()
 
     def _on_save(self):
+        # reset default folder for saving to be the same folder as input
+        # SaveDialog will append the /cluster_composition (or whatever
+        # the user selects)
         SaveDialog(self.master, params=self.saving_params,
                     handler=self._do_save_cluster_composition,
                     title="Save Cluster Composition",
@@ -571,6 +576,8 @@ class SaveDialog(tk.Toplevel):
         self.wait_window(self)
 
     def _create_vars(self):
+        self._Var_folder = tk.StringVar()
+        self._Var_folder.set(self._parameters["folder"])
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans.set(self._parameters["kmeans"]["save"])
         self._Var_kmeans_type = tk.BooleanVar()
@@ -592,7 +599,7 @@ class SaveDialog(tk.Toplevel):
         Frame = ttk.Frame(self)
 
         w = ttk.Label(Frame, text="Select what to save:")
-        w.grid(row=0, columnspan=2, pady=10)
+        w.grid(row=0, columnspan=2, pady=(10,5))
         
         Frame_checkbuttons = ttk.Frame(Frame)
         self._kmeans_checkbuttons = []
@@ -627,23 +634,37 @@ class SaveDialog(tk.Toplevel):
         Frame_checkbuttons.grid(padx=5)
 
         w = ttk.Label(Frame, text="Select a folder to save in:")
-        w.grid(row=2, columnspan=2, pady=10)
+        w.grid(row=2, columnspan=2, pady=(10,5))
+        Frame_folder = ttk.Frame(Frame)
+        w = ttk.Entry(Frame_folder, width=30, textvariable=self._Var_folder)
+        w.grid(row=0, column=0, sticky=tk.E)
+        w = ttk.Button(Frame_folder, text="Browse...", command=self._on_browse)
+        w.grid(row=0, column=1, padx=(5, 0))
+        Frame_folder.grid(padx=10)
 
         Frame_buttons = ttk.Frame(Frame)
         Button_save = ttk.Button(Frame_buttons, text="Save", width=15, command=self._on_save, default=tk.ACTIVE)
         Button_cancel = ttk.Button(Frame_buttons, text="Cancel", width=15, command=self._on_cancel)
-        Button_save.grid(row=0, column=0)
+        Button_save.grid(row=0, column=0, padx=(0,5))
         Button_cancel.grid(row=0, column=1)
 
         self.bind("<Return>", self._on_save)
         self.bind("<Escape>", self._on_cancel)
 
-        Frame_buttons.grid()
+        Frame_buttons.grid(pady=20)
         Frame.grid()
 
     def _disable_widgets(self, widgets):
         for w in widgets:
             w["state"] = "disabled"
+
+    def _on_browse(self):
+        dir = tkfd.askdirectory(initialdir=self._Var_folder.get())
+        # askdirectory returns '' if the user clicked cancel
+        # so only update the folder path if the user actually selected something
+        if dir != '':
+            self._Var_folder.set(dir)
+            self._parameters["folder"] = dir
 
     def _on_save(self, event=None):
         if not self.validate():
@@ -671,6 +692,3 @@ class SaveDialog(tk.Toplevel):
 
     def validate(self):
         return 1 # override
-
-        self._Frame_canvas.lower()  # hide 'canvas' frame
-
