@@ -12,7 +12,6 @@ import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
 import space_dbscan as db
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 
@@ -453,8 +452,9 @@ class SpaceApp(tk.Frame):
             self.log("PCA reducing data to %s dimensions..." % dimensions)
             plot_dataset = dataops.pca(self._dataset, dimensions)
         self.log("Plotting...")
-        figure = plot(plot_dataset, self._k_clusters, embedded=True)
-        self._kmeans_viz_panel.display_figure(figure)
+        canvas = plot(plot_dataset, self._k_clusters, embedded=True,
+                        master=self._kmeans_viz_panel.get_canvas_frame_handle())
+        self._kmeans_viz_panel.display_plot(canvas)
         self.log("-- End K-means plotting --")
 
     def _on_generate_plot_dbscan(self):
@@ -470,8 +470,9 @@ class SpaceApp(tk.Frame):
             self.log("PCA reducing data to %s dimensions..." % dimensions)
             plot_dataset = dataops.pca(self._dataset, dimensions)
         self.log("Plotting...")
-        figure = plot(plot_dataset, self._db_clusters, embedded=True)
-        self._dbscan_viz_panel.display_figure(figure)
+        canvas = plot(plot_dataset, self._db_clusters, embedded=True,
+                        master=self._dbscan_viz_panel.get_canvas_frame_handle())
+        self._dbscan_viz_panel.display_plot(canvas)
         self.log("-- End DBSCAN plotting --")
 
 
@@ -511,6 +512,11 @@ class VisualizationPanel(object):
         into the calling application."""
         return self._Frame
 
+    def get_canvas_frame_handle(self):
+        """Return handle to the 'canvas' frame so the plot
+        function can generate a canvas as a child of this frame."""
+        return self._Frame_canvas
+
     def get_dimensions(self):
         """Return the number of dimensions selected by the combobox."""
         return 2 if self._Var_dimensions.get() == '2D' else 3
@@ -526,12 +532,10 @@ class VisualizationPanel(object):
         self._Combobox.config(state="readonly")
         self._Button.config(state="normal")
 
-    def display_figure(self, figure):
-        """Set up a canvas, display a matplotlib figure on it, and
+    def display_plot(self, canvas):
+        """Display the canvas containing the plot and
         set up the plot toolbar."""
         self._Frame_controls.lower()  # hide 'controls' frame
-        canvas = FigureCanvasTkAgg(figure, master=self._Frame_canvas)
-        canvas.draw()
         # NOTE: must use pack geometry manager instead of grid here.
         # FigureCanvasTkAgg and NavigationToolbar2Tk appear to be using
         # pack internally and mixing it with grid is causing problems.

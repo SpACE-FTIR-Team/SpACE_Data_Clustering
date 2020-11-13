@@ -6,7 +6,8 @@ Currently performs Kmeans, calculates the composition of Kmeans clusters, and pl
 from sklearn.cluster import KMeans
 import pandas as pd
 import matplotlib.pyplot as plt
-
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 def do_Kmeans(num_clusters, dataset):
     """This function accepts a integer number of clusters and a pandas dataframe of shape n_samples x n_features it
@@ -39,14 +40,22 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
 
     return comp
 
-
-def plot3D(dataset, clusters, embedded=False):
+def plot3D(dataset, clusters, embedded=False, master=None):
     """This function plots clusters and cluster centers in 3D.
     If embedded is False, the the plot is displayed in a standalone
-    modal window and the function returns None.
-    If embedded is True, the function returns a Figure object
-    to be displayed on a FigureCanvasTkAgg embedded in the GUI."""
-    figure, axes = plt.subplots(subplot_kw={"projection": "3d"})
+    modal window, master is ignored, and the funtion returns None.
+    If embedded is True, master must be specified (the parent widget
+    for the canvas), and the function returns a canvas object
+    to be displayed in the visualization panel in the GUI."""
+
+    if embedded:
+        figure = Figure()
+        canvas = FigureCanvasTkAgg(figure, master=master)
+        canvas.draw()
+        axes = figure.add_subplot(111, projection="3d")
+    else:
+        figure, axes = plt.subplots(subplot_kw={"projection": "3d"})
+
     cx = []
     cy = []
     cz = []
@@ -57,20 +66,29 @@ def plot3D(dataset, clusters, embedded=False):
         cz.append(i[2])
     axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=clusters.labels_, cmap="plasma")
     axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="black", s=50)
+    
     if embedded:
-        return figure
+        return canvas
     else:
         plt.show()
         return None
 
-
-def plot2D(dataset, clusters, embedded=False):
-    """This function plots clusters and cluster centers in 2D.
+def plot2D(dataset, clusters, embedded=False, master=None):
+    """This function plots clusters and cluster centers in 3D.
     If embedded is False, the the plot is displayed in a standalone
-    modal window and the function returns None.
-    If embedded is True, the function returns a Figure object
-    to be displayed on a FigureCanvasTkAgg embedded in the GUI."""
-    figure, axes = plt.subplots()
+    modal window, master is ignored, and the funtion returns None.
+    If embedded is True, master must be specified (the parent widget
+    for the canvas), and the function returns a canvas object
+    to be displayed in the visualization panel in the GUI."""
+
+    if embedded:
+        figure = Figure()
+        canvas = FigureCanvasTkAgg(figure, master=master)
+        canvas.draw()
+        axes = figure.add_subplot()
+    else:
+        figure, axes = plt.subplots()
+
     cx = []
     cy = []
     clusters = clusters.fit(dataset)  # refit to reduced data for plotting
@@ -79,8 +97,9 @@ def plot2D(dataset, clusters, embedded=False):
         cy.append(i[1])
     axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="plasma")
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
+
     if embedded:
-        return figure
+        return canvas
     else:
         plt.show()
         return None
