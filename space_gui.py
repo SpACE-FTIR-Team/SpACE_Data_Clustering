@@ -470,8 +470,9 @@ class SpaceApp(tk.Frame):
             self.log("PCA reducing data to %s dimensions..." % dimensions)
             plot_dataset = dataops.pca(self._dataset, dimensions)
         self.log("Plotting...")
-        figure = plot(plot_dataset, self._db_clusters, embedded=True)
-        self._dbscan_viz_panel.display_figure(figure)
+        canvas = plot(plot_dataset, self._db_clusters, embedded=True,
+                        master=self._dbscan_viz_panel.get_canvas_frame_handle())
+        self._dbscan_viz_panel.display_plot(canvas)
         self.log("-- End DBSCAN plotting --")
 
 

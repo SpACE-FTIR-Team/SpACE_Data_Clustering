@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
 import numpy as np
@@ -31,10 +33,21 @@ def db_comp(db, data_objects, sort_category):
         
     return comp
 
-def plot2D(dataset, db, embedded=False):
-    """Attempt to write a 2D DBSCAN plot that is the same as K-means,
-    so we can then figure out how to modify it like K-means to plot 3D."""
-    figure, axes = plt.subplots()
+def plot2D(dataset, db, embedded=False, master=None):
+    """This function plots clusters and cluster centers in 3D.
+    If embedded is False, the the plot is displayed in a standalone
+    modal window, master is ignored, and the funtion returns None.
+    If embedded is True, master must be specified (the parent widget
+    for the canvas), and the function returns a canvas object
+    to be displayed in the visualization panel in the GUI."""
+
+    if embedded:
+        figure = Figure()
+        canvas = FigureCanvasTkAgg(figure, master=master)
+        canvas.draw()
+        axes = figure.add_subplot()
+    else:
+        figure, axes = plt.subplots()
 
     db = db.fit(dataset)  # refit to reduced data for plotting
     # dbscan labels contain some -1s, which is wreaking havoc,
@@ -54,14 +67,27 @@ def plot2D(dataset, db, embedded=False):
     axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
 
     if embedded:
-        return figure
+        return canvas
     else:
         plt.show()
         return None
 
 
-def plot3D(dataset, db, embedded=False):
-    figure, axes = plt.subplots(subplot_kw={"projection": "3d"})
+def plot3D(dataset, db, embedded=False, master=None):
+    """This function plots clusters and cluster centers in 3D.
+    If embedded is False, the the plot is displayed in a standalone
+    modal window, master is ignored, and the funtion returns None.
+    If embedded is True, master must be specified (the parent widget
+    for the canvas), and the function returns a canvas object
+    to be displayed in the visualization panel in the GUI."""
+
+    if embedded:
+        figure = Figure()
+        canvas = FigureCanvasTkAgg(figure, master=master)
+        canvas.draw()
+        axes = figure.add_subplot(111, projection="3d")
+    else:
+        figure, axes = plt.subplots(subplot_kw={"projection": "3d"})
 
     db = db.fit(dataset)  # refit to reduced data for plotting
     # dbscan labels contain some -1s, which is wreaking havoc,
@@ -81,7 +107,7 @@ def plot3D(dataset, db, embedded=False):
     axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
 
     if embedded:
-        return figure
+        return canvas
     else:
         plt.show()
         return None
