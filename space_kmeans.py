@@ -22,6 +22,7 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
     cluster.  Composition dataframe is of shape clusters x categories. Each row is a cluster, and each column is a
     category """
     comp = pd.DataFrame(index=range(num_clusters))
+    comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
         # The most complicated line of code I have ever written in my entire life.  Basically it just accesses the
         # value where the descriptor = sort_category
