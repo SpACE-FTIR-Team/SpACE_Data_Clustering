@@ -96,7 +96,7 @@ def plot2D(dataset, clusters, embedded=False, master=None):
         cx.append(i[0])
         cy.append(i[1])
     scatter = axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="plasma")
-    centers = axes.scatter(xs=cx, ys=cy, marker="x", color="black", s=50)
+    centers = axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
 
     axes.legend(*scatter.legend_elements(), title="Cluster #", loc="best")
 
