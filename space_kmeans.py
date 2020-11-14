@@ -95,8 +95,9 @@ def plot2D(dataset, clusters, embedded=False, master=None):
     for i in clusters.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
-    axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="plasma")
-    axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
+    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="plasma")
+
+    axes.legend(*scatter.legend_elements(), title="Cluster #", loc="best")
 
     if embedded:
         return canvas
