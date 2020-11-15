@@ -69,7 +69,7 @@ def plot3D(dataset, clusters, embedded=False, master=None):
     scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=clusters.labels_, cmap="viridis")
     axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="black", s=50)
 
-    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1.1, 1),
+    axes.legend(*scatter.legend_elements(num=clusters.n_clusters), loc='upper left', bbox_to_anchor=(1.1, 1),
                 title="Cluster #", fontsize='small', title_fontsize='small', fancybox=True,
                 borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, edgecolor='black')
 
@@ -105,7 +105,7 @@ def plot2D(dataset, clusters, embedded=False, master=None):
     scatter = axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="viridis")
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
 
-    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1, 1),
+    axes.legend(*scatter.legend_elements(num=clusters.n_clusters), loc='upper left', bbox_to_anchor=(1, 1),
                 title="Cluster #", fontsize='small', title_fontsize='small', fancybox=True,
                 borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, edgecolor='black')
 

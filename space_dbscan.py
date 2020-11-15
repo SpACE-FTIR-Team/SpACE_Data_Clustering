@@ -74,7 +74,8 @@ def plot2D(dataset, db, embedded=False, master=None):
 
     scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
 
-    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1, 1),
+    n_clusters = len(set(plot_labels)) - (1 if 0 in plot_labels else 0)
+    axes.legend(*scatter.legend_elements(num=n_clusters), loc='upper left', bbox_to_anchor=(1, 1),
                 title="Cluster #\n(0=Noise)", fontsize='small', title_fontsize='small', fancybox=True,
                 borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, columnspacing=3,
                 edgecolor='black')
@@ -119,7 +120,8 @@ def plot3D(dataset, db, embedded=False, master=None):
 
     scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
 
-    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1.1, 1),
+    n_clusters = len(set(plot_labels)) - (1 if 0 in plot_labels else 0)
+    axes.legend(*scatter.legend_elements(num=n_clusters), loc='upper left', bbox_to_anchor=(1.1, 1),
                 title="Cluster #\n(0=Noise)", fontsize='small', title_fontsize='small', fancybox=True,
                 borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, columnspacing=3,
                 edgecolor='black')
