@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
 def do_Kmeans(num_clusters, dataset):
     """This function accepts a integer number of clusters and a pandas dataframe of shape n_samples x n_features it
     fits the dataset, and returns a kmeans object which has attributes that describe the cluster centroids,
@@ -28,7 +29,7 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
         # The most complicated line of code I have ever written in my entire life.  Basically it just accesses the
         # value where the descriptor = sort_category
         if sort_category in data_objects[i].descriptive.descriptor.values:
-            category = data_objects[i].descriptive.\
+            category = data_objects[i].descriptive. \
                 loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
         else:
             category = "None specified"
@@ -39,6 +40,7 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
             comp.at[km.labels_[i], category] += 1
 
     return comp
+
 
 def plot3D(dataset, clusters, embedded=False, master=None):
     """This function plots clusters and cluster centers in 3D.
@@ -64,14 +66,19 @@ def plot3D(dataset, clusters, embedded=False, master=None):
         cx.append(i[0])
         cy.append(i[1])
         cz.append(i[2])
-    axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=clusters.labels_, cmap="plasma")
+    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=clusters.labels_, cmap="viridis")
     axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="black", s=50)
-    
+
+    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1.1, 1),
+                title="Cluster #", fontsize='small', title_fontsize='small', fancybox=True,
+                borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, edgecolor='black')
+
     if embedded:
         return canvas
     else:
         plt.show()
         return None
+
 
 def plot2D(dataset, clusters, embedded=False, master=None):
     """This function plots clusters and cluster centers in 3D.
@@ -95,8 +102,12 @@ def plot2D(dataset, clusters, embedded=False, master=None):
     for i in clusters.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
-    axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="plasma")
+    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="viridis")
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
+
+    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1, 1),
+                title="Cluster #", fontsize='small', title_fontsize='small', fancybox=True,
+                borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, edgecolor='black')
 
     if embedded:
         return canvas

@@ -14,6 +14,7 @@ def do_dbscan(epsilon, minimum, dataset):
     db = DBSCAN(eps=epsilon, min_samples=minimum).fit(dataset)
     return db
 
+
 # Compute cluster composition
 def db_comp(db, data_objects, sort_category):
     labels = db.labels_
@@ -21,13 +22,13 @@ def db_comp(db, data_objects, sort_category):
         start = -1
         end = len(set(labels)) - 1
     else:
-        start = 0 
+        start = 0
         end = len(set(labels))
-    comp = pd.DataFrame(index=range(start,end))
+    comp = pd.DataFrame(index=range(start, end))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
         if sort_category in data_objects[i].descriptive.descriptor.values:
-            category = data_objects[i].descriptive.\
+            category = data_objects[i].descriptive. \
                 loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
         else:
             category = "None specified"
@@ -36,8 +37,9 @@ def db_comp(db, data_objects, sort_category):
             comp.at[labels[i], category] = 1
         else:
             comp.at[labels[i], category] += 1
-        
+
     return comp
+
 
 def plot2D(dataset, db, embedded=False, master=None):
     """This function plots clusters and cluster centers in 3D.
@@ -65,12 +67,17 @@ def plot2D(dataset, db, embedded=False, master=None):
 
     # now, fix our colormap so that the first color (for 0, the new
     # noise points) is black
-    colormap = cm.get_cmap('plasma')(np.linspace(0, 1, 101))
+    colormap = cm.get_cmap('viridis')(np.linspace(0, 1, 101))
     black = [0, 0, 0, 1]
     new_colors = np.insert(colormap, 0, black, axis=0)
     new_colormap = ListedColormap(new_colors)
 
-    axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
+    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
+
+    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1, 1),
+                title="Cluster #\n(0=Noise)", fontsize='small', title_fontsize='small', fancybox=True,
+                borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, columnspacing=3,
+                edgecolor='black')
 
     if embedded:
         return canvas
@@ -105,12 +112,17 @@ def plot3D(dataset, db, embedded=False, master=None):
 
     # now, fix our colormap so that the first color (for 0, the new
     # noise points) is black
-    colormap = cm.get_cmap('plasma')(np.linspace(0, 1, 101))
+    colormap = cm.get_cmap('viridis')(np.linspace(0, 1, 101))
     black = [0, 0, 0, 1]
     new_colors = np.insert(colormap, 0, black, axis=0)
     new_colormap = ListedColormap(new_colors)
 
-    axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
+    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
+
+    axes.legend(*scatter.legend_elements(), loc='upper left', bbox_to_anchor=(1.1, 1),
+                title="Cluster #\n(0=Noise)", fontsize='small', title_fontsize='small', fancybox=True,
+                borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, columnspacing=3,
+                edgecolor='black')
 
     if embedded:
         return canvas
