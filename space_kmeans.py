@@ -71,6 +71,7 @@ def plot3D(dataset, clusters, embedded=False, master=None):
 
     axes.legend(*scatter.legend_elements(num=(clusters.n_clusters if clusters.n_clusters % 2 == 0 else
                                               clusters.n_clusters - 1)),
+                ncol=(2 if clusters.n_clusters > 50 else 1),
                 loc='upper left', bbox_to_anchor=(1.1, 1),
                 title="Cluster #", fontsize='small', title_fontsize='small', fancybox=True,
                 borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, edgecolor='black')
@@ -109,6 +110,7 @@ def plot2D(dataset, clusters, embedded=False, master=None):
 
     axes.legend(*scatter.legend_elements(num=(clusters.n_clusters if clusters.n_clusters % 2 == 0 else
                                               clusters.n_clusters - 1)),
+                ncol=(2 if clusters.n_clusters > 50 else 1),
                 loc='upper left', bbox_to_anchor=(1, 1),
                 title="Cluster #", fontsize='small', title_fontsize='small', fancybox=True,
                 borderpad=0.2, borderaxespad=0.3, labelspacing=0.2, handletextpad=1, markerscale=1, edgecolor='black')
