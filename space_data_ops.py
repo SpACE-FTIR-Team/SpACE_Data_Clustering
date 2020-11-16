@@ -249,5 +249,5 @@ NORMALIZATION_TYPES = {
     "None":     no_normalize,
     "0-to-1":   linear_normalize,
     "Z-Score":  zScore_normalize,
-    "Log":   log_normalize
+    #"Log":   log_normalize
 }
