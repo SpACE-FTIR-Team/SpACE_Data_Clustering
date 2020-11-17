@@ -69,8 +69,9 @@ def plot3D(dataset, clusters, embedded=False, master=None):
     scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=clusters.labels_, cmap="viridis")
     axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="black", s=50)
 
-    axes.legend(*scatter.legend_elements(num=(clusters.n_clusters if clusters.n_clusters % 2 == 0 else
-                                              clusters.n_clusters - 1)),
+    handles, labels = scatter.legend_elements(num=(clusters.n_clusters if clusters.n_clusters % 2 == 0 else
+                                              clusters.n_clusters - 1))
+    axes.legend(handles, labels,
                 ncol=(2 if clusters.n_clusters > 50 else 1),
                 loc='upper left', bbox_to_anchor=(1.1, 1),
                 title="Cluster #", fontsize='small', title_fontsize='small', fancybox=True,
@@ -108,7 +109,8 @@ def plot2D(dataset, clusters, embedded=False, master=None):
     scatter = axes.scatter(x=dataset[0], y=dataset[1], c=clusters.labels_, cmap="viridis")
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
 
-    handles, labels = scatter.legend_elements()
+    handles, labels = scatter.legend_elements(num=(clusters.n_clusters if clusters.n_clusters % 2 == 0 else
+                                              clusters.n_clusters - 1))
     axes.legend(handles, labels,
                 ncol=(2 if clusters.n_clusters > 50 else 1),
                 loc='upper left', bbox_to_anchor=(1, 1),
