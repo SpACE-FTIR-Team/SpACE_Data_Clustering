@@ -46,7 +46,7 @@ def file_to_data_object(file_list):
                     try:
                         float(val)
                     except ValueError:
-                        print(f"{item} contains an invalid or missing input at pair: {value}")
+                        return [], f"{item} contains an invalid or missing value at numerical pair: {value}"
                 pairs.append(value.split("\t"))
                 if pair_index == 0:
                     pair_index = first_col[first_col == value].index[0]
@@ -63,7 +63,7 @@ def file_to_data_object(file_list):
         # throw an error if the pair_index is zero (means that "\t" was not found in the file)
         else:
             descriptive_data = data
-            raise Exception(f"Numerical coordinate pairs could not found for {item}")
+            return [], f"Numerical coordinate pairs could not found for {item}"
 
         # Description Processing: for DataFrame conversion, overflow columns were needed
         # for the descriptions of each spectra, the code below removes the overflow.
@@ -106,7 +106,7 @@ def file_to_data_object(file_list):
         processed_item = DataObject(descriptive_data, xy_pairs, item)
         DataObjects.append(processed_item)
 
-    return DataObjects
+    return DataObjects, ""
 
 
 def reindex(data_objects):
