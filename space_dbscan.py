@@ -17,14 +17,8 @@ def do_dbscan(epsilon, minimum, dataset):
 
 # Compute cluster composition
 def db_comp(db, data_objects, sort_category):
-    labels = db.labels_
-    if -1 in labels:
-        start = -1
-        end = len(set(labels)) - 1
-    else:
-        start = 0
-        end = len(set(labels))
-    comp = pd.DataFrame(index=range(start, end))
+    labels = list(map(lambda x: x + 1, db.labels_)) if -1 in db.labels_ else db.labels_
+    comp = pd.DataFrame(index=range(len(set(labels))))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
         if sort_category in data_objects[i].descriptive.descriptor.values:
