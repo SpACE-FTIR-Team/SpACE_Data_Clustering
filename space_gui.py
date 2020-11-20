@@ -290,7 +290,11 @@ class SpaceApp(tk.Frame):
             return
         # parse
         self.log("Loading into data objects...")
-        self._data_objs = dataops.file_to_data_object(filtered_file_list)
+        self._data_objs, return_msg = dataops.file_to_data_object(filtered_file_list)
+        if not self._data_objs:
+            self.log(return_msg)
+            self._quick_message_box(return_msg)
+            return
         self.log("Loaded %s data objects" % len(self._data_objs))
         # re-index the pairs dataframes
         self.log("Re-indexing pairs dataframes...")
