@@ -380,8 +380,9 @@ class SpaceApp(tk.Frame):
             if self.saving_params["kmeans"]["by_subclass"]:
                 composition_by_subclass = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(), self._data_objs, "Subclass")
                 fileops.save_composition(self.saving_params["folder"], "kmeans", "by_subclass", composition_by_subclass)
-        self.log("Finished K-Means cluster compositions...")
+            self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
+            self.log("Calculating DBSCAN cluster compositions...")
             if self.saving_params["dbscan"]["by_type"]:
                 composition_by_type = db.db_comp(self._db_clusters, self._data_objs, "Type")
                 fileops.save_composition(self.saving_params["folder"], "dbscan", "by_type", composition_by_type)
@@ -391,6 +392,7 @@ class SpaceApp(tk.Frame):
             if self.saving_params["dbscan"]["by_subclass"]:
                 composition_by_subclass = db.db_comp(self._db_clusters, self._data_objs, "Subclass")
                 fileops.save_composition(self.saving_params["folder"], "dbscan", "by_subclass", composition_by_subclass)
+            self.log("Finished DBSCAN cluster compositions...")
 
     def _on_go(self):
         # this might take a while, so disable the buttons and busy the cursor
