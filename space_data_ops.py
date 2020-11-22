@@ -1,12 +1,27 @@
-#
-# Data functions for SpACE
+# -*- coding: utf-8 -*-
 # 
+# Spectral Analysis Clustering Explorer (SpACE)
+# Missouri State University
+# CSC450 Fall 2020 - Dr. Razib Iqbal
+#
+# Team 2 (FTIR/ECOSTRESS/SpACE team):
+# Austin Alvidrez
+# Brad Meyer
+# Collin Tinen
+# Kegan Moore
+# Sam Nack
+#
+# License:
+
+# space_data_ops.py
+# This file contains functions that operate on input data and dataframes.
+#
 # Currently includes: import NASA ECOstress Spectral Library files
 # into DataObjects (see DataObject.py), re-index dataframes,
 # find common range, truncate dataframes to common range,
 # align data to be in the same step, and add in missing values 
-# with interpolation, linear normalization (0 to 1), and PCA
-#
+# with interpolation, normalization, principal component analysis (PCA)
+# dimensionality reduction, combine dataframes.
 
 import pandas as pd
 import numpy as np
@@ -110,14 +125,16 @@ def file_to_data_object(file_list):
 
 
 def reindex(data_objects):
-    """This function takes a list of data objects, iterates over them,
+    """
+    This function takes a list of data objects, iterates over them,
     and changes the index in the 'pairs' dataframe of each data object.
     The integer index [0, 1, 2, ..., n] is dropped.
     The ' Wavelength (micrometers)' [note the leading space] column becomes
     the new index. [note also some columns have (micrometer) without
     the plural s]
     The ' Wavelength (micrometers)' column is renamed 'wavelength'.
-    Dataframes are modified in-place, so None is returned."""
+    Dataframes are modified in-place, so None is returned.
+    """
     for dobj in data_objects:
         dataframe = dobj.pairs
         wavelength_col_name = dataframe.columns[0]
@@ -128,12 +145,14 @@ def reindex(data_objects):
 
 
 def find_common_range(data_objects):
-    """This function takes a list of data objects, iterates over them,
+    """
+    This function takes a list of data objects, iterates over them,
     and checks the minimum and maximum wavelength in every 'pairs' dataframe,
     keeping track of the highest minimum and lowest maximum seen.
     When done, if min < max, then the common range of all data objects is
     min to max. Return (min, max).
-    If min > max, the data objects have no range in common. Return (None, None)."""
+    If min > max, the data objects have no range in common. Return (None, None).
+    """
     highest_minimum = data_objects[0].pairs.index.min()
     lowest_maximum = data_objects[0].pairs.index.max()
     for dobj in data_objects[1:]:
@@ -149,14 +168,16 @@ def find_common_range(data_objects):
 
 
 def truncate(data_objects, min, max):
-    """This function takes a list of data objects, iterates over them,
+    """
+    This function takes a list of data objects, iterates over them,
     and truncates every 'pairs' dataframe to remove any rows (wavelengths)
     below 'min' and above 'max'. The result is that all 'pairs' dataframes
     will have the same range of wavelengths. (Note that wavelengths are
     not aligned here; that comes later.)
     Pandas can't truncate in place, so a new truncated dataframe is
     constructed and then the DataObject 'pairs' dataframe is replaced
-    with the new dataframe. Returns None."""
+    with the new dataframe. Returns None.
+    """
     for dobj in data_objects:
         original_dataframe = dobj.pairs
         truncated_dataframe = original_dataframe.truncate(before=min, after=max, axis='index', copy=True)
@@ -165,8 +186,11 @@ def truncate(data_objects, min, max):
 
 
 def find_max_res(data_objects):
-    """This function takes a list of data objects and the range common to them, iterates over them, and finds the
-    object with the most points.  It will return the index of this object"""
+    """
+    This function takes a list of data objects, iterates over them,
+    and finds the data object with the most datapoints.
+    It returns the index of this object.
+    """
     max_pts = 0
     max_pts_index = 0
     for i in range(len(data_objects)):
@@ -178,63 +202,87 @@ def find_max_res(data_objects):
 
 
 def align(data_objects, align_to):
-    """This function takes a list of data objects, iterates over them, and makes every 'pairs' dataframe use the same
-    x axis.  The result is that all 'pairs' dataframes will use the same x axis and thus be aligned.  This will then fill in 
-    any missing values caused by the alignment using.  align_to should also be the index of the data object to align to
-    and contains the x axis that all dataobjs should be aligned to."""
-
+    """
+    This function takes a list of data objects, iterates over them,
+    and makes every 'pairs' dataframe use the same x axis by aligning
+    them to the data object at the index specified by align_to.
+    The result is that all 'pairs' dataframes will use the same x
+    axis and thus be aligned.  This will then fill in any missing
+    values caused by the alignment using linear interpolation.
+    """
     alignment_pairs = data_objects[align_to].pairs
     for dobj in data_objects:
         (_, dobj.pairs) = alignment_pairs.align(dobj.pairs, join="outer", axis=0)
         dobj.pairs = dobj.pairs.interpolate(limit_direction='both')
-        # dobj.pairs = dobj.pairs.interpolate()
         (_, dobj.pairs) = alignment_pairs.align(dobj.pairs, join="left", axis=0)
     return None
 
 
 def combine(data_objects):
-    """This function takes a list of data objects all sharing a common x coordinate and outputs them all as one block
-    This block will have each data_object taking up one row where each column is a different y coordinate.
-    Returns a block of data"""
+    """
+    This function takes a list of data objects all sharing a common
+    x axis (i.e., they are already aligned) and outputs them all as
+    one block.
+    This block will have each data_object taking up one row where
+    each column is a different y coordinate.
+    Returns a block of data.
+    """
     data_block = pd.concat([dobj.pairs.transpose() for dobj in data_objects], ignore_index=True)
     return data_block
 
 
-def linear_normalize(dataObjectArray):
-    """Normalizes data from range 0 to 1 and returns the array of DataObjects normalized"""
-    scaler = preprocessing.MinMaxScaler()
-    for i in dataObjectArray:
-        normalized_pairs = scaler.fit_transform(i.pairs)
-        n = i.pairs.columns[0]
-        i.pairs.drop(n, axis=1, inplace=True)
-        i.pairs[n] = normalized_pairs
-    return dataObjectArray
-
-
 def pca(dataObjectArray, dimensions):
-    """Performs PCA and returns the dataset transformed to n-dimensions as a DataFrame"""
+    """This function takes a data block (combined dataframe)
+    and a number of dimensions and performs PCA dimensionality
+    reduction to the specified number of dimensions.
+    Returns the datas block transformed to n-dimensions.
+    """
     pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
     pca.fit(dataObjectArray)
     transformed = pca.transform(dataObjectArray)
     return pd.DataFrame(transformed, index=dataObjectArray.index)
 
-def no_normalize(data_objects):
+
+def linear_normalize(data_block):
+    """
+    This function takes a data block (combined dataframe)
+    and normalizes data from range 0 to 1.
+    Returns the normalized data block.
+    """
+    scaler = preprocessing.MinMaxScaler()
+    for i in data_block:
+        normalized_pairs = scaler.fit_transform(i.pairs)
+        n = i.pairs.columns[0]
+        i.pairs.drop(n, axis=1, inplace=True)
+        i.pairs[n] = normalized_pairs
+    return data_block
+
+
+def no_normalize(data_block):
     """This function is a no-op; it does no normalization.
     Null design pattern in action!"""
-    return data_objects
+    return data_block
 
-def zScore_normalize(data_objects):
-    """Rescales data based on how many standard deviations the point is away from the 
-    mean of the dataset"""
-    for df in data_objects:
+def zScore_normalize(data_block):
+    """
+    This function takes a data block (combined dataframe)
+    and rescales data based on how many standard deviations
+    the point is away from the mean of the dataset.
+    Returns the modified data block.
+    """
+    for df in data_block:
         df.pairs = df.pairs.apply(zscore)
-    return data_objects
+    return data_block
 
-def log_normalize(data_objects):
-    """Log scaling computes the log of your values to compress a wide range to a narrow range."""
-    for df in data_objects:
+def log_normalize(data_block):
+    """
+    This function takes a data blcok (combined dataframe)
+    and rescales data by computing the log of the values 
+    to compress a wide range to a narrow range.
+    Returns the modified data block."""
+    for df in data_block:
         df.pairs = np.log(df.pairs)
-    return data_objects
+    return data_block
 
 # Normalization types that are implemented
 #
