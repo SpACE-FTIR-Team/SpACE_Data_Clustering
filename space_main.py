@@ -1,5 +1,23 @@
-# What kind of standardized header comments do we want to include?
+# -*- coding: utf-8 -*-
+# 
+# Spectral Analysis Clustering Explorer (SpACE)
+# Missouri State University
+# CSC450 Fall 2020 - Dr. Razib Iqbal
 #
+# Team 2 (FTIR/ECOSTRESS/SpACE team):
+# Austin Alvidrez
+# Brad Meyer
+# Collin Tinen
+# Kegan Moore
+# Sam Nack
+#
+# License:
+
+# space_main.py
+# This is the main entry point for the SpACE application, GUI version.
+#
+# Configuration options and defaults are specified here.
+# Then the GUI is launched.
 
 from os import getcwd
 import space_gui as gui
@@ -27,7 +45,6 @@ CONFIG = {
 
 def main():
     # add current directory to the config -- used for initial input folder path
-    # might change this later
     CONFIG["DEFAULT_INPUT_PATH"] = getcwd()
     gui.launch_gui(CONFIG)
 
