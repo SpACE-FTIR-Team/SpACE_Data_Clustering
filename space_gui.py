@@ -275,6 +275,7 @@ class SpaceApp(tk.Frame):
     def _do_import_data(self):
         # reset everything, in case we are running multiple times
         self._data_objs = []
+        self._dataset = None
         self.log("-- Begin data import and pre-processing --")
         # search for all files in input folder and subfolder
         file_list = fileops.collect_all_filenames(self._Var_folder.get())
@@ -454,6 +455,12 @@ class SpaceApp(tk.Frame):
         if self._dataset.shape[1] == dimensions:
             self.log("Skipping PCA because data set is already %s dimensions" % dimensions)
             plot_dataset = self._dataset
+        elif self._dataset.shape[1] < dimensions:
+            self.log("Cannot plot in %sD because input data is only in %s dimensions" % (dimensions, self._dataset.shape[1]))
+            self._quick_message_box("Cannot plot in %sD because input data is only in %s dimensions.\nPlotting in 2D instead."
+                                    % (dimensions, self._dataset.shape[1]))
+            plot_dataset = self._dataset
+            plot = km.plot2D
         else:
             self.log("PCA reducing data to %s dimensions..." % dimensions)
             plot_dataset = dataops.pca(self._dataset, dimensions)
@@ -467,11 +474,17 @@ class SpaceApp(tk.Frame):
         self.log("user: pressed Generate Plot button (dbscan)")
         plot_dataset = None
         dimensions = self._dbscan_viz_panel.get_dimensions()
-        self.log("Plotting in %s dimensions" % self._dbscan_viz_panel.get_dimensions())
+        self.log("-- Begin DBSCAN plotting in %sD --" % dimensions)
         plot = db.plot2D if dimensions == 2 else db.plot3D
         if self._dataset.shape[1] == dimensions:
             self.log("Skipping PCA because data set is already %s dimensions" % dimensions)
             plot_dataset = self._dataset
+        elif self._dataset.shape[1] < dimensions:
+            self.log("Cannot plot in %sD because input data is only in %s dimensions" % (dimensions, self._dataset.shape[1]))
+            self._quick_message_box("Cannot plot in %sD because input data is only in %s dimensions.\nPlotting in 2D instead."
+                                    % (dimensions, self._dataset.shape[1]))
+            plot_dataset = self._dataset
+            plot = db.plot2D
         else:
             self.log("PCA reducing data to %s dimensions..." % dimensions)
             plot_dataset = dataops.pca(self._dataset, dimensions)
