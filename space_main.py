@@ -26,7 +26,6 @@ CONFIG = {
 
 
 def main():
-    print("This is %s version %s." % (CONFIG["APP_NAME"], CONFIG["APP_VERSION"]))
     # add current directory to the config -- used for initial input folder path
     # might change this later
     CONFIG["DEFAULT_INPUT_PATH"] = getcwd()
