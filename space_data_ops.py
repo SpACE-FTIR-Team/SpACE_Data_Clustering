@@ -72,9 +72,12 @@ def file_to_data_object(file_list):
         # convert pairs to DataFrame, with column labels for given X Units and Y Units
         if pair_index != 0:
             descriptive_data = data.head(pair_index)
+            # find index of "X Units" and "Y Units" to find unit labels
+            x_units = first_col[first_col == "X Units"].index[0]
+            y_units = first_col[first_col == "Y Units"].index[0]
             xy_pairs = pd.DataFrame(pairs,
-                                    columns=[descriptive_data.loc[14, 'value'],
-                                             descriptive_data.loc[15, 'value']])
+                                    columns=[descriptive_data.loc[x_units, 'value'],
+                                             descriptive_data.loc[y_units, 'value']])
         # throw an error if the pair_index is zero (means that "\t" was not found in the file)
         else:
             descriptive_data = data
