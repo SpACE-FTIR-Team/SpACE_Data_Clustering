@@ -25,19 +25,26 @@ import os.path
 import glob
 
 def path_exists(folder):
-	"""Just checks to see if a path is a valid path."""
+	"""
+	Checks to see if a path exists.
+	Returns True if it exists.
+	"""
 	return os.path.exists(folder)
 
 def collect_all_filenames(folder):
-	"""Finds all files in a given folder and all of its
+	"""
+	Finds all files in a given folder and all of its
 	subfolders. Returns a Python list where each entry
-	is a filename with full path to the file."""
+	is a filename with full path to the file.
+	"""
 	return glob.glob(folder + '/**', recursive = True)
 
 def filter_filenames(file_list):
-	"""Iterates through a list of files and retains only
+	"""
+	Iterates through a list of files and retains only
 	those that have 'tir' 'nicolet' 'spectrum' and '.txt'
-	in the filename. Returns a Python list."""
+	in the filename. Returns a Python list.
+	"""
 	return list(filter(lambda filename: 'tir' in filename
 								and 'nicolet' in filename
 								and 'spectrum' in filename
@@ -45,10 +52,12 @@ def filter_filenames(file_list):
 								file_list))
 
 def save_data_files(folder, suffix, data_objects):
-	"""Accepts a specified filepath, a suffix to add to it,
+	"""
+	Accepts a specified filepath, a suffix to add to it,
 	and a list of data_objects. Iterates through them all 
 	and saves them to the filepath with the suffix added on.
-	Saves as .csv"""
+	Saves as .csv
+	"""
 	dir_name = os.path.join(folder, suffix)
 	if not path_exists(dir_name):
 		os.mkdir(dir_name)
@@ -58,9 +67,11 @@ def save_data_files(folder, suffix, data_objects):
 		dobj.pairs.to_csv(save_string)  # other arguments can be supplied, check pandas docs
 
 def save_block_data(folder, suffix, dataset):
-	"""Accepts a specified filepath, a suffix to add to it,
+	"""
+	Accepts a specified filepath, a suffix to add to it,
 	and a single combined dataframe.
-	Saves as .csv"""
+	Saves as .csv
+	"""
 	# suffix might be a single string in the case of saving
 	# the combine datablock, or it might be a tuple containing
 	# multiple strings (nested subfolder names) in the case
@@ -75,11 +86,11 @@ def save_block_data(folder, suffix, dataset):
 	dataset.to_csv(save_string)  # other arguments can be supplied, check pandas docs
 
 def save_composition(folder, clustering_type, file_suffix, c):
-	"""Accepts a specified filepath, a clustering type, 
+	"""
+	Accepts a specified filepath, a clustering type, 
 	a filename suffix, and a cluster compositon dataframe.
 	Saves the cluster composition info.
-	Might want to do more in this folder, but for now it creates
-	a folder and adds some imporant info."""
+	"""
 	if not path_exists(folder):
 		os.mkdir(folder)
 	file_name = clustering_type + "_composition_" + file_suffix + ".csv"
