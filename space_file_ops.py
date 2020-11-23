@@ -11,7 +11,24 @@
 # Kegan Moore
 # Sam Nack
 #
-# License:
+# Copyright 2020 Austin Alvidrez, Brad Meyer, Collin Tinen,
+# Kegan Moore, Sam Nack
+#
+# Spectral Analysis Clustering Explorer (SpACE) is free software:
+# you can redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Spectral Analysis Clustering Explorer (SpACE) is distributed in
+# the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Spectral Analysis Clustering Explorer (SpACE).
+# If not, see <https://www.gnu.org/licenses/>.
 
 # space_file_ops.py
 # This file contains functions that interact with files and folders.
