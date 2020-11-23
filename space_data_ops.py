@@ -41,13 +41,10 @@
 # dimensionality reduction, combine dataframes.
 
 import pandas as pd
-import numpy as np
 from DataObject import DataObject
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 from scipy.stats import zscore
-from sklearn.preprocessing import MinMaxScaler
-
 
 # columns include overflow for extra ":" characters found in the description field
 columns = ['descriptor', 'value', 'overflow', 'overflow2', 'overflow3']
@@ -102,7 +99,6 @@ def file_to_data_object(file_list):
 
         # Description Processing: for DataFrame conversion, overflow columns were needed
         # for the descriptions of each spectra, the code below removes the overflow.
-        # description = descriptive_data.loc[10, 'overflow, overflow2, or overflow3']
 
         # Make a copy, this is recommended by pandas documentation for modifying individual cells
         descriptive_copy = descriptive_data.copy()
@@ -208,7 +204,7 @@ def truncate(data_objects, min, max):
 def find_max_res(data_objects):
     """
     This function takes a list of data objects, iterates over them,
-    and finds the data object with the most datapoints.
+    and finds the data object with the most data points.
     It returns the index of this object.
     """
     max_pts = 0
@@ -255,7 +251,7 @@ def pca(dataObjectArray, dimensions):
     """This function takes a data block (combined dataframe)
     and a number of dimensions and performs PCA dimensionality
     reduction to the specified number of dimensions.
-    Returns the datas block transformed to n-dimensions.
+    Returns the data block transformed to n-dimensions.
     """
     pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
     pca.fit(dataObjectArray)
@@ -283,6 +279,7 @@ def no_normalize(data_block):
     Null design pattern in action!"""
     return data_block
 
+
 def zScore_normalize(data_block):
     """
     This function takes a data block (combined dataframe)
@@ -294,15 +291,6 @@ def zScore_normalize(data_block):
         df.pairs = df.pairs.apply(zscore)
     return data_block
 
-def log_normalize(data_block):
-    """
-    This function takes a data blcok (combined dataframe)
-    and rescales data by computing the log of the values 
-    to compress a wide range to a narrow range.
-    Returns the modified data block."""
-    for df in data_block:
-        df.pairs = np.log(df.pairs)
-    return data_block
 
 # Normalization types that are implemented
 #
@@ -314,8 +302,7 @@ def log_normalize(data_block):
 # Value is the function that will be called.
 
 NORMALIZATION_TYPES = {
-    "None":     no_normalize,
-    "0-to-1":   linear_normalize,
-    "Z-Score":  zScore_normalize,
-    #"Log":   log_normalize
+    "None": no_normalize,
+    "0-to-1": linear_normalize,
+    "Z-Score": zScore_normalize,
 }
