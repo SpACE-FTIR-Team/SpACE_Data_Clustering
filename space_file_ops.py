@@ -1,10 +1,25 @@
+# -*- coding: utf-8 -*-
+# 
+# Spectral Analysis Clustering Explorer (SpACE)
+# Missouri State University
+# CSC450 Fall 2020 - Dr. Razib Iqbal
 #
-# File and folder operations for SpACE
+# Team 2 (FTIR/ECOSTRESS/SpACE team):
+# Austin Alvidrez
+# Brad Meyer
+# Collin Tinen
+# Kegan Moore
+# Sam Nack
 #
-# Currently includes: selecting files in folder
-# and subfolders, filtering files by filename
+# License:
+
+# space_file_ops.py
+# This file contains functions that interact with files and folders.
 #
-# TODO: file saving functions likely will go here
+# Currently includes: check if a path is valid, selecting files in
+# a folder and subfolders, filtering files by filename, save modified
+# data files as .csv, save datablocks as .csv, save cluster
+# compositions as .csv
 
 import os.path
 import glob
