@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+# 
+# Spectral Analysis Clustering Explorer (SpACE)
+# Missouri State University
+# CSC450 Fall 2020 - Dr. Razib Iqbal
+#
+# Team 2 (FTIR/ECOSTRESS/SpACE team):
+# Austin Alvidrez
+# Brad Meyer
+# Collin Tinen
+# Kegan Moore
+# Sam Nack
+#
+# License:
+
+# space_dbscan.py
+# This file contains function related to the DBSCAN algorithm.
+#
+# Currently includes: DBSCAN clustering, calculate cluster
+# composition, 2D plotting, 3D plotting.
+
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -11,12 +32,24 @@ from sklearn.preprocessing import StandardScaler
 
 # Compute DBSCAN
 def do_dbscan(epsilon, minimum, dataset):
+    """
+    This function accepts values for epsilon and MinPts (minimum)
+    and a combined pandas dataframe of shape n_samples x n_features.
+    It fits the dataset, and returns a dbscan object.
+    """
     db = DBSCAN(eps=epsilon, min_samples=minimum).fit(dataset)
     return db
 
 
 # Compute cluster composition
 def db_comp(db, data_objects, sort_category):
+    """
+    This function accepts a dbscan object, a list of data objects, and
+    a category to sort by and calculates the composition of each cluster.
+    It returns a pandas dataframe with the composition of each cluster.
+    Composition dataframe is of shape clusters x categories.
+    Each row is a cluster, and each column is a category.
+    """
     labels = list(map(lambda x: x + 1, db.labels_)) if -1 in db.labels_ else db.labels_
     comp = pd.DataFrame(index=range(len(set(labels))))
     comp.index.name = "Cluster No."
@@ -36,13 +69,15 @@ def db_comp(db, data_objects, sort_category):
 
 
 def plot2D(dataset, db, embedded=False, master=None):
-    """This function plots clusters and cluster centers in 3D.
+    """
+    This function takes a combined pandas dataframe and a dbscan object.
+    It plots the DBSCAN clusters in 2D.
     If embedded is False, the the plot is displayed in a standalone
     modal window, master is ignored, and the funtion returns None.
     If embedded is True, master must be specified (the parent widget
     for the canvas), and the function returns a canvas object
-    to be displayed in the visualization panel in the GUI."""
-
+    to be displayed in the visualization panel in the GUI.
+    """
     if embedded:
         figure = Figure()
         canvas = FigureCanvasTkAgg(figure, master=master)
@@ -83,13 +118,15 @@ def plot2D(dataset, db, embedded=False, master=None):
 
 
 def plot3D(dataset, db, embedded=False, master=None):
-    """This function plots clusters and cluster centers in 3D.
+    """
+    This function takes a combined pandas dataframe and a dbscan object.
+    It plots the DBSCAN clusters in 3D.
     If embedded is False, the the plot is displayed in a standalone
     modal window, master is ignored, and the funtion returns None.
     If embedded is True, master must be specified (the parent widget
     for the canvas), and the function returns a canvas object
-    to be displayed in the visualization panel in the GUI."""
-
+    to be displayed in the visualization panel in the GUI.
+    """
     if embedded:
         figure = Figure()
         canvas = FigureCanvasTkAgg(figure, master=master)
