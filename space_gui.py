@@ -1,6 +1,20 @@
+# -*- coding: utf-8 -*-
+# 
+# Spectral Analysis Clustering Explorer (SpACE)
+# Missouri State University
+# CSC450 Fall 2020 - Dr. Razib Iqbal
 #
-# Graphical user interface for SpACE
+# Team 2 (FTIR/ECOSTRESS/SpACE team):
+# Austin Alvidrez
+# Brad Meyer
+# Collin Tinen
+# Kegan Moore
+# Sam Nack
 #
+# License:
+
+# space_gui.py
+# This is the graphical user interface for the SpACE application.
 
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -45,8 +59,10 @@ class SpaceApp(tk.Frame):
             self._set_defaults()
         self.log("SpACE graphical user interface startup")
 
-        # data objects holding pandas dataframes
+        # data objects holding pandas dataframes (empty for now)
         self._data_objs = []
+        # combined dataframe (none for now)
+        self._dataset = None
 
     def _create_widgets(self):
         """Create and configure all the widgets in the main frame."""
