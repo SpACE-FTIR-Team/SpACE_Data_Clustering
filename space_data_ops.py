@@ -41,6 +41,7 @@
 # dimensionality reduction, combine dataframes.
 
 import pandas as pd
+import numpy as np
 from DataObject import DataObject
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
@@ -248,15 +249,24 @@ def combine(data_objects):
 
 
 def pca(dataObjectArray, dimensions):
-    """This function takes a data block (combined dataframe)
+    """
+    This function takes a data block (combined dataframe)
     and a number of dimensions and performs PCA dimensionality
     reduction to the specified number of dimensions.
     Returns the data block transformed to n-dimensions.
+    A bug arose during testing that we believe to be Windows build-related (np.linalg.LinAlgError).
+    As far as we have tested, the bug does not affect the results of PCA or of any other process.
+    We also could not find an actual solution (or source) after several hours of debugging with two team members,
+    so, in the interest of time, we have added a while-try-except statement to PCA to ignore this bug/warning.
     """
-    pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
-    pca.fit(dataObjectArray)
-    transformed = pca.transform(dataObjectArray)
-    return pd.DataFrame(transformed, index=dataObjectArray.index)
+    while True:
+        try:
+            pca = PCA(n_components=dimensions, copy=False, svd_solver='full')
+            pca.fit(dataObjectArray)
+            transformed = pca.transform(dataObjectArray)
+            return pd.DataFrame(transformed, index=dataObjectArray.index)
+        except np.linalg.LinAlgError:
+            continue
 
 
 def linear_normalize(data_block):

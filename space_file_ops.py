@@ -111,7 +111,7 @@ def save_block_data(folder, suffix, dataset):
 def save_composition(folder, clustering_type, file_suffix, c):
     """
     Accepts a specified filepath, a clustering type,
-    a filename suffix, and a cluster compositon dataframe.
+    a filename suffix, and a cluster composition dataframe.
     Saves the cluster composition info.
     """
     if not path_exists(folder):
