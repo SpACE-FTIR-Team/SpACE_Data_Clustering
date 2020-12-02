@@ -33,7 +33,7 @@
 # space_dbscan.py
 # This file contains function related to the DBSCAN algorithm.
 #
-# Currently includes: DBSCAN clustering, calculate cluster
+# Includes: DBSCAN clustering, calculate cluster
 # composition, 2D plotting, 3D plotting.
 
 import matplotlib.pyplot as plt
@@ -66,7 +66,7 @@ def db_comp(db, data_objects, sort_category):
     Composition dataframe is of shape clusters x categories.
     Each row is a cluster, and each column is a category.
     """
-    labels = list(map(lambda x: x + 1, db.labels_)) if -1 in db.labels_ else db.labels_
+    labels = list(map(lambda x: x + 1, db.labels_))
     comp = pd.DataFrame(index=range(len(set(labels))))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
@@ -89,7 +89,7 @@ def plot2D(dataset, db, embedded=False, master=None):
     This function takes a combined pandas dataframe and a dbscan object.
     It plots the DBSCAN clusters in 2D.
     If embedded is False, the the plot is displayed in a standalone
-    modal window, master is ignored, and the funtion returns None.
+    modal window, master is ignored, and the function returns None.
     If embedded is True, master must be specified (the parent widget
     for the canvas), and the function returns a canvas object
     to be displayed in the visualization panel in the GUI.
@@ -102,7 +102,6 @@ def plot2D(dataset, db, embedded=False, master=None):
     else:
         figure, axes = plt.subplots()
 
-    db = db.fit(dataset)  # refit to reduced data for plotting
     # dbscan labels contain some -1s, which is wreaking havoc,
     # so let's change -1 to 0 and shift all other labels by +1
     # e.g. -1 becomes 0, 0 becomes 1, 1 becomes 2...
@@ -114,12 +113,18 @@ def plot2D(dataset, db, embedded=False, master=None):
     # noise points) is black
     colormap = cm.get_cmap('viridis')(np.linspace(0, 1, 101))
     black = [0, 0, 0, 1]
-    new_colors = np.insert(colormap, 0, black, axis=0)
-    new_colormap = ListedColormap(new_colors)
+
+    # if there is noise, add black to the colormap and set n_clusters to labels - 1, else do not
+    if 0 in plot_labels:
+        new_colors = np.insert(colormap, 0, black, axis=0)
+        new_colormap = ListedColormap(new_colors)
+        n_clusters = len(set(plot_labels)) - 1
+    else:
+        new_colormap = ListedColormap(colormap)
+        n_clusters = len(set(plot_labels))
 
     scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
 
-    n_clusters = len(set(plot_labels)) - (1 if 0 in plot_labels else 0)
     handles, labels = scatter.legend_elements(num=n_clusters if n_clusters > 0 else "auto")
     axes.legend(handles, labels, loc='upper left', bbox_to_anchor=(1, 1),
                 title="Cluster #\n(0=Noise)", fontsize='small', title_fontsize='small', fancybox=True,
@@ -138,7 +143,7 @@ def plot3D(dataset, db, embedded=False, master=None):
     This function takes a combined pandas dataframe and a dbscan object.
     It plots the DBSCAN clusters in 3D.
     If embedded is False, the the plot is displayed in a standalone
-    modal window, master is ignored, and the funtion returns None.
+    modal window, master is ignored, and the function returns None.
     If embedded is True, master must be specified (the parent widget
     for the canvas), and the function returns a canvas object
     to be displayed in the visualization panel in the GUI.
@@ -151,7 +156,6 @@ def plot3D(dataset, db, embedded=False, master=None):
     else:
         figure, axes = plt.subplots(subplot_kw={"projection": "3d"})
 
-    db = db.fit(dataset)  # refit to reduced data for plotting
     # dbscan labels contain some -1s, which is wreaking havoc,
     # so let's change -1 to 0 and shift all other labels by +1
     # e.g. -1 becomes 0, 0 becomes 1, 1 becomes 2...
@@ -163,12 +167,18 @@ def plot3D(dataset, db, embedded=False, master=None):
     # noise points) is black
     colormap = cm.get_cmap('viridis')(np.linspace(0, 1, 101))
     black = [0, 0, 0, 1]
-    new_colors = np.insert(colormap, 0, black, axis=0)
-    new_colormap = ListedColormap(new_colors)
+
+    # if there is noise, add black to the colormap, else do not
+    if 0 in plot_labels:
+        new_colors = np.insert(colormap, 0, black, axis=0)
+        new_colormap = ListedColormap(new_colors)
+        n_clusters = len(set(plot_labels)) - 1
+    else:
+        new_colormap = ListedColormap(colormap)
+        n_clusters = len(set(plot_labels))
 
     scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
 
-    n_clusters = len(set(plot_labels)) - (1 if 0 in plot_labels else 0)
     handles, labels = scatter.legend_elements(num=n_clusters if n_clusters > 0 else "auto")
     axes.legend(handles, labels, loc='upper left', bbox_to_anchor=(1.1, 1),
                 title="Cluster #\n(0=Noise)", fontsize='small', title_fontsize='small', fancybox=True,

@@ -33,7 +33,7 @@
 # space_data_ops.py
 # This file contains functions that operate on input data and dataframes.
 #
-# Currently includes: import NASA ECOstress Spectral Library files
+# Includes: import NASA ECOSTRESS Spectral Library files
 # into DataObjects (see DataObject.py), re-index dataframes,
 # find common range, truncate dataframes to common range,
 # align data to be in the same step, and add in missing values 

@@ -186,7 +186,7 @@ class SpaceApp(tk.Frame):
         self._Tab_log = ttk.Frame(Notebook_controller)
         self._Tab_kmeans = ttk.Frame(Notebook_controller)
         self._Tab_dbscan = ttk.Frame(Notebook_controller)
-        # rezise setup
+        # resize setup
         for tab in (self._Tab_log, self._Tab_kmeans, self._Tab_dbscan):
             tab.grid_columnconfigure(index=0, weight=1)
             tab.grid_rowconfigure(index=0, weight=1)
@@ -243,12 +243,6 @@ class SpaceApp(tk.Frame):
     def log(self, text):
         """A simple logging facility for status messages
         during program execution."""
-        # Right now this just logs to the console.
-        # Future expansion options:
-        # a) simply turn this off prior to project submission
-        # b) or perhaps save to a file
-        # c) or perhaps output to a logging window that the user can
-        #    see/hide as desired so they know what's going on
         self._Text_log.insert(tk.END, "%s\n" % text)
         self.master.update()
 
@@ -388,7 +382,6 @@ class SpaceApp(tk.Frame):
         self.log("Clustering...")
         self._k_clusters = km.do_Kmeans(self._Var_kmeans_clusters.get(), self._dataset)
         self.log("-- End K-means clustering --")
-        # TODO: check the kmeans clustering succeeded before enabling plot widgets
         self._kmeans_viz_panel.enable_widgets()
 
     def _do_dbscan_clustering(self):
@@ -398,7 +391,6 @@ class SpaceApp(tk.Frame):
         self.log("Clustering...")
         self._db_clusters = db.do_dbscan(self._Var_eps.get(), self._Var_minpts.get(), self._dataset)
         self.log("-- End DBSCAN clustering --")
-        # TODO: check the DBSSCAN clustering succeeded before enabling plot widgets
         self._dbscan_viz_panel.enable_widgets()
 
     def _do_save_cluster_composition(self):
@@ -448,7 +440,7 @@ class SpaceApp(tk.Frame):
         for viz_panel in [self._kmeans_viz_panel, self._dbscan_viz_panel]:
             viz_panel.destroy_canvas()
             viz_panel.disable_widgets()
-        # reset defaut cluster save location in case user is using
+        # reset default cluster save location in case user is using
         # new input data from a new path
         self._reset_default_save_path()
         if self._validate_user_input():
@@ -461,9 +453,6 @@ class SpaceApp(tk.Frame):
             # re-enable the save button if at least one algorithm was selected
             if self._Var_kmeans.get() or self._Var_dbscan.get():
                 self._Button_save["state"] = "normal"
-        else:
-            # at least one input check failed
-            pass  # this is here for possible future expansion
 
         # re-enable Go button and un-busy the cursor now that we're done
         self.master.config(cursor="")
