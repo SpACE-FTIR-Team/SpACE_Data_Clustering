@@ -66,7 +66,7 @@ def db_comp(db, data_objects, sort_category):
     Composition dataframe is of shape clusters x categories.
     Each row is a cluster, and each column is a category.
     """
-    labels = list(map(lambda x: x + 1, db.labels_)) if -1 in db.labels_ else db.labels_
+    labels = list(map(lambda x: x + 1, db.labels_))
     comp = pd.DataFrame(index=range(len(set(labels))))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
