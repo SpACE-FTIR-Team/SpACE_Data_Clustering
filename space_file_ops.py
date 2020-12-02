@@ -33,9 +33,9 @@
 # space_file_ops.py
 # This file contains functions that interact with files and folders.
 #
-# Currently includes: check if a path is valid, selecting files in
+# Includes: check if a path is valid, selecting files in
 # a folder and subfolders, filtering files by filename, save modified
-# data files as .csv, save datablocks as .csv, save cluster
+# data files as .csv, save data blocks as .csv, save cluster
 # compositions as .csv
 
 import os.path
@@ -95,7 +95,7 @@ def save_block_data(folder, suffix, dataset):
     Saves as .csv
     """
     # suffix might be a single string in the case of saving
-    # the combine datablock, or it might be a tuple containing
+    # the combined data block, or it might be a tuple containing
     # multiple strings (nested subfolder names) in the case
     # of saving PCA data
     if isinstance(suffix, tuple):

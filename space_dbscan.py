@@ -33,7 +33,7 @@
 # space_dbscan.py
 # This file contains function related to the DBSCAN algorithm.
 #
-# Currently includes: DBSCAN clustering, calculate cluster
+# Includes: DBSCAN clustering, calculate cluster
 # composition, 2D plotting, 3D plotting.
 
 import matplotlib.pyplot as plt
@@ -114,7 +114,7 @@ def plot2D(dataset, db, embedded=False, master=None):
     colormap = cm.get_cmap('viridis')(np.linspace(0, 1, 101))
     black = [0, 0, 0, 1]
 
-    # if there is noise, add black to the colormap, else do not
+    # if there is noise, add black to the colormap and set n_clusters to labels - 1, else do not
     if 0 in plot_labels:
         new_colors = np.insert(colormap, 0, black, axis=0)
         new_colormap = ListedColormap(new_colors)
@@ -143,7 +143,7 @@ def plot3D(dataset, db, embedded=False, master=None):
     This function takes a combined pandas dataframe and a dbscan object.
     It plots the DBSCAN clusters in 3D.
     If embedded is False, the the plot is displayed in a standalone
-    modal window, master is ignored, and the funtion returns None.
+    modal window, master is ignored, and the function returns None.
     If embedded is True, master must be specified (the parent widget
     for the canvas), and the function returns a canvas object
     to be displayed in the visualization panel in the GUI.

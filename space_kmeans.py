@@ -30,10 +30,10 @@
 # along with Spectral Analysis Clustering Explorer (SpACE).
 # If not, see <https://www.gnu.org/licenses/>.
 
-# space_dbscan.py
-# This file contains function related to the DBSCAN algorithm.
+# space_kmeans.py
+# This file contains function related to the KMeans algorithm.
 #
-# Currently includes: K-means clustering, calculate cluster
+# Includes: K-means clustering, calculate cluster
 # composition, 2D plotting, 3D plotting.
 
 from sklearn.cluster import KMeans
@@ -67,8 +67,7 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
     comp = pd.DataFrame(index=range(num_clusters))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
-        # The most complicated line of code I have ever written in my entire life.  Basically it just accesses the
-        # value where the descriptor = sort_category
+        # access the value where descriptor == sort_category
         if sort_category in data_objects[i].descriptive.descriptor.values:
             category = data_objects[i].descriptive. \
                 loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
@@ -88,7 +87,7 @@ def plot2D(dataset, km, embedded=False, master=None):
     This function takes a combined pandas dataframe and a kmeans object.
     It plots the K-means clusters and centroids in 2D.
     If embedded is False, the the plot is displayed in a standalone
-    modal window, master is ignored, and the funtion returns None.
+    modal window, master is ignored, and the function returns None.
     If embedded is True, master must be specified (the parent widget
     for the canvas), and the function returns a canvas object
     to be displayed in the visualization panel in the GUI.
@@ -103,7 +102,7 @@ def plot2D(dataset, km, embedded=False, master=None):
 
     cx = []
     cy = []
-    km = km.fit(dataset)  # refit to reduced data for plotting
+    km = km.fit(dataset)  # refit to reduced data for centroids
     for i in km.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
@@ -130,7 +129,7 @@ def plot3D(dataset, km, embedded=False, master=None):
     This function takes a combined pandas dataframe and a kmeans object.
     It plots the K-means clusters and centroids in 3D.
     If embedded is False, the the plot is displayed in a standalone
-    modal window, master is ignored, and the funtion returns None.
+    modal window, master is ignored, and the function returns None.
     If embedded is True, master must be specified (the parent widget
     for the canvas), and the function returns a canvas object
     to be displayed in the visualization panel in the GUI.
@@ -146,7 +145,7 @@ def plot3D(dataset, km, embedded=False, master=None):
     cx = []
     cy = []
     cz = []
-    km = km.fit(dataset)  # refit to reduced data for plotting
+    km = km.fit(dataset)  # refit to reduced data for centroids
     for i in km.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
