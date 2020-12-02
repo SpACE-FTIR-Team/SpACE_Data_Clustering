@@ -41,7 +41,7 @@ import space_gui as gui
 
 CONFIG = {
     "APP_NAME": "SpACE",
-    "APP_VERSION": "1.0.0rc1",
+    "APP_VERSION": "1.0.0rc2",
     "PCA_BY_DEFAULT": True,
     "DEFAULT_PCA_DIMENSIONS": 2,
     "SAVE_AFTER_DATA_MODIFICATION_BY_DEFAULT": False,
