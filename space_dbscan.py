@@ -120,7 +120,7 @@ def plot2D(dataset, db, embedded=False, master=None):
         new_colormap = ListedColormap(new_colors)
         n_clusters = len(set(plot_labels)) - 1
     else:
-        new_colormap = 'viridis'
+        new_colormap = ListedColormap(colormap)
         n_clusters = len(set(plot_labels))
 
     scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
@@ -174,7 +174,7 @@ def plot3D(dataset, db, embedded=False, master=None):
         new_colormap = ListedColormap(new_colors)
         n_clusters = len(set(plot_labels)) - 1
     else:
-        new_colormap = 'viridis'
+        new_colormap = ListedColormap(colormap)
         n_clusters = len(set(plot_labels))
 
     scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
