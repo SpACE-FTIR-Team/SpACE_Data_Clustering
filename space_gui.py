@@ -45,8 +45,10 @@ import space_kmeans as km
 import space_dbscan as db
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
-#entire page is linked to External Interface Requirements #1 - product must be encapsulated into a Graphical User Interface
-#entire page is linked to Non-functional requirement #1 - GUI responds in 2 seconds or less
+
+# entire file is linked to External Interface Requirements #1 - product must be encapsulated into a Graphical User
+# Interface
+# entire file is linked to Non-functional requirement #1 - GUI responds in 2 seconds or less
 def launch_gui(cnf):
     root = tk.Tk()
     app = SpaceApp(master=root, app_config=cnf)
@@ -56,7 +58,7 @@ def launch_gui(cnf):
 class SpaceApp(tk.Frame):
     """A tkinter GUI-based app for SpACE."""
 
-    #linked to functional requirement #13 - pre-populate parameters for k-means and DBSCAN with default values
+    # linked to functional requirement #13 - pre-populate parameters for k-means and DBSCAN with default values
     def __init__(self, master, app_config={}):
         """Set up the root window and instantiate the main frame."""
         super().__init__(master)
@@ -290,8 +292,8 @@ class SpaceApp(tk.Frame):
         self.log("-- End input validation --")
         return True
 
-    #linked to functional requirement #5 - accept input from data files
-    #linked to functional requirement #10 - accept subset of data folders
+    # linked to functional requirement #5 - accept input from data files
+    # linked to functional requirement #10 - accept subset of data folders
     def _on_browse(self):
         dir = tkfd.askdirectory(initialdir=self._Var_folder.get())
         # askdirectory returns '' if the user clicked cancel
@@ -303,9 +305,9 @@ class SpaceApp(tk.Frame):
     def _on_clear_log(self):
         self._Text_log.delete(1.0, tk.END)
 
-    #linked to functional requirement #6 - normalize data
-    #linked to functional requirement #3 - preprocess data files
-    #linked to functional requirement #7 - PCA
+    # linked to functional requirement #6 - normalize data
+    # linked to functional requirement #3 - preprocess data files
+    # linked to functional requirement #7 - PCA
     def _do_import_data(self):
         # reset everything, in case we are running multiple times
         self._data_objs = []
@@ -384,7 +386,7 @@ class SpaceApp(tk.Frame):
 
         self.log("-- End data import and pre-processing --")
 
-    #linked to functional requirement #1 - kmeans clustering algorithm
+    # linked to functional requirement #1 - kmeans clustering algorithm
     def _do_kmeans_clustering(self):
         self.log("-- Begin K-means clustering --")
         self.log("Clustering...")
@@ -392,7 +394,7 @@ class SpaceApp(tk.Frame):
         self.log("-- End K-means clustering --")
         self._kmeans_viz_panel.enable_widgets()
 
-    #linked to functional requirement #2 - dbscan clustering algorithm
+    # linked to functional requirement #2 - dbscan clustering algorithm
     def _do_dbscan_clustering(self):
         # epsilon: self._Var_eps.get()
         # minpts: self._Var_minpts.get()
@@ -402,10 +404,10 @@ class SpaceApp(tk.Frame):
         self.log("-- End DBSCAN clustering --")
         self._dbscan_viz_panel.enable_widgets()
 
-    #linked to functional requirement #8 - save data after modification
-    #linked to functional requirement #9 - save clustered data
-    #linked to non-functional requirement #4 - save as .csv files
-    #linked to non-functional requirement #5 - save files in a tree format
+    # linked to functional requirement #8 - save data after modification
+    # linked to functional requirement #9 - save clustered data
+    # linked to non-functional requirement #4 - save as .csv files
+    # linked to non-functional requirement #5 - save files in a tree format
     def _do_save_cluster_composition(self):
         """This function is the button handler for the Save button in the save dialog box."""
         self.log("user: pressed Save button in save dialog")
@@ -485,8 +487,8 @@ class SpaceApp(tk.Frame):
         self.master.quit()
         self.master.destroy()
 
-    #linked to non-functional requirement #2 - perform 2D and 3D visualization in 5 minutes or less
-    #linked to functional requirement #11 - visualize clustered data
+    # linked to non-functional requirement #2 - perform 2D and 3D visualization in 5 minutes or less
+    # linked to functional requirement #11 - visualize clustered data
     def _on_generate_plot_kmeans(self):
         self.log("user: pressed Generate Plot button (K-means)")
         plot_dataset = None
@@ -513,8 +515,8 @@ class SpaceApp(tk.Frame):
         self._kmeans_viz_panel.display_plot(canvas)
         self.log("-- End K-means plotting --")
 
-    #linked to non-functional requirement #2 - perform 2D and 3D visualization in 5 minutes or less
-    #linked to functional requirement #11 - visualize clustered data
+    # linked to non-functional requirement #2 - perform 2D and 3D visualization in 5 minutes or less
+    # linked to functional requirement #11 - visualize clustered data
     def _on_generate_plot_dbscan(self):
         self.log("user: pressed Generate Plot button (dbscan)")
         plot_dataset = None
@@ -541,7 +543,8 @@ class SpaceApp(tk.Frame):
         self._dbscan_viz_panel.display_plot(canvas)
         self.log("-- End DBSCAN plotting --")
 
-#linked to functional requirement #11 - visualize clustered data
+
+# linked to functional requirement #11 - visualize clustered data
 class VisualizationPanel(object):
     """A panel with tkinter widgets for the K-means and DBSCAN
     visualization plots."""
@@ -619,7 +622,8 @@ class VisualizationPanel(object):
 
         self._Frame_canvas.lower()  # hide 'canvas' frame
 
-#linked to functional requirement #9 - save clustered data
+
+# linked to functional requirement #9 - save clustered data
 class SaveDialog(tk.Toplevel):
     """A modal dialog for saving cluster composition."""
 

@@ -41,7 +41,8 @@
 import os.path
 import glob
 
-#linked to functional requirement #5 - accepting input from files
+
+# linked to functional requirement #5 - accepting input from files
 def path_exists(folder):
     """
     Checks to see if a path exists.
@@ -49,9 +50,10 @@ def path_exists(folder):
     """
     return os.path.exists(folder)
 
-#linked to functional requirement #5 - accepting input from files
-#linked to functional requirement #10 - accept subset of data files in folders
-#linked to non-functional requirement #3 - accept up to 2000 files
+
+# linked to functional requirement #5 - accepting input from files
+# linked to functional requirement #10 - accept subset of data files in folders
+# linked to non-functional requirement #3 - accept up to 2000 files
 def collect_all_filenames(folder):
     """
     Finds all files in a given folder and all of its
@@ -60,9 +62,10 @@ def collect_all_filenames(folder):
     """
     return glob.glob(folder + '/**', recursive=True)
 
-#linked to functional requirement #4 - filtering input from files
-#linked to functional requirement #5 - accepting input from files
-#linked to non-functional requirement #3 - accept up to 2000 files
+
+# linked to functional requirement #4 - filtering input from files
+# linked to functional requirement #5 - accepting input from files
+# linked to non-functional requirement #3 - accept up to 2000 files
 def filter_filenames(file_list):
     """
     Iterates through a list of files and retains only
@@ -75,10 +78,11 @@ def filter_filenames(file_list):
                                         and '.txt' in filename,
                        file_list))
 
-#linked to functional requirement #8 - saving data after modifications
-#linked to functional requirement #9 - saving clustered data 
-#linked to non-functional requirement #4 - save as .csv
-#linked to non-functional requirement #5 - save files in a tree format
+
+# linked to functional requirement #8 - saving data after modifications
+# linked to functional requirement #9 - saving clustered data
+# linked to non-functional requirement #4 - save as .csv
+# linked to non-functional requirement #5 - save files in a tree format
 def save_data_files(folder, suffix, data_objects):
     """
     Accepts a specified filepath, a suffix to add to it,
@@ -94,10 +98,11 @@ def save_data_files(folder, suffix, data_objects):
         save_string = os.path.join(dir_name, file_name)
         dobj.pairs.to_csv(save_string)  # other arguments can be supplied, check pandas docs
 
-#linked to functional requirement #8 - saving data after modifications
-#linked to functional requirement #9 - saving clustered data 
-#linked to non-functional requirement #4 - save as .csv
-#linked to non-functional requirement #5 - save files in a tree format
+
+# linked to functional requirement #8 - saving data after modifications
+# linked to functional requirement #9 - saving clustered data
+# linked to non-functional requirement #4 - save as .csv
+# linked to non-functional requirement #5 - save files in a tree format
 def save_block_data(folder, suffix, dataset):
     """
     Accepts a specified filepath, a suffix to add to it,
@@ -117,10 +122,11 @@ def save_block_data(folder, suffix, dataset):
     save_string = os.path.join(dir_name, "data_block.csv")
     dataset.to_csv(save_string)  # other arguments can be supplied, check pandas docs
 
-#linked to functional requirement #8 - saving data after modifications
-#linked to functional requirement #9 - saving clustered data 
-#linked to non-functional requirement #4 - save as .csv
-#linked to non-functional requirement #5 - save files in a tree format
+
+# linked to functional requirement #8 - saving data after modifications
+# linked to functional requirement #9 - saving clustered data
+# linked to non-functional requirement #4 - save as .csv
+# linked to non-functional requirement #5 - save files in a tree format
 def save_composition(folder, clustering_type, file_suffix, c):
     """
     Accepts a specified filepath, a clustering type,

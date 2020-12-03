@@ -39,7 +39,7 @@
 from os import getcwd
 import space_gui as gui
 
-##linked to functional requirement #13 - pre-populating default values for kmeans and DBSCAN clustering algorithms
+# linked to functional requirement #13 - pre-populating default values for kmeans and DBSCAN clustering algorithms
 CONFIG = {
     "APP_NAME": "SpACE",
     "APP_VERSION": "1.0.0rc2",

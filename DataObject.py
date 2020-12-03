@@ -37,7 +37,7 @@
 # descriptive_data and xy_pairs are pandas DataFrames
 # filepath is the filepath in form ("ecostress_data_files\\datafile.txt")
 
-#linked to functional requirement 3 - preprocessing of data files into data objects
+# linked to functional requirement 3 - preprocessing of data files into data objects
 class DataObject:
     def __init__(self, descriptive_data, xy_pairs, filepath):
         self.descriptive = descriptive_data
