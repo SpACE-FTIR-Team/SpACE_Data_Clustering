@@ -42,7 +42,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-
+#linked to functional requirement #1 - kmeans clustering algorithm
 def do_Kmeans(num_clusters, dataset):
     """
     This function accepts an integer number of clusters and
@@ -54,7 +54,8 @@ def do_Kmeans(num_clusters, dataset):
     kmeans = KMeans(n_clusters=num_clusters).fit(dataset)
     return kmeans
 
-
+#linked to functional requirement #1 - kmeans clustering algorithm
+#linked to functional requirement #12 - calculate cluster composition
 def calculate_composition(km, num_clusters, data_objects, sort_category):
     """
     This function accepts a kmeans object, a number of clusters,
@@ -81,7 +82,9 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
 
     return comp
 
-
+#linked to functional requirement #11 - visualize clustered data
+#linked to non-functional requirement #2 - perform visualization in under 5 minutes
+#linked to non-functional requirement #6 - support up to 100 different colors for visualization
 def plot2D(dataset, km, embedded=False, master=None):
     """
     This function takes a combined pandas dataframe and a kmeans object.
@@ -123,7 +126,9 @@ def plot2D(dataset, km, embedded=False, master=None):
         plt.show()
         return None
 
-
+#linked to functional requirement #11 - visualize clustered data
+#linked to non-functional requirement #2 - perform visualization in under 5 minutes
+#linked to non-functional requirement #6 - support up to 100 different colors for visualization
 def plot3D(dataset, km, embedded=False, master=None):
     """
     This function takes a combined pandas dataframe and a kmeans object.

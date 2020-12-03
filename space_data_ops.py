@@ -50,7 +50,7 @@ from scipy.stats import zscore
 # columns include overflow for extra ":" characters found in the description field
 columns = ['descriptor', 'value', 'overflow', 'overflow2', 'overflow3']
 
-
+#linked to functional requirement #3 - preprocessing of data files
 def file_to_data_object(file_list):
     """
     Function: File to DataObject
@@ -140,7 +140,7 @@ def file_to_data_object(file_list):
 
     return DataObjects, ""
 
-
+#linked to functional requirement #6 - data normalization
 def reindex(data_objects):
     """
     This function takes a list of data objects, iterates over them,
@@ -160,7 +160,7 @@ def reindex(data_objects):
         dataframe.sort_index(inplace=True)
     return None
 
-
+#linked to functional requirement #6 - data normalization
 def find_common_range(data_objects):
     """
     This function takes a list of data objects, iterates over them,
@@ -183,7 +183,7 @@ def find_common_range(data_objects):
     else:
         return None, None
 
-
+#linked to functional requirement #6 - data normalization
 def truncate(data_objects, min, max):
     """
     This function takes a list of data objects, iterates over them,
@@ -201,7 +201,7 @@ def truncate(data_objects, min, max):
         dobj.pairs = truncated_dataframe
     return None
 
-
+#linked to functional requirement #6 - data normalization
 def find_max_res(data_objects):
     """
     This function takes a list of data objects, iterates over them,
@@ -217,7 +217,7 @@ def find_max_res(data_objects):
             max_pts_index = i
     return max_pts_index
 
-
+#linked to functional requirement #6 - data normalization
 def align(data_objects, align_to):
     """
     This function takes a list of data objects, iterates over them,
@@ -234,7 +234,7 @@ def align(data_objects, align_to):
         (_, dobj.pairs) = alignment_pairs.align(dobj.pairs, join="left", axis=0)
     return None
 
-
+#linked to functional requirement #6 - data normalization
 def combine(data_objects):
     """
     This function takes a list of data objects all sharing a common
@@ -247,7 +247,8 @@ def combine(data_objects):
     data_block = pd.concat([dobj.pairs.transpose() for dobj in data_objects], ignore_index=True)
     return data_block
 
-
+#linked to functional requirement #6 - data normalization
+#linked to functional requirement #7 - PCA
 def pca(dataObjectArray, dimensions):
     """
     This function takes a data block (combined dataframe)
@@ -268,7 +269,7 @@ def pca(dataObjectArray, dimensions):
         except np.linalg.LinAlgError:
             continue
 
-
+#linked to functional requirement #6 - data normalization
 def linear_normalize(data_block):
     """
     This function takes a data block (combined dataframe)
@@ -283,13 +284,13 @@ def linear_normalize(data_block):
         i.pairs[n] = normalized_pairs
     return data_block
 
-
+#linked to functional requirement #6 - data normalization
 def no_normalize(data_block):
     """This function is a no-op; it does no normalization.
     Null design pattern in action!"""
     return data_block
 
-
+#linked to functional requirement #6 - data normalization
 def zScore_normalize(data_block):
     """
     This function takes a data block (combined dataframe)

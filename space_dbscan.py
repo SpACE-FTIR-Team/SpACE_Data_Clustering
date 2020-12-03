@@ -45,7 +45,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import DBSCAN
 
-
+#linked to functional requirement #2 - DBSCAN clustering algorithm
 # Compute DBSCAN
 def do_dbscan(epsilon, minimum, dataset):
     """
@@ -56,7 +56,8 @@ def do_dbscan(epsilon, minimum, dataset):
     db = DBSCAN(eps=epsilon, min_samples=minimum).fit(dataset)
     return db
 
-
+#linked to functional requirement #2 - DBSCAN clustering algorithm
+#linked to functional requirement #12 - calculate cluster of composition
 # Compute cluster composition
 def db_comp(db, data_objects, sort_category):
     """
@@ -83,7 +84,9 @@ def db_comp(db, data_objects, sort_category):
 
     return comp
 
-
+#linked to functional requirement #11 - visualize clustered data
+#linked to non-functional requirement #2 - perform visualization in under 5 minutes
+#linked to non-functional requirement #6 - support up to 100 different colors for visualization
 def plot2D(dataset, db, embedded=False, master=None):
     """
     This function takes a combined pandas dataframe and a dbscan object.
@@ -137,7 +140,9 @@ def plot2D(dataset, db, embedded=False, master=None):
         plt.show()
         return None
 
-
+#linked to functional requirement #11 - visualize clustered data
+#linked to non-functional requirement #2 - perform visualization in under 5 minutes
+#linked to non-functional requirement #6 - support up to 100 different colors for visualization
 def plot3D(dataset, db, embedded=False, master=None):
     """
     This function takes a combined pandas dataframe and a dbscan object.
