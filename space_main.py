@@ -42,7 +42,7 @@ import space_gui as gui
 # linked to functional requirement #13 - pre-populating default values for kmeans and DBSCAN clustering algorithms
 CONFIG = {
     "APP_NAME": "SpACE",
-    "APP_VERSION": "1.0.0rc2",
+    "APP_VERSION": "1.0.0",
     "PCA_BY_DEFAULT": True,
     "DEFAULT_PCA_DIMENSIONS": 8,
     "SAVE_AFTER_DATA_MODIFICATION_BY_DEFAULT": False,
