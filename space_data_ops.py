@@ -278,40 +278,52 @@ def pca(dataObjectArray, dimensions):
             continue
 
 
+<<<<<<< Updated upstream
 # linked to functional requirement #6 - data normalization
 def linear_normalize(data_block):
+=======
+def linear_normalize(data_objects):
+>>>>>>> Stashed changes
     """
-    This function takes a data block (combined dataframe)
+    This function takes a list of data objects
     and normalizes data from range 0 to 1.
-    Returns the normalized data block.
+    Returns the normalized data objects
     """
     scaler = preprocessing.MinMaxScaler()
-    for i in data_block:
+    for i in data_objects:
         normalized_pairs = scaler.fit_transform(i.pairs)
         n = i.pairs.columns[0]
         i.pairs.drop(n, axis=1, inplace=True)
         i.pairs[n] = normalized_pairs
-    return data_block
+    return data_objects
 
 
+<<<<<<< Updated upstream
 # linked to functional requirement #6 - data normalization
 def no_normalize(data_block):
+=======
+def no_normalize(data_objects):
+>>>>>>> Stashed changes
     """This function is a no-op; it does no normalization.
     Null design pattern in action!"""
-    return data_block
+    return data_objects
 
 
+<<<<<<< Updated upstream
 # linked to functional requirement #6 - data normalization
 def zScore_normalize(data_block):
+=======
+def zScore_normalize(data_objects):
+>>>>>>> Stashed changes
     """
-    This function takes a data block (combined dataframe)
+    This function takes a list of data objects
     and rescales data based on how many standard deviations
     the point is away from the mean of the dataset.
-    Returns the modified data block.
+    Returns the modified data objects
     """
-    for df in data_block:
+    for df in data_objects:
         df.pairs = df.pairs.apply(zscore)
-    return data_block
+    return data_objects
 
 
 # Normalization types that are implemented
