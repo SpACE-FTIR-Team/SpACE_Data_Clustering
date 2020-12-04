@@ -278,12 +278,7 @@ def pca(dataObjectArray, dimensions):
             continue
 
 
-<<<<<<< Updated upstream
-# linked to functional requirement #6 - data normalization
-def linear_normalize(data_block):
-=======
 def linear_normalize(data_objects):
->>>>>>> Stashed changes
     """
     This function takes a list of data objects
     and normalizes data from range 0 to 1.
@@ -298,23 +293,13 @@ def linear_normalize(data_objects):
     return data_objects
 
 
-<<<<<<< Updated upstream
-# linked to functional requirement #6 - data normalization
-def no_normalize(data_block):
-=======
 def no_normalize(data_objects):
->>>>>>> Stashed changes
     """This function is a no-op; it does no normalization.
     Null design pattern in action!"""
     return data_objects
 
 
-<<<<<<< Updated upstream
-# linked to functional requirement #6 - data normalization
-def zScore_normalize(data_block):
-=======
 def zScore_normalize(data_objects):
->>>>>>> Stashed changes
     """
     This function takes a list of data objects
     and rescales data based on how many standard deviations
