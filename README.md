@@ -10,5 +10,3 @@ spectra for thousands of substances measured in a variety of different laborator
 will need to be preprocessed and possibly will need to be normalized prior to clustering. The
 option to select subsets of the data and get results from the intermediary phases of analysis
 may also be included.
-
-(**insert starting point here**)
