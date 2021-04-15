@@ -67,15 +67,17 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
     Composition dataframe is of shape clusters x categories.
     Each row is a cluster, and each column is a category.
     """
+
     comp = pd.DataFrame(index=range(num_clusters))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
         # access the value where descriptor == sort_category
-        if sort_category in data_objects[i].descriptive.descriptor.values:
-            category = data_objects[i].descriptive. \
-                loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
-        else:
-            category = "None specified"
+        split_file_name = data_objects[i].filename[0].split(".")
+        category = split_file_name[0]
+        if sort_category > 1:
+            category = category + "." + split_file_name[1]
+            if sort_category > 2:
+                category = category + "." + split_file_name[2]
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[km.labels_[i], category] = 1

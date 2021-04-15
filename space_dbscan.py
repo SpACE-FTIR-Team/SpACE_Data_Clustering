@@ -73,11 +73,12 @@ def db_comp(db, data_objects, sort_category):
     comp = pd.DataFrame(index=range(len(set(labels))))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
-        if sort_category in data_objects[i].descriptive.descriptor.values:
-            category = data_objects[i].descriptive. \
-                loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
-        else:
-            category = "None specified"
+        split_file_name = data_objects[i].filename[0].split(".")
+        category = split_file_name[0]
+        if sort_category > 1:
+            category = category + "." + split_file_name[1]
+            if sort_category > 2:
+                category = category + "." + split_file_name[2]
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[labels[i], category] = 1
