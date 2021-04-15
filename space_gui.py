@@ -108,6 +108,13 @@ class SpaceApp(tk.Frame):
         self._Button_browse.grid(row=1, column=1, padx=(5, 0))
         self._Frame_input.grid(row=0, padx=5, pady=(5, 0), sticky=tk.W)
 
+        # -- align sub-frame --
+        self._Frame_align = ttk.Frame(self._LabelFrame_data)
+        self._Var_align = tk.BooleanVar()
+        self._Checkbutton_align = ttk.Checkbutton(self._Frame_align, text= "Align Data", variable=self._Var_align)
+        self._Checkbutton_align.grid(row=0,sticky=tk.W)
+        self._Frame_align.grid(row=1,padx=5,pady=(10,0),sticky=tk.W)
+
         # -- normalize sub-frame --
         Frame_normalize = ttk.Frame(self._LabelFrame_data)
         Label_normalize = ttk.Label(Frame_normalize, text="Normalization:")
@@ -118,7 +125,7 @@ class SpaceApp(tk.Frame):
         Combobox_normalize.current(0)
         Label_normalize.grid(row=0, column=0, sticky=tk.W)
         Combobox_normalize.grid(row=0, column=1, padx=(5, 0), sticky=tk.W)
-        Frame_normalize.grid(row=1, padx=5, pady=(10, 0), sticky=tk.W)
+        Frame_normalize.grid(row=2, padx=5, pady=(10, 0), sticky=tk.W)
 
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
@@ -130,13 +137,13 @@ class SpaceApp(tk.Frame):
         self._Checkbutton_pca.grid(row=0, sticky=tk.W)
         self._Label_pca_text.grid(row=1, column=0, sticky=tk.W)
         self._Entry_pca.grid(row=1, column=1, padx=5)
-        self._Frame_pca.grid(row=2, padx=5, pady=(10, 0), sticky=tk.W)
+        self._Frame_pca.grid(row=3, padx=5, pady=(10, 0), sticky=tk.W)
 
         # -- save after processing steps --
         self._Var_save_after_modify = tk.BooleanVar()
         Checkbutton_save_after_modify = ttk.Checkbutton(self._LabelFrame_data, text="Save after each data modification",
                                                         variable=self._Var_save_after_modify)
-        Checkbutton_save_after_modify.grid(row=3, padx=5, pady=10, sticky=tk.W)
+        Checkbutton_save_after_modify.grid(row=4, padx=5, pady=10, sticky=tk.W)
 
         # - DATA widgets grid -
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
