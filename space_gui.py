@@ -111,7 +111,7 @@ class SpaceApp(tk.Frame):
         # -- align sub-frame --
         self._Frame_align = ttk.Frame(self._LabelFrame_data)
         self._Var_align = tk.BooleanVar()
-        self._Checkbutton_align = ttk.Checkbutton(self._Frame_align, text= "Align Data", variable=self._Var_align)
+        self._Checkbutton_align = ttk.Checkbutton(self._Frame_align, text= "Use aligned data", variable=self._Var_align)
         self._Checkbutton_align.grid(row=0,sticky=tk.W)
         self._Frame_align.grid(row=1,padx=5,pady=(10,0),sticky=tk.W)
 
@@ -333,40 +333,49 @@ class SpaceApp(tk.Frame):
             self._quick_message_box("No files found:\n%s" % self._Var_folder.get())
             return
         # parse
-        self.log("Loading into data objects...")
-        self._data_objs, return_msg = dataops.file_to_data_object(filtered_file_list)
-        if not self._data_objs:
-            self.log(return_msg)
-            self._quick_message_box(return_msg)
-            return
-        self.log("Loaded %s data objects" % len(self._data_objs))
-        # re-index the pairs dataframes
-        self.log("Re-indexing pairs dataframes...")
-        dataops.reindex(self._data_objs)
-        # range check
-        self.log("Calculating common range...")
-        min, max = dataops.find_common_range(self._data_objs)
-        if (min, max) == (None, None):
-            # lack of a common range across files is a fatal error
-            # log to console and pop up a messagebox
-            self.log("No range in common!")
-            self._quick_message_box("No range in common!")
-            self._data_objs = []
-            return
+        if not self._Var_align:
+            #This means we are working with the raw Ecostress files,
+            #if false, we are working with already aligned files, and we can skip this step
+            self.log("Loading into data objects...")
+            self._data_objs, return_msg = dataops.file_to_data_object(filtered_file_list)
+            if not self._data_objs:
+                self.log(return_msg)
+                self._quick_message_box(return_msg)
+                return
+            self.log("Loaded %s data objects" % len(self._data_objs))
+            # re-index the pairs dataframes
+            self.log("Re-indexing pairs dataframes...")
+            dataops.reindex(self._data_objs)
+            # range check
+            self.log("Calculating common range...")
+            min, max = dataops.find_common_range(self._data_objs)
+            if (min, max) == (None, None):
+                # lack of a common range across files is a fatal error
+                # log to console and pop up a messagebox
+                self.log("No range in common!")
+                self._quick_message_box("No range in common!")
+                self._data_objs = []
+                return
+            else:
+                self.log("All files have this wavelength range in common: %s to %s" % (min, max))
+            # truncate to common range
+            self.log("Truncating data to range %s to %s..." % (min, max))
+            dataops.truncate(self._data_objs, min, max)
+            # finds the index of the file with the highest resolution
+            self.log("Finding highest resolution file...")
+            max_res_index = dataops.find_max_res(self._data_objs)
+            # align the pairs dataframes to dataframe with highest resolution
+            self.log("Aligning the data...")
+            dataops.align(self._data_objs, max_res_index)
+            if self._Var_save_after_modify.get():
+                self.log("Saving aligned data...")
+                fileops.save_data_files(self._Var_folder.get(), "aligned", self._data_objs)
         else:
-            self.log("All files have this wavelength range in common: %s to %s" % (min, max))
-        # truncate to common range
-        self.log("Truncating data to range %s to %s..." % (min, max))
-        dataops.truncate(self._data_objs, min, max)
-        # finds the index of the file with the highest resolution
-        self.log("Finding highest resolution file...")
-        max_res_index = dataops.find_max_res(self._data_objs)
-        # align the pairs dataframes to dataframe with highest resolution
-        self.log("Aligning the data...")
-        dataops.align(self._data_objs, max_res_index)
-        if self._Var_save_after_modify.get():
-            self.log("Saving aligned data...")
-            fileops.save_data_files(self._Var_folder.get(), "aligned", self._data_objs)
+            #Working with already aligned files
+            self.log("Loading aligned files into data objects...")
+            self._data_objs = dataops.aligned_file_to_data_object(filtered_file_list)
+            self.log("Loaded %s data objects" % len(self._data_objs))
+
         # Normalization
         self.log("Normalizing data with method: %s" % self._Var_normalize.get())
         self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
