@@ -72,7 +72,7 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
         # access the value where descriptor == sort_category
-        split_file_name = data_objects[i].filename[0].split(".")
+        split_file_name = data_objects[i].filename.split(".")
         category = split_file_name[0]
         if sort_category > 1:
             category = category + "." + split_file_name[1]

@@ -73,7 +73,7 @@ def db_comp(db, data_objects, sort_category):
     comp = pd.DataFrame(index=range(len(set(labels))))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
-        split_file_name = data_objects[i].filename[0].split(".")
+        split_file_name = data_objects[i].filename.split(".")
         category = split_file_name[0]
         if sort_category > 1:
             category = category + "." + split_file_name[1]
