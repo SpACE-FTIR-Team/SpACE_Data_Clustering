@@ -256,6 +256,21 @@ class SpaceApp(tk.Frame):
         during program execution."""
         self._Text_log.insert(tk.END, "%s\n" % text)
         self.master.update()
+    
+    def km_pick_handler(self,event):
+        """Handles any specific point being selected"""
+        for ind in event.ind:
+            name = self._data_objs[ind].filename
+            cluster_label = self._k_clusters.labels_[ind]
+            centroid = self._k_clusters.cluster_centers_[cluster_label]
+            self._quick_message_box(str(ind) + " " + name + "\nCluster no:" + str(cluster_label) + "\nCentroid:" + str(centroid))
+
+    def db_pick_handler(self,event):
+        """Handles any specific point being selected"""
+        for ind in event.ind:
+            name = self._data_objs[ind].filename
+            cluster_label = self._db_clusters.labels_[ind]
+            self._quick_message_box(str(ind) + " " + name + "\nCluster no:" + str(cluster_label))
 
     def _quick_message_box(self, text):
         """A quick and dirty messagebox for showing simple output for debugging."""
@@ -528,6 +543,7 @@ class SpaceApp(tk.Frame):
         self.log("Plotting...")
         canvas = plot(plot_dataset, self._k_clusters, embedded=True,
                       master=self._kmeans_viz_panel.get_canvas_frame_handle())
+        canvas.mpl_connect('pick_event', self.km_pick_handler)
         self._kmeans_viz_panel.display_plot(canvas)
         self.log("-- End K-means plotting --")
 
@@ -556,6 +572,7 @@ class SpaceApp(tk.Frame):
         self.log("Plotting...")
         canvas = plot(plot_dataset, self._db_clusters, embedded=True,
                       master=self._dbscan_viz_panel.get_canvas_frame_handle())
+        canvas.mpl_connect('pick_event', self.db_pick_handler)
         self._dbscan_viz_panel.display_plot(canvas)
         self.log("-- End DBSCAN plotting --")
 
@@ -605,6 +622,7 @@ class VisualizationPanel(object):
     def get_dimensions(self):
         """Return the number of dimensions selected by the combobox."""
         return 2 if self._Var_dimensions.get() == '2D' else 3
+    
 
     def disable_widgets(self):
         """Disable the dimensions combobox and Generate Plot button

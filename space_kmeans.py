@@ -114,7 +114,7 @@ def plot2D(dataset, km, embedded=False, master=None):
     for i in km.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
-    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=km.labels_, cmap="viridis")
+    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=km.labels_, cmap="viridis", picker=True)
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
 
     handles, labels = scatter.legend_elements(num=(km.n_clusters if km.n_clusters % 2 == 0 else
@@ -161,7 +161,7 @@ def plot3D(dataset, km, embedded=False, master=None):
         cx.append(i[0])
         cy.append(i[1])
         cz.append(i[2])
-    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=km.labels_, cmap="viridis")
+    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=km.labels_, cmap="viridis", picker=True)
     axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="black", s=50)
 
     handles, labels = scatter.legend_elements(num=(km.n_clusters if km.n_clusters % 2 == 0 else

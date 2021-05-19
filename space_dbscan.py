@@ -130,7 +130,7 @@ def plot2D(dataset, db, embedded=False, master=None):
         new_colormap = ListedColormap(colormap)
         n_clusters = len(set(plot_labels))
 
-    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
+    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap, picker=True)
 
     handles, labels = scatter.legend_elements(num=n_clusters if n_clusters > 0 else "auto")
     axes.legend(handles, labels, loc='upper left', bbox_to_anchor=(1, 1),
@@ -187,7 +187,7 @@ def plot3D(dataset, db, embedded=False, master=None):
         new_colormap = ListedColormap(colormap)
         n_clusters = len(set(plot_labels))
 
-    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
+    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap,picker=True)
 
     handles, labels = scatter.legend_elements(num=n_clusters if n_clusters > 0 else "auto")
     axes.legend(handles, labels, loc='upper left', bbox_to_anchor=(1.1, 1),

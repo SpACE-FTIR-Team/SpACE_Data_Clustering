@@ -43,7 +43,7 @@ import space_gui as gui
 CONFIG = {
     "APP_NAME": "SpACE",
     "APP_VERSION": "1.0.0",
-    "PCA_BY_DEFAULT": True,
+    "PCA_BY_DEFAULT": False,
     "DEFAULT_PCA_DIMENSIONS": 8,
     "SAVE_AFTER_DATA_MODIFICATION_BY_DEFAULT": False,
     "DEFAULT_KMEANS_K": 8,
