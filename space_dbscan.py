@@ -73,11 +73,12 @@ def db_comp(db, data_objects, sort_category):
     comp = pd.DataFrame(index=range(len(set(labels))))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
-        if sort_category in data_objects[i].descriptive.descriptor.values:
-            category = data_objects[i].descriptive. \
-                loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
-        else:
-            category = "None specified"
+        split_file_name = data_objects[i].filename.split(".")
+        category = split_file_name[0]
+        if sort_category > 1:
+            category = category + "." + split_file_name[1]
+            if sort_category > 2:
+                category = category + "." + split_file_name[2]
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[labels[i], category] = 1
@@ -85,6 +86,22 @@ def db_comp(db, data_objects, sort_category):
             comp.at[labels[i], category] += 1
 
     return comp
+
+def do_comprehensive(cluster, dobjs):
+    col_names = ["Filename","Cluster No.","Type","Type.Class","Type.Class.Subclass"]
+    df = pd.DataFrame(columns=col_names)
+    for i, dobj in enumerate(dobjs):
+        new_row = [dobj.filename, cluster.labels_[i]]
+        split_name = dobj.filename.split(".")
+        type = split_name[0]
+        tc = type + "." + split_name[1]
+        tcsc = tc + "." + split_name[2]
+        new_row.append(type)
+        new_row.append(tc)
+        new_row.append(tcsc)
+        zipped_row = dict(zip(col_names, new_row))
+        df = df.append(zipped_row,ignore_index=True)
+    return df
 
 
 # linked to functional requirement #11 - visualize clustered data
@@ -129,7 +146,7 @@ def plot2D(dataset, db, embedded=False, master=None):
         new_colormap = ListedColormap(colormap)
         n_clusters = len(set(plot_labels))
 
-    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap)
+    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=plot_labels, cmap=new_colormap, picker=True)
 
     handles, labels = scatter.legend_elements(num=n_clusters if n_clusters > 0 else "auto")
     axes.legend(handles, labels, loc='upper left', bbox_to_anchor=(1, 1),
@@ -186,7 +203,7 @@ def plot3D(dataset, db, embedded=False, master=None):
         new_colormap = ListedColormap(colormap)
         n_clusters = len(set(plot_labels))
 
-    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap)
+    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=plot_labels, cmap=new_colormap,picker=True)
 
     handles, labels = scatter.legend_elements(num=n_clusters if n_clusters > 0 else "auto")
     axes.legend(handles, labels, loc='upper left', bbox_to_anchor=(1.1, 1),

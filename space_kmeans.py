@@ -67,15 +67,17 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
     Composition dataframe is of shape clusters x categories.
     Each row is a cluster, and each column is a category.
     """
+
     comp = pd.DataFrame(index=range(num_clusters))
     comp.index.name = "Cluster No."
     for i in range(len(data_objects)):
         # access the value where descriptor == sort_category
-        if sort_category in data_objects[i].descriptive.descriptor.values:
-            category = data_objects[i].descriptive. \
-                loc[data_objects[i].descriptive['descriptor'] == sort_category, 'value'].iloc(0)[0].upper()
-        else:
-            category = "None specified"
+        split_file_name = data_objects[i].filename.split(".")
+        category = split_file_name[0]
+        if sort_category > 1:
+            category = category + "." + split_file_name[1]
+            if sort_category > 2:
+                category = category + "." + split_file_name[2]
         if not (category in comp.columns):
             comp.insert(0, category, 0)
             comp.at[km.labels_[i], category] = 1
@@ -83,6 +85,23 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
             comp.at[km.labels_[i], category] += 1
 
     return comp
+
+def do_comprehensive(cluster, dobjs):
+    col_names = ["Filename","Cluster No.","Type","Type.Class","Type.Class.Subclass","Additional Information"]
+    df = pd.DataFrame(columns=col_names)
+    for i, dobj in enumerate(dobjs):
+        new_row = [dobj.filename, cluster.labels_[i]]
+        split_name = dobj.filename.split(".")
+        type = split_name[0]
+        tc = type + "." + split_name[1]
+        tcsc = tc + "." + split_name[2]
+        new_row.append(type)
+        new_row.append(tc)
+        new_row.append(tcsc)
+        new_row.append(cluster.cluster_centers_[i])
+        zipped_row = dict(zip(col_names, new_row))
+        df = df.append(zipped_row,ignore_index=True)
+    return df
 
 
 # linked to functional requirement #11 - visualize clustered data
@@ -112,7 +131,7 @@ def plot2D(dataset, km, embedded=False, master=None):
     for i in km.cluster_centers_:
         cx.append(i[0])
         cy.append(i[1])
-    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=km.labels_, cmap="viridis")
+    scatter = axes.scatter(x=dataset[0], y=dataset[1], c=km.labels_, cmap="viridis", picker=True)
     axes.scatter(x=cx, y=cy, marker="x", color="black", s=50)
 
     handles, labels = scatter.legend_elements(num=(km.n_clusters if km.n_clusters % 2 == 0 else
@@ -159,7 +178,7 @@ def plot3D(dataset, km, embedded=False, master=None):
         cx.append(i[0])
         cy.append(i[1])
         cz.append(i[2])
-    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=km.labels_, cmap="viridis")
+    scatter = axes.scatter3D(xs=dataset[0], ys=dataset[1], zs=dataset[2], c=km.labels_, cmap="viridis", picker=True)
     axes.scatter3D(xs=cx, ys=cy, zs=cz, marker="x", color="black", s=50)
 
     handles, labels = scatter.legend_elements(num=(km.n_clusters if km.n_clusters % 2 == 0 else

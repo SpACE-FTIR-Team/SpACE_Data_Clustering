@@ -39,6 +39,8 @@ import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 from time import sleep
 import os.path
+
+from pandas.core.frame import DataFrame
 import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
@@ -108,6 +110,13 @@ class SpaceApp(tk.Frame):
         self._Button_browse.grid(row=1, column=1, padx=(5, 0))
         self._Frame_input.grid(row=0, padx=5, pady=(5, 0), sticky=tk.W)
 
+        # -- align sub-frame --
+        self._Frame_align = ttk.Frame(self._LabelFrame_data)
+        self._Var_align = tk.BooleanVar()
+        self._Checkbutton_align = ttk.Checkbutton(self._Frame_align, text= "Use aligned data", variable=self._Var_align)
+        self._Checkbutton_align.grid(row=0,sticky=tk.W)
+        self._Frame_align.grid(row=1,padx=5,pady=(10,0),sticky=tk.W)
+
         # -- normalize sub-frame --
         Frame_normalize = ttk.Frame(self._LabelFrame_data)
         Label_normalize = ttk.Label(Frame_normalize, text="Normalization:")
@@ -118,7 +127,7 @@ class SpaceApp(tk.Frame):
         Combobox_normalize.current(0)
         Label_normalize.grid(row=0, column=0, sticky=tk.W)
         Combobox_normalize.grid(row=0, column=1, padx=(5, 0), sticky=tk.W)
-        Frame_normalize.grid(row=1, padx=5, pady=(10, 0), sticky=tk.W)
+        Frame_normalize.grid(row=2, padx=5, pady=(10, 0), sticky=tk.W)
 
         # -- pca sub-frame --
         self._Frame_pca = ttk.Frame(self._LabelFrame_data)
@@ -130,13 +139,13 @@ class SpaceApp(tk.Frame):
         self._Checkbutton_pca.grid(row=0, sticky=tk.W)
         self._Label_pca_text.grid(row=1, column=0, sticky=tk.W)
         self._Entry_pca.grid(row=1, column=1, padx=5)
-        self._Frame_pca.grid(row=2, padx=5, pady=(10, 0), sticky=tk.W)
+        self._Frame_pca.grid(row=3, padx=5, pady=(10, 0), sticky=tk.W)
 
         # -- save after processing steps --
         self._Var_save_after_modify = tk.BooleanVar()
         Checkbutton_save_after_modify = ttk.Checkbutton(self._LabelFrame_data, text="Save after each data modification",
                                                         variable=self._Var_save_after_modify)
-        Checkbutton_save_after_modify.grid(row=3, padx=5, pady=10, sticky=tk.W)
+        Checkbutton_save_after_modify.grid(row=4, padx=5, pady=10, sticky=tk.W)
 
         # - DATA widgets grid -
         self._LabelFrame_data.grid(row=0, column=0, padx=(10, 0), pady=(5, 0))
@@ -249,6 +258,21 @@ class SpaceApp(tk.Frame):
         during program execution."""
         self._Text_log.insert(tk.END, "%s\n" % text)
         self.master.update()
+    
+    def km_pick_handler(self,event):
+        """Handles any specific point being selected"""
+        for ind in event.ind:
+            name = self._data_objs[ind].filename
+            cluster_label = self._k_clusters.labels_[ind]
+            centroid = self._k_clusters.cluster_centers_[cluster_label]
+            self._quick_message_box(str(ind) + " " + name + "\nCluster no:" + str(cluster_label) + "\nCentroid:" + str(centroid))
+
+    def db_pick_handler(self,event):
+        """Handles any specific point being selected"""
+        for ind in event.ind:
+            name = self._data_objs[ind].filename
+            cluster_label = self._db_clusters.labels_[ind]
+            self._quick_message_box(str(ind) + " " + name + "\nCluster no:" + str(cluster_label))
 
     def _quick_message_box(self, text):
         """A quick and dirty messagebox for showing simple output for debugging."""
@@ -326,40 +350,49 @@ class SpaceApp(tk.Frame):
             self._quick_message_box("No files found:\n%s" % self._Var_folder.get())
             return
         # parse
-        self.log("Loading into data objects...")
-        self._data_objs, return_msg = dataops.file_to_data_object(filtered_file_list)
-        if not self._data_objs:
-            self.log(return_msg)
-            self._quick_message_box(return_msg)
-            return
-        self.log("Loaded %s data objects" % len(self._data_objs))
-        # re-index the pairs dataframes
-        self.log("Re-indexing pairs dataframes...")
-        dataops.reindex(self._data_objs)
-        # range check
-        self.log("Calculating common range...")
-        min, max = dataops.find_common_range(self._data_objs)
-        if (min, max) == (None, None):
-            # lack of a common range across files is a fatal error
-            # log to console and pop up a messagebox
-            self.log("No range in common!")
-            self._quick_message_box("No range in common!")
-            self._data_objs = []
-            return
+        if not self._Var_align:
+            #This means we are working with the raw Ecostress files,
+            #if false, we are working with already aligned files, and we can skip this step
+            self.log("Loading into data objects...")
+            self._data_objs, return_msg = dataops.file_to_data_object(filtered_file_list)
+            if not self._data_objs:
+                self.log(return_msg)
+                self._quick_message_box(return_msg)
+                return
+            self.log("Loaded %s data objects" % len(self._data_objs))
+            # re-index the pairs dataframes
+            self.log("Re-indexing pairs dataframes...")
+            dataops.reindex(self._data_objs)
+            # range check
+            self.log("Calculating common range...")
+            min, max = dataops.find_common_range(self._data_objs)
+            if (min, max) == (None, None):
+                # lack of a common range across files is a fatal error
+                # log to console and pop up a messagebox
+                self.log("No range in common!")
+                self._quick_message_box("No range in common!")
+                self._data_objs = []
+                return
+            else:
+                self.log("All files have this wavelength range in common: %s to %s" % (min, max))
+            # truncate to common range
+            self.log("Truncating data to range %s to %s..." % (min, max))
+            dataops.truncate(self._data_objs, min, max)
+            # finds the index of the file with the highest resolution
+            self.log("Finding highest resolution file...")
+            max_res_index = dataops.find_max_res(self._data_objs)
+            # align the pairs dataframes to dataframe with highest resolution
+            self.log("Aligning the data...")
+            dataops.align(self._data_objs, max_res_index)
+            if self._Var_save_after_modify.get():
+                self.log("Saving aligned data...")
+                fileops.save_data_files(self._Var_folder.get(), "aligned", self._data_objs)
         else:
-            self.log("All files have this wavelength range in common: %s to %s" % (min, max))
-        # truncate to common range
-        self.log("Truncating data to range %s to %s..." % (min, max))
-        dataops.truncate(self._data_objs, min, max)
-        # finds the index of the file with the highest resolution
-        self.log("Finding highest resolution file...")
-        max_res_index = dataops.find_max_res(self._data_objs)
-        # align the pairs dataframes to dataframe with highest resolution
-        self.log("Aligning the data...")
-        dataops.align(self._data_objs, max_res_index)
-        if self._Var_save_after_modify.get():
-            self.log("Saving aligned data...")
-            fileops.save_data_files(self._Var_folder.get(), "aligned", self._data_objs)
+            #Working with already aligned files
+            self.log("Loading aligned files into data objects...")
+            self._data_objs = dataops.aligned_file_to_data_object(filtered_file_list)
+            self.log("Loaded %s data objects" % len(self._data_objs))
+
         # Normalization
         self.log("Normalizing data with method: %s" % self._Var_normalize.get())
         self._data_objs = dataops.NORMALIZATION_TYPES[self._Var_normalize.get()](self._data_objs)
@@ -413,29 +446,35 @@ class SpaceApp(tk.Frame):
         self.log("user: pressed Save button in save dialog")
         if self.saving_params["kmeans"]["save"]:
             self.log("Calculating K-Means cluster compositions...")
+            if self.saving_params["kmeans"]["comp"]:
+                comprehensive_composition = km.do_comprehensive(self._k_clusters, self._data_objs)
+                fileops.save_composition(self.saving_params["folder"], "kmeans", "comprehensive", comprehensive_composition)
             if self.saving_params["kmeans"]["by_type"]:
                 composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(),
-                                                               self._data_objs, "Type")
+                                                               self._data_objs, 1)
                 fileops.save_composition(self.saving_params["folder"], "kmeans", "by_type", composition_by_type)
             if self.saving_params["kmeans"]["by_class"]:
                 composition_by_class = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(),
-                                                                self._data_objs, "Class")
+                                                                self._data_objs, 2)
                 fileops.save_composition(self.saving_params["folder"], "kmeans", "by_class", composition_by_class)
             if self.saving_params["kmeans"]["by_subclass"]:
                 composition_by_subclass = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(),
-                                                                   self._data_objs, "Subclass")
+                                                                   self._data_objs, 3)
                 fileops.save_composition(self.saving_params["folder"], "kmeans", "by_subclass", composition_by_subclass)
             self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
             self.log("Calculating DBSCAN cluster compositions...")
+            if self.saving_params["dbscan"]["comp"]:
+                comprehensive_composition = db.do_comprehensive(self._db_clusters, self._data_objs)
+                fileops.save_composition(self.saving_params["folder"], "dbscan", "comprehensive", comprehensive_composition)
             if self.saving_params["dbscan"]["by_type"]:
-                composition_by_type = db.db_comp(self._db_clusters, self._data_objs, "Type")
+                composition_by_type = db.db_comp(self._db_clusters, self._data_objs, 1)
                 fileops.save_composition(self.saving_params["folder"], "dbscan", "by_type", composition_by_type)
             if self.saving_params["dbscan"]["by_class"]:
-                composition_by_class = db.db_comp(self._db_clusters, self._data_objs, "Class")
+                composition_by_class = db.db_comp(self._db_clusters, self._data_objs, 2)
                 fileops.save_composition(self.saving_params["folder"], "dbscan", "by_class", composition_by_class)
             if self.saving_params["dbscan"]["by_subclass"]:
-                composition_by_subclass = db.db_comp(self._db_clusters, self._data_objs, "Subclass")
+                composition_by_subclass = db.db_comp(self._db_clusters, self._data_objs, 3)
                 fileops.save_composition(self.saving_params["folder"], "dbscan", "by_subclass", composition_by_subclass)
             self.log("Finished DBSCAN cluster compositions...")
 
@@ -512,6 +551,7 @@ class SpaceApp(tk.Frame):
         self.log("Plotting...")
         canvas = plot(plot_dataset, self._k_clusters, embedded=True,
                       master=self._kmeans_viz_panel.get_canvas_frame_handle())
+        canvas.mpl_connect('pick_event', self.km_pick_handler)
         self._kmeans_viz_panel.display_plot(canvas)
         self.log("-- End K-means plotting --")
 
@@ -540,6 +580,7 @@ class SpaceApp(tk.Frame):
         self.log("Plotting...")
         canvas = plot(plot_dataset, self._db_clusters, embedded=True,
                       master=self._dbscan_viz_panel.get_canvas_frame_handle())
+        canvas.mpl_connect('pick_event', self.db_pick_handler)
         self._dbscan_viz_panel.display_plot(canvas)
         self.log("-- End DBSCAN plotting --")
 
@@ -589,6 +630,7 @@ class VisualizationPanel(object):
     def get_dimensions(self):
         """Return the number of dimensions selected by the combobox."""
         return 2 if self._Var_dimensions.get() == '2D' else 3
+    
 
     def disable_widgets(self):
         """Disable the dimensions combobox and Generate Plot button
@@ -658,6 +700,8 @@ class SaveDialog(tk.Toplevel):
         self._Var_folder.set(self._parameters["folder"])
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans.set(self._parameters["kmeans"]["save"])
+        self._Var_kmeans_comp = tk.BooleanVar()
+        self._Var_kmeans_comp.set(self._parameters["kmeans"]["comp"])
         self._Var_kmeans_type = tk.BooleanVar()
         self._Var_kmeans_type.set(self._parameters["kmeans"]["by_type"])
         self._Var_kmeans_class = tk.BooleanVar()
@@ -666,6 +710,8 @@ class SaveDialog(tk.Toplevel):
         self._Var_kmeans_subclass.set(self._parameters["kmeans"]["by_subclass"])
         self._Var_dbscan = tk.BooleanVar()
         self._Var_dbscan.set(self._parameters["dbscan"]["save"])
+        self._Var_dbscan_comp = tk.BooleanVar()
+        self._Var_dbscan_comp.set(self._parameters["dbscan"]["comp"])
         self._Var_dbscan_type = tk.BooleanVar()
         self._Var_dbscan_type.set(self._parameters["dbscan"]["by_type"])
         self._Var_dbscan_class = tk.BooleanVar()
@@ -682,9 +728,13 @@ class SaveDialog(tk.Toplevel):
         Frame_checkbuttons = ttk.Frame(Frame)
         self._kmeans_checkbuttons = []
         self._dbscan_checkbuttons = []
+
         w = ttk.Checkbutton(Frame_checkbuttons, text="K-means", variable=self._Var_kmeans)
         self._kmeans_checkbuttons.append(w)
         Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w=ttk.Checkbutton(Labelframe, text="Comprehensive",variable=self._Var_kmeans_comp)
+        self._kmeans_checkbuttons.append(w)
+        w.grid(padx=10, pady=(10, 0), sticky=tk.W)
         w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_kmeans_type)
         self._kmeans_checkbuttons.append(w)
         w.grid(padx=10, pady=(10, 0), sticky=tk.W)
@@ -699,6 +749,9 @@ class SaveDialog(tk.Toplevel):
         w = ttk.Checkbutton(Frame_checkbuttons, text="DBSCAN", variable=self._Var_dbscan)
         self._dbscan_checkbuttons.append(w)
         Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w = ttk.Checkbutton(Labelframe, text="Comprehensive", variable=self._Var_dbscan_comp)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(padx=10, pady=(10, 0), sticky=tk.W)
         w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_dbscan_type)
         self._dbscan_checkbuttons.append(w)
         w.grid(padx=10, pady=(10, 0), sticky=tk.W)
@@ -756,11 +809,14 @@ class SaveDialog(tk.Toplevel):
         self.withdraw()
         self.update_idletasks()
 
+        
         self._parameters["kmeans"]["save"] = self._Var_kmeans.get()
+        self._parameters["kmeans"]["comp"] = self._Var_kmeans_comp.get()
         self._parameters["kmeans"]["by_type"] = self._Var_kmeans_type.get()
         self._parameters["kmeans"]["by_class"] = self._Var_kmeans_class.get()
         self._parameters["kmeans"]["by_subclass"] = self._Var_kmeans_subclass.get()
         self._parameters["dbscan"]["save"] = self._Var_dbscan.get()
+        self._parameters["dbscan"]["comp"] = self._Var_dbscan_comp.get()
         self._parameters["dbscan"]["by_type"] = self._Var_dbscan_type.get()
         self._parameters["dbscan"]["by_class"] = self._Var_dbscan_class.get()
         self._parameters["dbscan"]["by_subclass"] = self._Var_dbscan_subclass.get()
