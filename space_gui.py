@@ -39,6 +39,8 @@ import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 from time import sleep
 import os.path
+
+from pandas.core.frame import DataFrame
 import space_file_ops as fileops
 import space_data_ops as dataops
 import space_kmeans as km
@@ -444,6 +446,9 @@ class SpaceApp(tk.Frame):
         self.log("user: pressed Save button in save dialog")
         if self.saving_params["kmeans"]["save"]:
             self.log("Calculating K-Means cluster compositions...")
+            if self.saving_params["kmeans"]["comp"]:
+                comprehensive_composition = km.do_comprehensive(self._k_clusters, self._data_objs)
+                fileops.save_composition(self.saving_params["folder"], "kmeans", "comprehensive", comprehensive_composition)
             if self.saving_params["kmeans"]["by_type"]:
                 composition_by_type = km.calculate_composition(self._k_clusters, self._Var_kmeans_clusters.get(),
                                                                self._data_objs, 1)
@@ -459,6 +464,9 @@ class SpaceApp(tk.Frame):
             self.log("Finished K-Means cluster compositions...")
         if self.saving_params["dbscan"]["save"]:
             self.log("Calculating DBSCAN cluster compositions...")
+            if self.saving_params["dbscan"]["comp"]:
+                comprehensive_composition = db.do_comprehensive(self._db_clusters, self._data_objs)
+                fileops.save_composition(self.saving_params["folder"], "dbscan", "comprehensive", comprehensive_composition)
             if self.saving_params["dbscan"]["by_type"]:
                 composition_by_type = db.db_comp(self._db_clusters, self._data_objs, 1)
                 fileops.save_composition(self.saving_params["folder"], "dbscan", "by_type", composition_by_type)
@@ -692,6 +700,8 @@ class SaveDialog(tk.Toplevel):
         self._Var_folder.set(self._parameters["folder"])
         self._Var_kmeans = tk.BooleanVar()
         self._Var_kmeans.set(self._parameters["kmeans"]["save"])
+        self._Var_kmeans_comp = tk.BooleanVar()
+        self._Var_kmeans_comp.set(self._parameters["kmeans"]["comp"])
         self._Var_kmeans_type = tk.BooleanVar()
         self._Var_kmeans_type.set(self._parameters["kmeans"]["by_type"])
         self._Var_kmeans_class = tk.BooleanVar()
@@ -700,6 +710,8 @@ class SaveDialog(tk.Toplevel):
         self._Var_kmeans_subclass.set(self._parameters["kmeans"]["by_subclass"])
         self._Var_dbscan = tk.BooleanVar()
         self._Var_dbscan.set(self._parameters["dbscan"]["save"])
+        self._Var_dbscan_comp = tk.BooleanVar()
+        self._Var_dbscan_comp.set(self._parameters["dbscan"]["comp"])
         self._Var_dbscan_type = tk.BooleanVar()
         self._Var_dbscan_type.set(self._parameters["dbscan"]["by_type"])
         self._Var_dbscan_class = tk.BooleanVar()
@@ -716,9 +728,13 @@ class SaveDialog(tk.Toplevel):
         Frame_checkbuttons = ttk.Frame(Frame)
         self._kmeans_checkbuttons = []
         self._dbscan_checkbuttons = []
+
         w = ttk.Checkbutton(Frame_checkbuttons, text="K-means", variable=self._Var_kmeans)
         self._kmeans_checkbuttons.append(w)
         Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w=ttk.Checkbutton(Labelframe, text="Comprehensive",variable=self._Var_kmeans_comp)
+        self._kmeans_checkbuttons.append(w)
+        w.grid(padx=10, pady=(10, 0), sticky=tk.W)
         w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_kmeans_type)
         self._kmeans_checkbuttons.append(w)
         w.grid(padx=10, pady=(10, 0), sticky=tk.W)
@@ -733,6 +749,9 @@ class SaveDialog(tk.Toplevel):
         w = ttk.Checkbutton(Frame_checkbuttons, text="DBSCAN", variable=self._Var_dbscan)
         self._dbscan_checkbuttons.append(w)
         Labelframe = tk.LabelFrame(Frame_checkbuttons, labelwidget=w)
+        w = ttk.Checkbutton(Labelframe, text="Comprehensive", variable=self._Var_dbscan_comp)
+        self._dbscan_checkbuttons.append(w)
+        w.grid(padx=10, pady=(10, 0), sticky=tk.W)
         w = ttk.Checkbutton(Labelframe, text="By Type", variable=self._Var_dbscan_type)
         self._dbscan_checkbuttons.append(w)
         w.grid(padx=10, pady=(10, 0), sticky=tk.W)
@@ -790,11 +809,14 @@ class SaveDialog(tk.Toplevel):
         self.withdraw()
         self.update_idletasks()
 
+        
         self._parameters["kmeans"]["save"] = self._Var_kmeans.get()
+        self._parameters["kmeans"]["comp"] = self._Var_kmeans_comp.get()
         self._parameters["kmeans"]["by_type"] = self._Var_kmeans_type.get()
         self._parameters["kmeans"]["by_class"] = self._Var_kmeans_class.get()
         self._parameters["kmeans"]["by_subclass"] = self._Var_kmeans_subclass.get()
         self._parameters["dbscan"]["save"] = self._Var_dbscan.get()
+        self._parameters["dbscan"]["comp"] = self._Var_dbscan_comp.get()
         self._parameters["dbscan"]["by_type"] = self._Var_dbscan_type.get()
         self._parameters["dbscan"]["by_class"] = self._Var_dbscan_class.get()
         self._parameters["dbscan"]["by_subclass"] = self._Var_dbscan_subclass.get()

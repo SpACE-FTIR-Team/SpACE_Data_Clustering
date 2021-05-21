@@ -86,6 +86,23 @@ def calculate_composition(km, num_clusters, data_objects, sort_category):
 
     return comp
 
+def do_comprehensive(cluster, dobjs):
+    col_names = ["Filename","Cluster No.","Type","Type.Class","Type.Class.Subclass","Additional Information"]
+    df = pd.DataFrame(columns=col_names)
+    for i, dobj in enumerate(dobjs):
+        new_row = [dobj.filename, cluster.labels_[i]]
+        split_name = dobj.filename.split(".")
+        type = split_name[0]
+        tc = type + "." + split_name[1]
+        tcsc = tc + "." + split_name[2]
+        new_row.append(type)
+        new_row.append(tc)
+        new_row.append(tcsc)
+        new_row.append(cluster.cluster_centers_[i])
+        zipped_row = dict(zip(col_names, new_row))
+        df = df.append(zipped_row,ignore_index=True)
+    return df
+
 
 # linked to functional requirement #11 - visualize clustered data
 # linked to non-functional requirement #2 - perform visualization in under 5 minutes
